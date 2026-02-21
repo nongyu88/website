@@ -138,7 +138,7 @@ export default function HomePage() {
                 {/* Logo Container */}
                 <div className="w-8 h-8 md:w-10 md:h-10 relative rounded overflow-hidden group-hover:opacity-80 transition-opacity">
                   <Image
-                    src="/images/kraftgene-logo.jpg"
+                    src="/images/new_logo.PNG"
                     alt="Kraftgene AI"
                     width={40}
                     height={40}
