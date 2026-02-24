@@ -528,12 +528,13 @@ export default function HomePage() {
       </p>
     </div>
 
-    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
+    {/* Updated to grid-cols-5 to keep all 5 members in one line on desktop */}
+    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-4">
       {[
         {
           name: "Yu Nong (John)",
           role: "Founder & CEO",
-          image: "images/me.jpg",
+          image: "images/nong2.PNG",
           linkedin: "https://www.linkedin.com/in/nongyu/",
           bio: "John blends visionary leadership with expertise in ML, software engineering, and robotics to drive global infrastructure resilience.",
         },
@@ -545,18 +546,25 @@ export default function HomePage() {
           bio: "With over 15 years of expertise in AI/ML, full-stack development, and MLOps, Mohd leads our engineering efforts to build robust and scalable platforms.",
         },
         {
-          name: "Min Li",
+          name: "Nicco Ulbricht",
+          role: "Cofounder & Digital Twin Engineer",
+          image: "images/Nicco.jpg",
+          linkedin: "https://www.linkedin.com/in/nicco-ulbricht/",
+          bio: "Nicco is an NYU PhD candidate specializing in digital twins and physics-informed machine learning to enable real-time engineering optimization and predictive modeling.",
+        },
+        {
+          name: "Min (Rominou) Lee",
           role: "Cofounder & Lead AI Engineer",
           image: "images/min_li.jpg",
           linkedin: "https://www.linkedin.com/in/min-lee0/",
-          bio: "Min specializes in ML systems, PyTorch, GNNs, and real-time inference, driving the development of our core predictive analytics capabilities.",
+          bio: "Rominou specializes in ML systems, PyTorch, GNNs, and real-time inference, driving the development of our core predictive analytics capabilities.",
         },
         {
           name: "Yonghao Mai (Michael)",
           role: "Cofounder & AI Engineer",
           image: "images/michael_mai.PNG",
           linkedin: "https://www.linkedin.com/in/michael-yong-hao-mai-78702234/",
-          bio: "Michael has expertise in ML, full-stack architecture, and automation to build highimpact, market-ready platforms.",
+          bio: "Michael has expertise in ML, full-stack architecture, and automation to build high-impact, market-ready platforms.",
         },
       ].map((member, index) => (
         <a 
