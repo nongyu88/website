@@ -547,7 +547,7 @@ export default function HomePage() {
         },
         {
           name: "Nicco Ulbricht",
-          role: "Founder & Digital Twin Engineer",
+          role: "Founder & CTO",
           image: "images/Nicco.jpg",
           linkedin: "https://www.linkedin.com/in/nicco-ulbricht/",
           bio: "Nicco is an NYU PhD candidate specializing in digital twins and physics-informed machine learning to enable real-time engineering optimization and predictive modeling.",
@@ -561,7 +561,7 @@ export default function HomePage() {
         },
         {
           name: "Yonghao Mai (Michael)",
-          role: "Founder & AI Engineer",
+          role: "Founder & COO",
           image: "images/michael_mai.PNG",
           linkedin: "https://www.linkedin.com/in/michael-yong-hao-mai-78702234/",
           bio: "Michael has expertise in ML, full-stack architecture, and automation to build high-impact, market-ready platforms.",
