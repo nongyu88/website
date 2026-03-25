@@ -521,7 +521,7 @@ export default function HomePage() {
         Our Leadership
       </Badge>
       <h2 className="text-3xl md:text-5xl font-bold text-white mb-6">
-        Meet Our Co-founding Team
+        Meet Our Founding Team
       </h2>
       <p className="text-gray-400 max-w-2xl mx-auto text-lg">
         A diverse group of experts in AI, robotics, and engineering dedicated to building resilient critical infrastructure.
@@ -534,7 +534,7 @@ export default function HomePage() {
         {
           name: "Yu Nong (John)",
           role: "Founder & CEO",
-          image: "images/nong2.PNG",
+          image: "images/me.jpg",
           linkedin: "https://www.linkedin.com/in/nongyu/",
           bio: "John blends visionary leadership with expertise in ML, software engineering, and robotics to drive global infrastructure resilience.",
         },
@@ -561,7 +561,7 @@ export default function HomePage() {
         },
         {
           name: "Yonghao Mai (Michael)",
-          role: "Founder & COO",
+          role: "Founder & Chief AI Officer",
           image: "images/michael_mai.PNG",
           linkedin: "https://www.linkedin.com/in/michael-yong-hao-mai-78702234/",
           bio: "Michael has expertise in ML, full-stack architecture, and automation to build high-impact, market-ready platforms.",
@@ -1039,7 +1039,7 @@ These visual insights serve as dynamic inputs for our failure analysis, predicti
                </div>
                <div className="flex items-center space-x-3 text-gray-300">
                   <Mail className="w-5 h-5 text-emerald-500" />
-                  <span>info@kraftgeneai.com</span>
+                  <span>info@kraftgeneai.ca</span>
                </div>
             </div>
             
