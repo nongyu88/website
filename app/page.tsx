@@ -539,13 +539,6 @@ export default function HomePage() {
           bio: "John blends visionary leadership with expertise in ML, software engineering, and robotics to drive global infrastructure resilience.",
         },
         {
-          name: "Mohd Atir",
-          role: "Founder & VP of Engineering",
-          image: "images/Atir.jpg",
-          linkedin: "https://www.linkedin.com/in/mohd-atir-ca/",
-          bio: "With over 15 years of expertise in AI/ML, full-stack development, and MLOps, Mohd leads our engineering efforts to build robust and scalable platforms.",
-        },
-        {
           name: "Nicco Ulbricht",
           role: "Founder & CTO",
           image: "images/Nicco.jpg",
