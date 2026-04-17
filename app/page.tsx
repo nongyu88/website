@@ -11,7 +11,7 @@ import {
 import Link from "next/link"
 import Image from "next/image"
 import { FaGithub, FaDiscord, FaLinkedin } from "react-icons/fa";
-import  ModeToggle  from "@/components/ui/mode-toggle"
+import ModeToggle from "@/components/ui/mode-toggle"
 
 export default function HomePage() {
   // 1. DEFINE SLIDE DATA 
@@ -154,8 +154,8 @@ export default function HomePage() {
                   </span>
                   {/* 2. Added "Made in Canada" */}
                   <span className="text-[10px] font-bold text-[#AA8239] uppercase tracking-widest leading-none mb-0.5">
-  Made in Canada
-</span>
+                    Made in Canada
+                  </span>
                   <span className="text-[10px] font-medium text-slate-500 dark:text-gray-500 group-hover:text-slate-400 dark:group-hover:text-gray-400 transition-colors leading-none">
                     Empowering a Sustainable Energy Future.
                    </span>
@@ -203,7 +203,8 @@ export default function HomePage() {
             </div>
 
             {/* Mobile Menu Toggle */}
-             <div className="xl:hidden flex items-center z-50">
+             <div className="xl:hidden flex items-center gap-2 z-50">
+                <ModeToggle />
                 <Button variant="ghost" size="icon" onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)} className="text-slate-900 dark:text-white">
                     {isMobileMenuOpen ?
                      <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
@@ -228,11 +229,10 @@ export default function HomePage() {
                     <Button variant="ghost" className="w-full justify-start text-base h-10 text-slate-900 dark:text-white">Research</Button>
                 </Link>
                  <Link href="#contact" onClick={() => setIsMobileMenuOpen(false)} className="w-full">
-                    <Button className="w-full bg-emerald-600 text-white h-10">Get in Touch</Button>
+                 <Button className="w-full bg-emerald-600 hover:bg-emerald-700 text-white h-10">Get in Touch</Button>
                 </Link>
                 
                 <div className="flex justify-center gap-4 pt-4 border-t border-slate-200 dark:border-white/10">
-                  <ModeToggle />
                   <SocialButtons />
                 </div>
             </div>
@@ -254,7 +254,7 @@ export default function HomePage() {
               muted
               loop
               playsInline
-              className="w-full h-full object-cover opacity-200"
+              className="w-full h-full object-cover opacity-60"
               src={shouldLoadVideo(index) ? src : undefined}
             />
             <div className="absolute inset-0 bg-gradient-to-t from-slate-50 via-slate-50/50 to-transparent dark:from-black dark:via-black/40 dark:to-black/30"></div>
@@ -330,7 +330,7 @@ export default function HomePage() {
                   <h3 className="text-2xl md:text-3xl font-bold text-slate-900 dark:text-white mb-4">Innovation in Progress</h3>
                   <p className="text-lg md:text-xl text-slate-600 dark:text-gray-400 mb-8">Building tomorrow's solutions today</p>
                   <Link href="https://www.energyeminence.online" target="_blank" className="inline-flex items-center text-emerald-600 dark:text-emerald-400 hover:text-emerald-700 dark:hover:text-emerald-300 font-semibold transition-colors">
-                      Visit our MVP demo <ArrowRight className="ml-2 w-5 h-5" />
+                      Visit our dashboard demo <ArrowRight className="ml-2 w-5 h-5" />
                   </Link>
               </div>
             </div>
