@@ -986,24 +986,12 @@ These visual insights serve as dynamic inputs for our failure analysis, predicti
 
           <div className="flex flex-wrap justify-center items-center gap-6 md:gap-8">
             {[
-    { src: "/images/partner1.JPG", alt: "Hydro Québec", href: "https://www.hydroquebec.com" },
-    { src: "/images/partner4.JPG", alt: "Alberta Innovates", href: "https://albertainnovates.ca" },
-    { src: "/images/partner5.JPG", alt: "Canadian Natural", href: "https://www.cnrl.com" },
     { src: "/images/partner2.JPG", alt: "Altitude Accelerator", href: "https://altitudeaccelerator.ca" },
     { src: "/images/partner3.png", alt: "AWS", href: "https://aws.amazon.com" },
-    { src: "/images/partner20.png", alt: "TC", href: "https://www.tcenergy.com" },
-    { src: "/images/partner9.png", alt: "BDC", href: "https://www.bdc.ca" },
-    { src: "/images/partner8.png", alt: "Enbridge", href: "https://www.enbridge.com" },
     { src: "/images/partner6.jpg", alt: "Nvidia", href: "https://www.nvidia.com" },
-    { src: "/images/partner7.jpg", alt: "CED", href: "https://ced.canada.ca" },
     { src: "/images/partner10.JPG", alt: "Google", href: "https://www.google.com" },
+    { src: "/images/partner111.jpg", alt: "Cooperathon", href: "https://cooperathon.ca/" },
     { src: "/images/partner11.PNG", alt: "MS", href: "https://www.microsoft.com" },
-    { src: "/images/partner12.PNG", alt: "YOTTA", href: "https://www.yotta.com" },
-    { src: "/images/partner13.PNG", alt: "NEBIUS", href: "https://nebius.com" },
-    { src: "/images/partner14.PNG", alt: "Scaleway", href: "https://www.scaleway.com" },
-    { src: "/images/partner15.PNG", alt: "Lambda", href: "https://lambda.ai" },
-    { src: "/images/partner17.PNG", alt: "FreeEelectron", href: "https://freeelectrons.org" },
-    { src: "/images/partner19.PNG", alt: "RBC", href: "https://www.rbc.com" },
   ].map((partner, index) => (
     <a 
     key={index} 
