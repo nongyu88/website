@@ -546,11 +546,11 @@ export default function HomePage() {
           bio: "John blends visionary leadership with expertise in ML, software engineering, and robotics to drive global infrastructure resilience.",
         },
         {
-          name: "Nicco Ulbricht",
-          role: "Founder & Digital Twins Engineer",
-          image: "images/Nicco.jpg",
-          linkedin: "https://www.linkedin.com/in/nicco-ulbricht/",
-          bio: "Nicco is an NYU PhD candidate specializing in digital twins and physics-informed machine learning to enable real-time engineering optimization and predictive modeling.",
+          name: "Sacha Alaby",
+          role: "Co-Founder & COO",
+          image: "images/sacha.jpg",
+          linkedin: "https://www.linkedin.com/in/sacha-alaby-526b431ba/",
+          bio: "Sacha is a strategic leader overseeing Kraftgene AI's daily business operations and Go-to-Market strategy. ",
         },
         {
           name: "Min (Rominou) Lee",
