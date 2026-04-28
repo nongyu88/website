@@ -555,7 +555,7 @@ export default function HomePage() {
         {
           name: "Min (Rominou) Lee",
           role: "Founder & Lead AI Engineer",
-          image: "images/min_li.jpg",
+          image: "images/min.jpg",
           linkedin: "https://www.linkedin.com/in/min-lee0/",
           bio: "Rominou specializes in ML systems, PyTorch, GNNs, and real-time inference, driving the development of our core predictive analytics capabilities.",
         },
