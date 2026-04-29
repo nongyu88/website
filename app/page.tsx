@@ -545,13 +545,13 @@ export default function HomePage() {
           linkedin: "https://www.linkedin.com/in/nongyu/",
           bio: "John blends visionary leadership with expertise in ML, software engineering, and robotics to drive global infrastructure resilience.",
         },
-        {
-          name: "Sacha Alaby",
-          role: "Co-Founder & COO",
-          image: "images/sacha.jpg",
-          linkedin: "https://www.linkedin.com/in/sacha-alaby-526b431ba/",
-          bio: "Sacha is a strategic leader overseeing Kraftgene AI's daily business operations and Go-to-Market strategy. ",
-        },
+        // {
+        //   name: "Sacha Alaby",
+        //   role: "Co-Founder & COO",
+        //   image: "images/sacha.jpg",
+        //   linkedin: "https://www.linkedin.com/in/sacha-alaby-526b431ba/",
+        //   bio: "Sacha is a strategic leader overseeing Kraftgene AI's daily business operations and Go-to-Market strategy. ",
+        // },
         {
           name: "Min (Rominou) Lee",
           role: "Founder & Lead AI Engineer",
