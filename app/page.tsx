@@ -535,8 +535,8 @@ export default function HomePage() {
       </p>
     </div>
 
-    {/* Updated to grid-cols-5 to keep all 5 members in one line on desktop */}
-    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-20">
+    {/* Updated to grid-cols-4 since there are now 4 members */}
+    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-12">
       {[
         {
           name: "Yu Nong (John)",
@@ -545,13 +545,13 @@ export default function HomePage() {
           linkedin: "https://www.linkedin.com/in/nongyu/",
           bio: "John blends visionary leadership with expertise in ML, software engineering, and robotics to drive global infrastructure resilience.",
         },
-        // {
-        //   name: "Sacha Alaby",
-        //   role: "Co-Founder & COO",
-        //   image: "images/sacha.jpg",
-        //   linkedin: "https://www.linkedin.com/in/sacha-alaby-526b431ba/",
-        //   bio: "Sacha is a strategic leader overseeing Kraftgene AI's daily business operations and Go-to-Market strategy. ",
-        // },
+        {
+          name: "Huy (Michel) Trinh",
+          role: "Founder & Digital Twins Engineer",
+          image: "images/huy.jpg", // Make sure to add this image to your public/images folder
+          linkedin: "https://www.linkedin.com/in/huy-michel-trinh-masc-085905187/",
+          bio: "Huy bridges physics-informed modeling with machine learning, leading the development of our high-performance Digital Twin architecture.",
+        },
         {
           name: "Min (Rominou) Lee",
           role: "Founder & Lead AI Engineer",
