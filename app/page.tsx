@@ -548,7 +548,7 @@ export default function HomePage() {
         {
           name: "Huy (Michel) Trinh",
           role: "Founder & Digital Twins Engineer",
-          image: "images/huy.jpg", // Make sure to add this image to your public/images folder
+          image: "images/Huy.jpg", // Make sure to add this image to your public/images folder
           linkedin: "https://www.linkedin.com/in/huy-michel-trinh-masc-085905187/",
           bio: "Huy bridges physics-informed modeling with machine learning, leading the development of our high-performance Digital Twin architecture.",
         },
