@@ -528,15 +528,15 @@ export default function HomePage() {
         Our Leadership
       </Badge>
       <h2 className="text-3xl md:text-5xl font-bold text-slate-900 dark:text-white mb-6">
-        Meet Our Founding Team
+        Meet Our Founders
       </h2>
       <p className="text-slate-600 dark:text-gray-400 max-w-2xl mx-auto text-lg">
         A diverse group of experts in AI, robotics, and engineering dedicated to building resilient critical infrastructure.
       </p>
     </div>
 
-    {/* Updated to grid-cols-4 since there are now 4 members */}
-    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-12">
+    {/* Updated to grid-cols-3 for 3 members */}
+    <div className="grid grid-cols-1 md:grid-cols-3 gap-12 max-w-6xl mx-auto">
       {[
         {
           name: "Yu Nong (John)",
@@ -547,21 +547,14 @@ export default function HomePage() {
         },
         {
           name: "Huy (Michel) Trinh",
-          role: "Founder & Digital Twins Engineer",
-          image: "images/Huy.jpg", // Make sure to add this image to your public/images folder
+          role: "Co-Founder, Digital Twins Engineer & Head of Technical Partnerships",
+          image: "images/Huy.jpg",
           linkedin: "https://www.linkedin.com/in/huy-michel-trinh-masc-085905187/",
-          bio: "Huy bridges physics-informed modeling with machine learning, leading the development of our high-performance Digital Twin architecture.",
-        },
-        {
-          name: "Min (Rominou) Lee",
-          role: "Founder & Lead AI Engineer",
-          image: "images/min.jpg",
-          linkedin: "https://www.linkedin.com/in/min-lee0/",
-          bio: "Rominou specializes in ML systems, PyTorch, GNNs, and real-time inference, driving the development of our core predictive analytics capabilities.",
+          bio: "Michel bridges physics-informed modeling with machine learning, leading the development of our high-performance Digital Twin architecture and spearheading strategic industry partnerships.",
         },
         {
           name: "Yonghao Mai (Michael)",
-          role: "Founder & Chief AI Officer",
+          role: "Co-Founder & Chief AI Officer",
           image: "images/michael_mai.PNG",
           linkedin: "https://www.linkedin.com/in/michael-yong-hao-mai-78702234/",
           bio: "Michael has expertise in ML, full-stack architecture, and automation to build high-impact, market-ready platforms.",
@@ -577,11 +570,10 @@ export default function HomePage() {
           <div className="relative w-32 h-32 mx-auto mb-6">
             <div className="absolute inset-0 rounded-full bg-emerald-100 dark:bg-emerald-500/20 blur-lg group-hover:bg-emerald-200 dark:group-hover:bg-emerald-500/40 transition-all"></div>
             <div className="relative w-full h-full rounded-full border-2 border-emerald-200 dark:border-emerald-500/30 overflow-hidden">
-              <Image 
+              <img 
                 src={member.image} 
                 alt={member.name}
-                fill
-                className="object-cover"
+                className="object-cover w-full h-full"
               />
             </div>
           </div>
