@@ -546,13 +546,6 @@ export default function HomePage() {
           bio: "John blends visionary leadership with expertise in ML, software engineering, and robotics to drive global infrastructure resilience.",
         },
         {
-          name: "Huy (Michel) Trinh",
-          role: "Co-Founder, Digital Twins Engineer & Head of Technical Partnerships",
-          image: "images/Huy.jpg",
-          linkedin: "https://www.linkedin.com/in/huy-michel-trinh-masc-085905187/",
-          bio: "Michel bridges physics-informed modeling with machine learning, leading the development of our high-performance Digital Twin architecture and spearheading strategic industry partnerships.",
-        },
-        {
           name: "Yonghao Mai (Michael)",
           role: "Co-Founder & Chief AI Officer",
           image: "images/michael_mai.PNG",
