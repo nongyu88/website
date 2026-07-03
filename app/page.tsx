@@ -521,7 +521,7 @@ export default function HomePage() {
       </section>
 
 {/* Co-founding Team Section */}
-{/* <section id="team" className="py-24 bg-slate-50 dark:bg-black border-t border-slate-200 dark:border-white/5 transition-colors duration-300">
+<section id="team" className="py-24 bg-slate-50 dark:bg-black border-t border-slate-200 dark:border-white/5 transition-colors duration-300">
   <div className="container mx-auto px-4 sm:px-6 lg:px-8">
     <div className="text-center mb-16">
       <Badge className="mb-4 bg-emerald-100 dark:bg-emerald-500/10 text-emerald-700 dark:text-emerald-500 border-emerald-200 dark:border-emerald-500/20 px-4 py-1 text-sm">
@@ -585,7 +585,7 @@ export default function HomePage() {
       ))}
     </div>
   </div>
-</section> */}
+</section>
 
       {/* Research & Innovation Section */}
       <section id="research" className="py-16 md:py-24 bg-white dark:bg-black border-t border-slate-200 dark:border-white/10 transition-colors duration-300">
