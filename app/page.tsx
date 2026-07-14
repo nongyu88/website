@@ -547,7 +547,7 @@ export default function HomePage() {
         {
           name: "Huy (Michel) Trinh",
           role: "Co-Founder, Digital Twins Engineer & Head of Technical Partnerships",
-          image: "images/Huy.jpg",
+          image: "images/Huy.jfif",
           linkedin: "https://www.linkedin.com/in/huy-michel-trinh-masc-085905187/",
           bio: "Michel bridges physics-informed modeling with machine learning, leading the development of our high-performance Digital Twin architecture and spearheading strategic industry partnerships.",
         },
@@ -848,7 +848,7 @@ These visual insights serve as dynamic inputs for our failure analysis, predicti
              <div className="grid lg:grid-cols-2 gap-8 md:gap-12 items-center">
                
               {/* ITEM 5 FIGURE & CAPTION */}
-<div 
+              <div 
   className="rounded-2xl border border-slate-200 dark:border-white/10 shadow-2xl shadow-emerald-100 dark:shadow-emerald-900/20 bg-slate-50 dark:bg-gray-900 p-2 md:p-4 cursor-pointer hover:border-emerald-400 dark:hover:border-emerald-500/50 transition-colors"
   onClick={() => setSelectedImage({ src: "/images/screenshot1.JPG", alt: "Figure 5: Interactive Mini-MVP Engineer Mode" })}
 >
@@ -961,6 +961,71 @@ These visual insights serve as dynamic inputs for our failure analysis, predicti
                   </Link>
                 </div>
               </div>
+            </div>
+            {/* Research Item 7: Upgraded Interactive MVP */}
+            <div className="grid lg:grid-cols-2 gap-8 md:gap-12 items-center">
+              
+              {/* TEXT CONTENT (Left) */}
+              <div className="order-2 lg:order-1">
+                <div className="flex items-center space-x-3 mb-4">
+                  <Badge variant="outline" className="border-emerald-500 text-emerald-600 dark:text-emerald-400">Interactive Sandbox</Badge>
+                  <span className="text-slate-500 dark:text-gray-500 text-sm">Live Platform</span>
+                </div>
+                <h3 className="text-2xl md:text-3xl font-bold text-slate-900 dark:text-white mb-4">EnergyEminence™ Interactive Digital Twin Sandbox</h3>
+                <p className="text-slate-600 dark:text-gray-400 mb-6 leading-relaxed">
+                  We have upgraded our platform to a fully interactive, production-ready digital twin. This public sandbox allows users to dynamically redesign a 118-bus utility grid, draw new transmission lines, and drop substations across both 2D Geographic and 3D Topological maps.
+                </p>
+                
+                {/* Capabilities Box */}
+                <div className="p-6 bg-emerald-50 dark:bg-emerald-900/20 border border-emerald-200 dark:border-emerald-500/20 rounded-xl mb-6">
+                  <h4 className="text-emerald-600 dark:text-emerald-400 font-semibold mb-3">Platform Capabilities</h4>
+                  <ul className="space-y-3 text-slate-700 dark:text-gray-300 text-sm">
+                    <li className="flex items-start">
+                      <ArrowRight className="h-4 w-4 text-emerald-500 mr-2 mt-0.5 shrink-0" /> 
+                      <span><strong>Decoupled Architecture:</strong> Client-side "Topology Demo" allows safe, zero-cost public topology sketching.</span>
+                    </li>
+                    <li className="flex items-start">
+                      <ArrowRight className="h-4 w-4 text-emerald-500 mr-2 mt-0.5 shrink-0" /> 
+                      <span><strong>Physics-Engine Integration:</strong> Secured FastAPI backend runs intensive PyPSA powerflow matrix calculations.</span>
+                    </li>
+                    <li className="flex items-start">
+                      <ArrowRight className="h-4 w-4 text-emerald-500 mr-2 mt-0.5 shrink-0" /> 
+                      <span><strong>Multi-Modal Maps:</strong> Seamless synchronization between 3D physics-relaxed shapes and 2D geographic reality.</span>
+                    </li>
+                  </ul>
+                </div>
+
+                <div className="flex flex-wrap gap-4">
+                  <Link href="https://www.energyeminence.online" target="_blank" className="w-full sm:w-auto">
+                    <Button className="bg-emerald-600 hover:bg-emerald-700 text-white transition-colors w-full sm:w-auto h-10 border-0">
+                      <Zap className="w-4 h-4 mr-2" /> Try Live Sandbox
+                    </Button>
+                  </Link>
+                  <Link href="https://www.linkedin.com/feed/update/urn:li:activity:7482853711518793728" target="_blank" className="w-full sm:w-auto">
+                    <Button variant="outline" className="w-full sm:w-auto border-emerald-500 text-emerald-600 dark:text-emerald-400 hover:bg-emerald-50 hover:text-emerald-700 dark:hover:bg-emerald-500 dark:hover:text-white transition-colors h-10">
+                      <FaLinkedin className="w-4 h-4 mr-2"/> View on LinkedIn
+                    </Button>
+                  </Link>
+                </div>
+              </div>
+
+              {/* ITEM 7 FIGURE & CAPTION (Right) */}
+              <div 
+                className="order-1 lg:order-2 rounded-2xl border border-slate-200 dark:border-white/10 shadow-2xl shadow-emerald-100 dark:shadow-emerald-900/20 bg-slate-50 dark:bg-gray-900 p-2 md:p-4 cursor-pointer hover:border-emerald-400 dark:hover:border-emerald-500/50 transition-colors"
+                onClick={() => setSelectedImage({ src: "/images/upgraded_mvp.PNG", alt: "Figure 7: EnergyEminence Interactive Digital Twin Sandbox" })}
+              >
+                {/* NOTE: Make sure to upload a screenshot of your app to your public/images folder and name it upgraded_mvp.jpg, or change the src path below! */}
+                <Image 
+                  src="/images/upgraded_mvp.PNG" 
+                  alt="EnergyEminence Interactive Digital Twin Sandbox" 
+                  width={800} height={600} 
+                  className="w-full h-auto rounded-xl"
+                />
+                <p className="text-slate-600 dark:text-gray-400 text-sm mt-3 text-center leading-relaxed px-2">
+                  Figure 7: EnergyEminence™ Interactive Sandbox showcasing real-time grid modifications and multi-modal visualization.
+                </p>
+              </div>
+              
             </div>
           </div>
         </div>
