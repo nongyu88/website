@@ -1047,6 +1047,7 @@ These visual insights serve as dynamic inputs for our failure analysis, predicti
     { src: "/images/partner6.jpg", alt: "Nvidia", href: "https://www.nvidia.com" },
     { src: "/images/partner10.JPG", alt: "Google", href: "https://www.google.com" },
     { src: "/images/partner111.jpg", alt: "Cooperathon", href: "https://cooperathon.ca/" },
+    { src: "/images/partner112.png", alt: "Cooperathon", href: "https://vectorinstitute.ai/" },
     { src: "/images/partnerp.jpg", alt: "Cooperathon", href: "https://www.plugandplaytechcenter.com/" },
     { src: "/images/partner11.PNG", alt: "MS", href: "https://www.microsoft.com" },
   ].map((partner, index) => (
