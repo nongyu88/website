@@ -7,7 +7,7 @@ import {
   ArrowRight, MapPin, Mail, Zap, ShieldCheck, 
   Brain, Leaf, CheckCircle, Cpu, Network, Map, 
   Menu, X, Droplet, Sun, Layers, PlayCircle, Activity,
-  CloudLightning, AlertTriangle, Database // <-- Added Database here
+  CloudLightning, AlertTriangle, Database, ArrowUpRight // <-- Added ArrowUpRight here
 } from "lucide-react"
 import Link from "next/link"
 import Image from "next/image"
@@ -228,6 +228,14 @@ const shouldLoadVideo = (index: number) => {
                   >
                     {loginText}
                   </Button>
+
+                {/* OpenAI-Style MVP Button */}
+                <Link href="https://www.energyeminence.online/" target="_blank" rel="noopener noreferrer">
+                   <Button className="bg-white text-black hover:bg-slate-100 dark:bg-white dark:text-black dark:hover:bg-slate-200 border border-slate-200 dark:border-transparent rounded-full h-9 px-5 text-sm font-semibold shadow-sm transition-all flex items-center">
+                     Try our MVP <ArrowUpRight className="ml-1.5 w-4 h-4" />
+                   </Button>
+                 </Link>
+
                  <Link href="#contact">
                   <Button className="bg-emerald-600 hover:bg-emerald-700 text-white border-0 h-9 px-5 text-sm font-medium shadow-sm rounded-md transition-all">
                     Get in Touch
@@ -261,6 +269,11 @@ const shouldLoadVideo = (index: number) => {
                 </Link>
                 <Link href="#demo" onClick={() => setIsMobileMenuOpen(false)} className="w-full">
                     <Button variant="ghost" className="w-full justify-start text-base h-10 text-emerald-600 dark:text-emerald-400"><PlayCircle className="w-4 h-4 mr-2"/> Platform</Button>
+                </Link>
+                <Link href="https://www.kraftgeneai.ca/" target="_blank" rel="noopener noreferrer" className="w-full">
+                    <Button className="w-full bg-white text-black hover:bg-slate-100 border border-slate-200 dark:border-transparent dark:bg-white dark:text-black dark:hover:bg-slate-200 h-10 font-semibold flex items-center justify-center">
+                      Try our MVP <ArrowUpRight className="ml-1.5 w-4 h-4" />
+                    </Button>
                 </Link>
                  <Link href="#contact" onClick={() => setIsMobileMenuOpen(false)} className="w-full">
                  <Button className="w-full bg-emerald-600 hover:bg-emerald-700 text-white h-10">Get in Touch</Button>
@@ -785,7 +798,7 @@ const shouldLoadVideo = (index: number) => {
               The Data Pipeline
             </Badge>
             <h2 className="text-3xl md:text-5xl font-bold text-slate-900 dark:text-white mb-6 tracking-tight">
-              How EnergyEminence Works
+              How EnergyEminence™ Works
             </h2>
             <p className="text-lg text-slate-600 dark:text-gray-400 max-w-2xl mx-auto">
               A seamless, continuous loop of intelligence bridging the physical and digital worlds in real-time.
@@ -942,6 +955,7 @@ const shouldLoadVideo = (index: number) => {
               { src: "/images/partner10.JPG", alt: "Google", href: "https://www.google.com" },
               { src: "/images/partner111.jpg", alt: "Cooperathon", href: "https://cooperathon.ca/" },
               { src: "/images/vin.png", alt: "Vector Institute", href: "https://vectorinstitute.ai/" },
+              { src: "/images/openai.jfif", alt: "Open AI", href: "https://openai.com/" },
               { src: "/images/partnerp.jpg", alt: "Plug and Play", href: "https://www.plugandplaytechcenter.com/" },
               { src: "/images/partner11.PNG", alt: "Microsoft", href: "https://www.microsoft.com" },
             ].map((partner, index) => (
