@@ -6,7 +6,8 @@ import { Badge } from "@/components/ui/badge"
 import { 
   ArrowRight, MapPin, Mail, Zap, ShieldCheck, 
   Brain, Leaf, CheckCircle, Cpu, Network, Map, 
-  Menu, X, Droplet, Sun, Layers, PlayCircle, Activity 
+  Menu, X, Droplet, Sun, Layers, PlayCircle, Activity,
+  CloudLightning, AlertTriangle, Database // <-- Added Database here
 } from "lucide-react"
 import Link from "next/link"
 import Image from "next/image"
@@ -103,6 +104,15 @@ const [currentSlideIdx, setCurrentSlideIdx] = useState(0);
 const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
 const timerRef = useRef<NodeJS.Timeout | null>(null);
 const videoRefs = useRef<(HTMLVideoElement | null)[]>([]);
+const [loginText, setLoginText] = useState("Client Login");
+
+// <-- Add this function
+const handleLoginClick = () => {
+  setLoginText("Coming Soon...");
+  setTimeout(() => {
+    setLoginText("Client Login");
+  }, 3000);
+};
 
 const nextSlide = () => {
   setCurrentSlideIdx((prevIdx) => (prevIdx === videoSlides.length - 1 ? 0 : prevIdx + 1));
@@ -188,35 +198,38 @@ const shouldLoadVideo = (index: number) => {
               </Link>
             </div>
 
-            {/* Desktop Navigation */}
-            <div className="hidden xl:flex items-center gap-2">
-               <Link href="#about">
-                 <Button variant="ghost" className="text-slate-600 dark:text-gray-300 hover:text-slate-900 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-white/10 h-9 px-4 text-sm font-medium rounded-md">
-                   About
-                 </Button>
-               </Link>
-               <Link href="#team">
-                 <Button variant="ghost" className="text-slate-600 dark:text-gray-300 hover:text-slate-900 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-white/10 h-9 px-4 text-sm font-medium rounded-md">
-                   Team
-                 </Button>
-               </Link>
-               <Link href="#solutions">
-                 <Button variant="ghost" className="text-slate-600 dark:text-gray-300 hover:text-emerald-600 dark:hover:text-emerald-400 hover:bg-emerald-50 dark:hover:bg-emerald-500/10 h-9 px-4 text-sm font-medium rounded-md">
-                   Solutions
-                 </Button>
-               </Link>
-               <Link href="#demo">
-                 <Button variant="ghost" className="text-slate-600 dark:text-gray-300 hover:text-emerald-600 dark:hover:text-emerald-400 hover:bg-emerald-50 dark:hover:bg-emerald-500/10 h-9 px-4 text-sm font-medium rounded-md">
-                   <PlayCircle className="w-4 h-4 mr-2"/> Platform
-                 </Button>
-               </Link>
+{/* Desktop Navigation */}
+<div className="hidden xl:flex items-center gap-6">
+               <div className="flex items-center space-x-2">
+                   <Link href="#demo">
+                     <Button variant="ghost" className="text-slate-600 dark:text-gray-300 hover:text-emerald-600 dark:hover:text-emerald-400 h-9 px-4 text-sm font-medium rounded-md">
+                       Platform
+                     </Button>
+                   </Link>
+                   <Link href="#solutions">
+                     <Button variant="ghost" className="text-slate-600 dark:text-gray-300 hover:text-emerald-600 dark:hover:text-emerald-400 h-9 px-4 text-sm font-medium rounded-md">
+                       Solutions
+                     </Button>
+                   </Link>
+                   <Link href="#about">
+                     <Button variant="ghost" className="text-slate-600 dark:text-gray-300 hover:text-emerald-600 dark:hover:text-emerald-400 h-9 px-4 text-sm font-medium rounded-md">
+                       About
+                     </Button>
+                   </Link>
+               </div>
 
-               <div className="h-6 w-px bg-slate-200 dark:bg-white/10 mx-2"></div>
-               <SocialButtons />
+               <div className="h-5 w-px bg-slate-200 dark:bg-white/10 mx-2"></div>
                
-               <div className="flex items-center gap-2 sm:gap-4 ml-4">
+               <div className="flex items-center gap-3">
+                <Button 
+                    variant="ghost" 
+                    onClick={handleLoginClick}
+                    className="text-slate-500 dark:text-gray-400 hover:text-slate-900 dark:hover:text-white h-9 px-4 text-sm font-medium w-32 transition-all duration-300"
+                  >
+                    {loginText}
+                  </Button>
                  <Link href="#contact">
-                  <Button className="bg-emerald-600 hover:bg-emerald-700 text-white border-0 h-9 px-5 text-sm font-medium shadow-lg shadow-emerald-900/20 rounded-md">
+                  <Button className="bg-emerald-600 hover:bg-emerald-700 text-white border-0 h-9 px-5 text-sm font-medium shadow-sm rounded-md transition-all">
                     Get in Touch
                   </Button>
                  </Link>
@@ -636,60 +649,184 @@ const shouldLoadVideo = (index: number) => {
         </div>
       </section>
 
-      {/* System Architecture */}
-      <section className="relative py-16 md:py-32 bg-slate-50 dark:bg-black border-t border-slate-200 dark:border-white/10 overflow-hidden transition-colors duration-300">
-        <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[200%] md:w-[1000px] h-[500px] bg-emerald-200/50 dark:bg-emerald-900/20 rounded-full blur-[80px] md:blur-[120px] pointer-events-none" />
-        
-        <div className="container relative z-10 mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="max-w-4xl mx-auto text-center mb-12 md:mb-20">
-            <Badge variant="outline" className="mb-4 border-slate-300 dark:border-white/20 text-slate-600 dark:text-gray-400 uppercase tracking-wider text-xs">Technical Architecture</Badge>
-            <h2 className="text-3xl md:text-5xl font-bold text-slate-900 dark:text-white mb-6">Engineered for Scale</h2>
-            <p className="text-lg md:text-xl text-slate-600 dark:text-gray-400">
-            Explore the engineering behind EnergyEminence. From our foundational data acquisition platform handling complex Grid & Flow Physics to our advanced roadmap for autonomous agentic systems.
+{/* Market Urgency Section */}
+<section id="urgency" className="py-32 bg-slate-50 dark:bg-[#050505] border-t border-slate-200 dark:border-white/5 transition-colors duration-300">
+        <div className="container mx-auto px-4 sm:px-6 lg:px-8 max-w-7xl">
+            
+            {/* Section Header */}
+            <div className="text-center mb-24 md:mb-32">
+                <Badge variant="outline" className="mb-6 border-red-500 text-red-600 dark:text-red-400 bg-red-50 dark:bg-red-500/10 px-4 py-1.5 uppercase tracking-widest text-xs">
+                  The Urgency of Now
+                </Badge>
+                <h2 className="text-4xl md:text-6xl font-bold text-slate-900 dark:text-white mb-8 tracking-tight">
+                  Infrastructure at a Breaking Point.
+                </h2>
+                <p className="text-xl text-slate-600 dark:text-gray-400 max-w-3xl mx-auto leading-relaxed">
+                  We are entering an era of unprecedented stress on global energy networks. Legacy monitoring systems are fundamentally unequipped to handle the speed, complexity, and scale of modern grid threats.
+                </p>
+            </div>
+
+            <div className="space-y-40">
+                
+                {/* URGENCY 1: CLIMATE VOLATILITY */}
+                <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 lg:gap-20 items-center">
+                    <div className="order-2 lg:order-1 space-y-8">
+                        <div className="flex items-center space-x-4 mb-6">
+                            <div className="bg-red-100 dark:bg-red-500/10 w-12 h-12 rounded-lg flex items-center justify-center">
+                                <CloudLightning className="w-6 h-6 text-red-600 dark:text-red-500" />
+                            </div>
+                            <h3 className="text-3xl lg:text-4xl font-bold text-slate-900 dark:text-white tracking-tight">Extreme Weather Events</h3>
+                        </div>
+                        <div className="space-y-4 mt-6">
+                            <p className="text-lg text-slate-600 dark:text-gray-400 leading-relaxed">
+                                Wildfires, deep freezes, and category 5 hurricanes are increasing in frequency. The grid was not engineered to withstand these relentless environmental assaults, leading to catastrophic physical damage.
+                            </p>
+                            <p className="text-lg text-slate-600 dark:text-gray-400 leading-relaxed">
+                                Relying on historical weather models is no longer safe. Trillion-dollar energy grids need dynamic, physics-backed situational awareness to anticipate atmospheric impacts hours before they strike physical nodes.
+                            </p>
+                        </div>
+                    </div>
+                    {/* 4-Image 2x2 Grid ('e' group) */}
+                    <div className="order-1 lg:order-2 grid grid-cols-2 grid-rows-2 gap-4 h-[500px]">
+                        <div className="relative rounded-2xl overflow-hidden shadow-xl border border-slate-200 dark:border-white/10 col-span-1 row-span-1 group">
+                            <Image src="/images/e1.jpg" alt="Severe weather storm over power grid" fill className="object-cover group-hover:scale-105 transition-transform duration-700" />
+                        </div>
+                        <div className="relative rounded-2xl overflow-hidden shadow-xl border border-slate-200 dark:border-white/10 col-span-1 row-span-1 group">
+                            <Image src="/images/e2.jpg" alt="Wildfire encroaching infrastructure" fill className="object-cover group-hover:scale-105 transition-transform duration-700" />
+                        </div>
+                        <div className="relative rounded-2xl overflow-hidden shadow-xl border border-slate-200 dark:border-white/10 col-span-1 row-span-1 group">
+                            <Image src="/images/e3.jfif" alt="Iced transmission lines" fill className="object-cover group-hover:scale-105 transition-transform duration-700" />
+                        </div>
+                        <div className="relative rounded-2xl overflow-hidden shadow-xl border border-slate-200 dark:border-white/10 col-span-1 row-span-1 group">
+                            <Image src="/images/e4.webp" alt="Climate impact" fill className="object-cover group-hover:scale-105 transition-transform duration-700" />
+                        </div>
+                    </div>
+                </div>
+
+                {/* URGENCY 2: THE AI POWER SURGE */}
+                <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 lg:gap-20 items-center">
+                    {/* 4-Image 2x2 Grid ('a' group) */}
+                    <div className="order-1 lg:order-1 grid grid-cols-2 grid-rows-2 gap-4 h-[500px]">
+                        <div className="relative rounded-2xl overflow-hidden shadow-xl border border-slate-200 dark:border-white/10 col-span-1 row-span-1 group">
+                            <Image src="/images/a1.jfif" alt="Massive data center racks" fill className="object-cover group-hover:scale-105 transition-transform duration-700" />
+                        </div>
+                        <div className="relative rounded-2xl overflow-hidden shadow-xl border border-slate-200 dark:border-white/10 col-span-1 row-span-1 group">
+                            <Image src="/images/a2.jfif" alt="High voltage power substation" fill className="object-cover group-hover:scale-105 transition-transform duration-700" />
+                        </div>
+                        <div className="relative rounded-2xl overflow-hidden shadow-xl border border-slate-200 dark:border-white/10 col-span-1 row-span-1 group">
+                            <Image src="/images/a3.jfif" alt="Global energy consumption overlay" fill className="object-cover group-hover:scale-105 transition-transform duration-700" />
+                        </div>
+                        <div className="relative rounded-2xl overflow-hidden shadow-xl border border-slate-200 dark:border-white/10 col-span-1 row-span-1 group">
+                            <Image src="/images/a4.webp" alt="AI grid demand" fill className="object-cover group-hover:scale-105 transition-transform duration-700" />
+                        </div>
+                    </div>
+                    <div className="order-2 lg:order-2 space-y-8">
+                        <div className="flex items-center space-x-4 mb-6">
+                            <div className="bg-amber-100 dark:bg-amber-500/10 w-12 h-12 rounded-lg flex items-center justify-center">
+                                <Zap className="w-6 h-6 text-amber-600 dark:text-amber-500" />
+                            </div>
+                            <h3 className="text-3xl lg:text-4xl font-bold text-slate-900 dark:text-white tracking-tight">The AI Power Surge</h3>
+                        </div>
+                        <div className="space-y-4 mt-6">
+                            <p className="text-lg text-slate-600 dark:text-gray-400 leading-relaxed">
+                                The rapid scaling of AI data centers and global electrification is draining baseload power. Grids are operating dangerously close to their maximum physical thresholds on a daily basis.
+                            </p>
+                            <p className="text-lg text-slate-600 dark:text-gray-400 leading-relaxed">
+                                Without real-time topology adjustments and autonomous load-shedding configurations, localized thermal overloads from high-density computation clusters risk triggering massive, cascading regional blackouts.
+                            </p>
+                        </div>
+                    </div>
+                </div>
+
+                {/* URGENCY 3: AGING ASSETS */}
+                <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 lg:gap-20 items-center">
+                    <div className="order-2 lg:order-1 space-y-8">
+                        <div className="flex items-center space-x-4 mb-6">
+                            <div className="bg-orange-100 dark:bg-orange-500/10 w-12 h-12 rounded-lg flex items-center justify-center">
+                                <AlertTriangle className="w-6 h-6 text-orange-600 dark:text-orange-500" />
+                            </div>
+                            <h3 className="text-3xl lg:text-4xl font-bold text-slate-900 dark:text-white tracking-tight">Aging Assets & Legacy Decay</h3>
+                        </div>
+                        <div className="space-y-4 mt-6">
+                            <p className="text-lg text-slate-600 dark:text-gray-400 leading-relaxed">
+                                Much of the global transmission architecture is decades past its intended lifespan. Relying on human dispatchers and delayed SCADA alerts to manage decaying assets is a mathematical impossibility.
+                            </p>
+                            <p className="text-lg text-slate-600 dark:text-gray-400 leading-relaxed">
+                                To prevent trillion-dollar collapses, the grid must think for itself. Autonomous AI is no longer a futuristic luxury—it is the only statistically viable way to calculate asset degradation and execute defensive isolation in real-time.
+                            </p>
+                        </div>
+                    </div>
+                    {/* 4-Image 2x2 Grid ('o' group) */}
+                    <div className="order-1 lg:order-2 grid grid-cols-2 grid-rows-2 gap-4 h-[500px]">
+                        <div className="relative rounded-2xl overflow-hidden shadow-xl border border-slate-200 dark:border-white/10 col-span-1 row-span-1 group">
+                            <Image src="/images/o1.jpg" alt="Aging heavy industrial plant" fill className="object-cover group-hover:scale-105 transition-transform duration-700" />
+                        </div>
+                        <div className="relative rounded-2xl overflow-hidden shadow-xl border border-slate-200 dark:border-white/10 col-span-1 row-span-1 group">
+                            <Image src="/images/o2.jfif" alt="Old substation transformer" fill className="object-cover group-hover:scale-105 transition-transform duration-700" />
+                        </div>
+                        <div className="relative rounded-2xl overflow-hidden shadow-xl border border-slate-200 dark:border-white/10 col-span-1 row-span-1 group">
+                            <Image src="/images/o3.jfif" alt="Corroded electrical components" fill className="object-cover group-hover:scale-105 transition-transform duration-700" />
+                        </div>
+                        <div className="relative rounded-2xl overflow-hidden shadow-xl border border-slate-200 dark:border-white/10 col-span-1 row-span-1 group">
+                            <Image src="/images/o4.jfif" alt="Infrastructure wear" fill className="object-cover group-hover:scale-105 transition-transform duration-700" />
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+      </section>
+
+      {/* How It Works (Data Pipeline) */}
+      <section className="py-24 bg-white dark:bg-black border-t border-slate-200 dark:border-white/10 transition-colors duration-300">
+        <div className="container mx-auto px-4 sm:px-6 lg:px-8 max-w-7xl">
+          <div className="text-center mb-20">
+            <Badge variant="outline" className="mb-6 border-emerald-500 text-emerald-600 dark:text-emerald-400 bg-emerald-50 dark:bg-emerald-500/10 px-4 py-1.5 uppercase tracking-widest text-xs">
+              The Data Pipeline
+            </Badge>
+            <h2 className="text-3xl md:text-5xl font-bold text-slate-900 dark:text-white mb-6 tracking-tight">
+              How EnergyEminence Works
+            </h2>
+            <p className="text-lg text-slate-600 dark:text-gray-400 max-w-2xl mx-auto">
+              A seamless, continuous loop of intelligence bridging the physical and digital worlds in real-time.
             </p>
           </div>
 
-          <div className="grid lg:grid-cols-2 gap-8 max-w-6xl mx-auto">
-            <div className="group relative bg-white/80 dark:bg-gray-900/40 backdrop-blur-sm border border-slate-200 dark:border-white/10 rounded-3xl overflow-hidden hover:border-emerald-400 dark:hover:border-emerald-500/50 transition-all duration-500">
-              <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-emerald-400 dark:from-emerald-500 to-transparent opacity-50 group-hover:opacity-100 transition-opacity" />
-              <div className="p-6 md:p-10">
-                <div className="flex items-start justify-between mb-8">
-                  <div className="w-12 h-12 md:w-14 md:h-14 bg-emerald-100 dark:bg-emerald-950/50 rounded-2xl border border-emerald-200 dark:border-emerald-500/20 flex items-center justify-center">
-                    <Network className="w-6 h-6 md:w-7 md:h-7 text-emerald-600 dark:text-emerald-500" />
-                  </div>
-                  <Badge className="bg-emerald-100 dark:bg-emerald-500/10 text-emerald-700 dark:text-emerald-400 border-emerald-200 dark:border-emerald-500/20 px-3 py-1 text-xs md:text-sm">Current Platform</Badge>
-                </div>
-                <h3 className="text-2xl font-bold text-slate-900 dark:text-white mb-4">EnergyEminence Foundation</h3>
-                <p className="text-slate-600 dark:text-gray-400 mb-8 leading-relaxed h-auto md:h-32 text-sm md:text-base">
-                  Moving beyond basic data acquisition, our platform leverages Physics-Informed Graph Neural Networks combined with Neural ODEs and discrete jump handlers to model cascading failure continuous dynamics governed by Kirchhoff's laws alongside discrete relay trips. This allows for exact, component-level failure predictions across utility and pipeline assets before physical breakdown occurs.
-                </p>
-                <Link href="#contact">
-                  <Button className="w-full bg-slate-100 dark:bg-white/5 text-slate-900 dark:text-white border border-slate-300 dark:border-white/20 hover:bg-emerald-100 dark:hover:bg-emerald-500/20 hover:text-emerald-700 dark:hover:text-emerald-300 transition-all duration-300 font-semibold h-12">
-                    Request Architecture Specs
-                  </Button>
-                </Link>
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-12 relative">
+            {/* Connecting Line (Desktop only) */}
+            <div className="hidden md:block absolute top-[3rem] left-[16%] right-[16%] h-0.5 bg-gradient-to-r from-transparent via-emerald-500/40 to-transparent z-0"></div>
+
+            {/* Step 1: Ingest */}
+            <div className="relative z-10 flex flex-col items-center text-center group">
+              <div className="w-24 h-24 bg-slate-50 dark:bg-[#050505] rounded-full border-4 border-white dark:border-black flex items-center justify-center shadow-xl shadow-slate-200/50 dark:shadow-none mb-8 group-hover:scale-110 transition-transform duration-500">
+                <Database className="w-8 h-8 text-blue-500" />
               </div>
+              <h3 className="text-2xl font-bold text-slate-900 dark:text-white mb-4">1. Ingest</h3>
+              <p className="text-slate-600 dark:text-gray-400 leading-relaxed max-w-xs">
+                Connect directly to existing SCADA systems, distributed IoT sensors, and live edge-processed drone telemetry.
+              </p>
             </div>
 
-            <div className="group relative bg-white/80 dark:bg-gray-900/40 backdrop-blur-sm border border-slate-200 dark:border-white/10 rounded-3xl overflow-hidden hover:border-purple-400 dark:hover:border-purple-500/50 transition-all duration-500">
-              <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-purple-400 dark:from-purple-500 to-transparent opacity-50 group-hover:opacity-100 transition-opacity" />
-              <div className="p-6 md:p-10">
-                <div className="flex items-start justify-between mb-8">
-                  <div className="w-12 h-12 md:w-14 md:h-14 bg-purple-100 dark:bg-purple-950/50 rounded-2xl border border-purple-200 dark:border-purple-500/20 flex items-center justify-center">
-                    <Cpu className="w-6 h-6 md:w-7 md:h-7 text-purple-600 dark:text-purple-500" />
-                  </div>
-                  <Badge className="bg-purple-100 dark:bg-purple-500/10 text-purple-700 dark:text-purple-400 border-purple-200 dark:border-purple-500/20 px-3 py-1 text-xs md:text-sm">Future Vision</Badge>
-                </div>
-                <h3 className="text-2xl font-bold text-slate-900 dark:text-white mb-4">AI Agentic System Extension</h3>
-                <p className="text-slate-600 dark:text-gray-400 mb-8 leading-relaxed h-auto md:h-32 text-sm md:text-base">
-                  Our roadmap utilizes bounded Agentic AI and multi-agent reinforcement learning for deep perception, reasoning, and multi-step planning. These autonomous decision-making agents bypass human latency, executing automated self-healing networks and pipeline isolation operations strictly enforced by supervisory safety constraints.
-                </p>
-                <Link href="#contact">
-                  <Button className="w-full bg-slate-100 dark:bg-white/5 text-slate-900 dark:text-white border border-slate-300 dark:border-white/20 hover:bg-purple-100 dark:hover:bg-purple-500/20 hover:text-purple-700 dark:hover:text-purple-300 transition-all duration-300 font-semibold h-12">
-                    Request Vision Paper
-                  </Button>
-                </Link>
+            {/* Step 2: Process */}
+            <div className="relative z-10 flex flex-col items-center text-center group">
+              <div className="w-24 h-24 bg-slate-50 dark:bg-[#050505] rounded-full border-4 border-white dark:border-black flex items-center justify-center shadow-xl shadow-slate-200/50 dark:shadow-none mb-8 group-hover:scale-110 transition-transform duration-500">
+                <Layers className="w-8 h-8 text-purple-500" />
               </div>
+              <h3 className="text-2xl font-bold text-slate-900 dark:text-white mb-4">2. Process</h3>
+              <p className="text-slate-600 dark:text-gray-400 leading-relaxed max-w-xs">
+                Map incoming spatial and meteorological data instantly onto the 3D physics-informed topological digital twin.
+              </p>
+            </div>
+
+            {/* Step 3: Act */}
+            <div className="relative z-10 flex flex-col items-center text-center group">
+              <div className="w-24 h-24 bg-slate-50 dark:bg-[#050505] rounded-full border-4 border-white dark:border-black flex items-center justify-center shadow-xl shadow-slate-200/50 dark:shadow-none mb-8 group-hover:scale-110 transition-transform duration-500">
+                <Zap className="w-8 h-8 text-emerald-500" />
+              </div>
+              <h3 className="text-2xl font-bold text-slate-900 dark:text-white mb-4">3. Act</h3>
+              <p className="text-slate-600 dark:text-gray-400 leading-relaxed max-w-xs">
+                The autonomous AI Copilot calculates mitigation matrices, isolates failing nodes, and prevents cascading infrastructure collapse.
+              </p>
             </div>
           </div>
         </div>
