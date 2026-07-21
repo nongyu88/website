@@ -17,8 +17,8 @@ import ModeToggle from "@/components/ui/mode-toggle"
 export default function HomePage() {
   // 1. DEFINE SLIDE DATA (Hero Backgrounds)
   const videoSlides = [
-    "/1.mp4", "/2.mp4", "/3.mp4", "/4.mp4", 
-    "/5.mp4", "/6.mp4", "/7.mp4", "/8.mp4"
+    "/1.webm", "/2.webm", "/3.webm", "/4.webm", 
+    "/5.webm", "/6.webm", "/7.webm", "/8.webm"
   ];
 
 // Track active module and create refs for the scroll-spy effect
@@ -31,43 +31,43 @@ const demoModules = [
     id: "01",
     title: "Multi-Modal Twin Visualization",
     description: "Seamlessly toggle between 2D geographic reality and 3D physics-relaxed topological shapes. Understand the spatial and logical relationships of critical infrastructure simultaneously in real-time.",
-    videoSrc: "/demo1-maps.mp4"
+    videoSrc: "/demo1-maps.webm"
   },
   {
     id: "02",
     title: "Dynamic Topology Engineering",
     description: "Edit grid architecture on the fly. Drop new generation nodes, draw transmission lines, and define load parameters within an interactive sandbox to securely model infrastructure upgrades.",
-    videoSrc: "/demo2-topology.mp4"
+    videoSrc: "/demo2-topology.webm"
   },
   {
     id: "03",
     title: "Environmental Intelligence Fusion",
     description: "Overlay live meteorological data directly onto the grid topology. Monitor severe weather patterns, flood zones, and atmospheric conditions to proactively manage infrastructure exposure.",
-    videoSrc: "/demo3-weather.mp4"
+    videoSrc: "/demo3-weather.webm"
   },
   {
     id: "04",
     title: "Edge-Processed UAV Ingestion",
     description: "Pipe live drone video feeds directly into the digital twin. Deployed edge AI models process visual data locally, identifying physical threats like encroaching wildfires with zero latency.",
-    videoSrc: "/demo4-uav.mp4"
+    videoSrc: "/demo4-uav.webm"
   },
   {
     id: "05",
     title: "Autonomous Grid Copilot",
     description: "Transition from reactive alerts to autonomous action. The Grid Copilot instantly generates an executable mitigation matrix to isolate burning nodes, shed load, and halt cascading failures.",
-    videoSrc: "/demo5-copilot.mp4"
+    videoSrc: "/demo5-copilot.webm"
   },
   {
     id: "06",
     title: "3D Spatial Mitigation",
     description: "Execute complex cascade and wildfire response strategies using our immersive 3D topological view. The Copilot orchestrates real-time spatial isolation commands with complete situational awareness.",
-    videoSrc: "/demo6-copilot-3d.mp4"
+    videoSrc: "/demo6-copilot-3d.webm"
   },
   {
     id: "07",
     title: "Physics-Informed Prediction Engine",
     description: "Stay ahead of catastrophe. Our predictive AI engine utilizes physics-informed machine learning to forecast node failures and map cascading blackouts before physical infrastructure is actually compromised.",
-    videoSrc: "/demo7-prediction.mp4"
+    videoSrc: "/demo7-prediction.webm"
   }
 ];
 
@@ -296,7 +296,15 @@ const shouldLoadVideo = (index: number) => {
               index === currentSlideIdx ? "opacity-100 z-10" : "opacity-0 z-0"
             }`}
           >
-            <video ref={(el) => { videoRefs.current[index] = el }} muted loop playsInline className="w-full h-full object-cover opacity-60" src={shouldLoadVideo(index) ? src : undefined} />
+            <video 
+              ref={(el) => { videoRefs.current[index] = el }} 
+              muted 
+              loop 
+              playsInline 
+              preload={index === 0 ? "auto" : "none"} // <-- ONLY preload the very first video
+              className="w-full h-full object-cover opacity-60" 
+              src={shouldLoadVideo(index) ? src : undefined} 
+            />
             <div className="absolute inset-0 bg-gradient-to-t from-slate-50 via-slate-50/50 to-transparent dark:from-black dark:via-black/40 dark:to-black/30"></div>
           </div>
         ))}
@@ -439,19 +447,21 @@ const shouldLoadVideo = (index: number) => {
     </span>
   </div>
 
-  {/* Dynamic Video Player */}
-  <div className="relative overflow-hidden rounded-md border border-slate-300 dark:border-white/5 bg-white dark:bg-[#050505] aspect-video transition-colors">
-                  <video 
-                    key={activeModule}
-                    autoPlay 
-                    loop 
-                    muted 
-                    playsInline 
-                    className="w-full h-full object-contain opacity-95"
-                  >
-                    <source src={demoModules[activeModule].videoSrc} type="video/mp4" />
-                  </video>
-                </div>
+            {/* Dynamic Video Player */}
+            <div className="relative overflow-hidden rounded-md border border-slate-300 dark:border-white/5 bg-white dark:bg-[#050505] aspect-video transition-colors">
+                <video 
+                  key={activeModule}
+                  autoPlay 
+                  loop 
+                  muted 
+                  playsInline
+                  preload="none" // <-- ADD THIS: Stops background downloading
+                  poster="/images/video-placeholder.jpg" // <-- ADD THIS: Shows an image instantly
+                  className="w-full h-full object-contain opacity-95"
+                >
+                  <source src={demoModules[activeModule].videoSrc} type="video/mp4" />
+                </video>
+              </div>
 
               </div>
             </div>
