@@ -456,10 +456,9 @@ const shouldLoadVideo = (index: number) => {
                   muted 
                   playsInline
                   preload="none" // <-- ADD THIS: Stops background downloading
-                  poster="/images/video-placeholder.jpg" // <-- ADD THIS: Shows an image instantly
                   className="w-full h-full object-contain opacity-95"
                 >
-                  <source src={demoModules[activeModule].videoSrc} type="video/mp4" />
+                  <source src={demoModules[activeModule].videoSrc} type="video/webm" />
                 </video>
               </div>
 
@@ -510,13 +509,13 @@ const shouldLoadVideo = (index: number) => {
                     {/* 3-Image Masonry Grid */}
                     <div className="order-1 lg:order-2 grid grid-cols-2 grid-rows-2 gap-4 h-[500px]">
                         <div className="relative rounded-2xl overflow-hidden shadow-xl border border-slate-200 dark:border-white/10 col-span-2 row-span-1 group">
-                            <Image src="/images/utility1.jpg" alt="Utility Infrastructure Operations" fill className="object-cover group-hover:scale-105 transition-transform duration-700" />
+                            <Image src="/images/utility1.webp" alt="Utility Infrastructure Operations" fill className="object-cover group-hover:scale-105 transition-transform duration-700" />
                         </div>
                         <div className="relative rounded-2xl overflow-hidden shadow-xl border border-slate-200 dark:border-white/10 col-span-1 row-span-1 group">
-                            <Image src="/images/utility2.jfif" alt="Transmission Lines" fill className="object-cover group-hover:scale-105 transition-transform duration-700" />
+                            <Image src="/images/utility2.webp" alt="Transmission Lines" fill className="object-cover group-hover:scale-105 transition-transform duration-700" />
                         </div>
                         <div className="relative rounded-2xl overflow-hidden shadow-xl border border-slate-200 dark:border-white/10 col-span-1 row-span-1 group">
-                            <Image src="/images/utility3.jfif" alt="Power Generation Plant" fill className="object-cover group-hover:scale-105 transition-transform duration-700" />
+                            <Image src="/images/utility3.webp" alt="Power Generation Plant" fill className="object-cover group-hover:scale-105 transition-transform duration-700" />
                         </div>
                     </div>
                 </div>
@@ -526,13 +525,13 @@ const shouldLoadVideo = (index: number) => {
                     {/* 3-Image Masonry Grid */}
                     <div className="order-1 lg:order-1 grid grid-cols-2 grid-rows-2 gap-4 h-[500px]">
                         <div className="relative rounded-2xl overflow-hidden shadow-xl border border-slate-200 dark:border-white/10 col-span-1 row-span-1 group">
-                            <Image src="/images/oil2.jfif" alt="Refinery Construction" fill className="object-cover group-hover:scale-105 transition-transform duration-700" />
+                            <Image src="/images/oil2.webp" alt="Refinery Construction" fill className="object-cover group-hover:scale-105 transition-transform duration-700" />
                         </div>
                         <div className="relative rounded-2xl overflow-hidden shadow-xl border border-slate-200 dark:border-white/10 col-span-1 row-span-1 group">
-                            <Image src="/images/oil3.jfif" alt="Pipeline Inspection" fill className="object-cover group-hover:scale-105 transition-transform duration-700" />
+                            <Image src="/images/oil3.webp" alt="Pipeline Inspection" fill className="object-cover group-hover:scale-105 transition-transform duration-700" />
                         </div>
                         <div className="relative rounded-2xl overflow-hidden shadow-xl border border-slate-200 dark:border-white/10 col-span-2 row-span-1 group">
-                            <Image src="/images/oil1.jfif" alt="Oil and Gas Integrity Monitoring" fill className="object-cover group-hover:scale-105 transition-transform duration-700" />
+                            <Image src="/images/oil1.webp" alt="Oil and Gas Integrity Monitoring" fill className="object-cover group-hover:scale-105 transition-transform duration-700" />
                         </div>
                     </div>
                     <div className="order-2 lg:order-2 space-y-8">
@@ -574,13 +573,13 @@ const shouldLoadVideo = (index: number) => {
                     {/* 3-Image Masonry Grid */}
                     <div className="order-1 lg:order-2 grid grid-cols-2 grid-rows-2 gap-4 h-[500px]">
                         <div className="relative rounded-2xl overflow-hidden shadow-xl border border-slate-200 dark:border-white/10 col-span-2 row-span-1 group">
-                            <Image src="/images/renew 3.jpg" alt="Wind Farm Engineers" fill className="object-cover group-hover:scale-105 transition-transform duration-700" />
+                            <Image src="/images/renew 3.webp" alt="Wind Farm Engineers" fill className="object-cover group-hover:scale-105 transition-transform duration-700" />
                         </div>
                         <div className="relative rounded-2xl overflow-hidden shadow-xl border border-slate-200 dark:border-white/10 col-span-1 row-span-1 group">
-                            <Image src="/images/renew2.jfif" alt="Solar Installation" fill className="object-cover group-hover:scale-105 transition-transform duration-700" />
+                            <Image src="/images/renew2.webp" alt="Solar Installation" fill className="object-cover group-hover:scale-105 transition-transform duration-700" />
                         </div>
                         <div className="relative rounded-2xl overflow-hidden shadow-xl border border-slate-200 dark:border-white/10 col-span-1 row-span-1 group">
-                            <Image src="/images/renew1.jpg" alt="Renewable Energy Integration" fill className="object-cover group-hover:scale-105 transition-transform duration-700" />
+                            <Image src="/images/renew1.webp" alt="Renewable Energy Integration" fill className="object-cover group-hover:scale-105 transition-transform duration-700" />
                         </div>
                     </div>
                 </div>
@@ -624,7 +623,7 @@ const shouldLoadVideo = (index: number) => {
               </div>
               <div className="order-1 lg:order-2 relative h-[400px] lg:h-[500px] rounded-3xl overflow-hidden shadow-2xl border border-slate-200 dark:border-white/10 group">
                 <div className="absolute inset-0 bg-gradient-to-tr from-purple-500/20 to-transparent z-10 opacity-0 group-hover:opacity-100 transition-opacity duration-700"></div>
-                <Image src="/images/vision-ai-brain.png" alt="AI Agentic Neural Network" fill className="object-cover group-hover:scale-105 transition-transform duration-1000" />
+                <Image src="/images/vision-ai-brain.webp" alt="AI Agentic Neural Network" fill className="object-cover group-hover:scale-105 transition-transform duration-1000" />
               </div>
             </div>
 
@@ -632,7 +631,7 @@ const shouldLoadVideo = (index: number) => {
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 lg:gap-20 items-center">
               <div className="order-1 lg:order-1 relative h-[400px] lg:h-[500px] rounded-3xl overflow-hidden shadow-2xl border border-slate-200 dark:border-white/10 group">
                 <div className="absolute inset-0 bg-gradient-to-tr from-red-500/20 to-transparent z-10 opacity-0 group-hover:opacity-100 transition-opacity duration-700"></div>
-                <Image src="/images/vision-environment.png" alt="Proactive Environmental Shield" fill className="object-cover group-hover:scale-105 transition-transform duration-1000" />
+                <Image src="/images/vision-environment.webp" alt="Proactive Environmental Shield" fill className="object-cover group-hover:scale-105 transition-transform duration-1000" />
               </div>
               <div className="order-2 lg:order-2 space-y-6">
                 <div className="w-14 h-14 bg-red-100 dark:bg-red-500/10 rounded-2xl flex items-center justify-center border border-red-200 dark:border-red-500/20 mb-6">
@@ -664,7 +663,7 @@ const shouldLoadVideo = (index: number) => {
               </div>
               <div className="order-1 lg:order-2 relative h-[400px] lg:h-[500px] rounded-3xl overflow-hidden shadow-2xl border border-slate-200 dark:border-white/10 group">
                 <div className="absolute inset-0 bg-gradient-to-tr from-emerald-500/20 to-transparent z-10 opacity-0 group-hover:opacity-100 transition-opacity duration-700"></div>
-                <Image src="/images/vision-clean-energy.png" alt="Sustainable Energy Transition" fill className="object-cover group-hover:scale-105 transition-transform duration-1000" />
+                <Image src="/images/vision-clean-energy.webp" alt="Sustainable Energy Transition" fill className="object-cover group-hover:scale-105 transition-transform duration-1000" />
               </div>
             </div>
 
@@ -712,13 +711,13 @@ const shouldLoadVideo = (index: number) => {
                     {/* 4-Image 2x2 Grid ('e' group) */}
                     <div className="order-1 lg:order-2 grid grid-cols-2 grid-rows-2 gap-4 h-[500px]">
                         <div className="relative rounded-2xl overflow-hidden shadow-xl border border-slate-200 dark:border-white/10 col-span-1 row-span-1 group">
-                            <Image src="/images/e1.jpg" alt="Severe weather storm over power grid" fill className="object-cover group-hover:scale-105 transition-transform duration-700" />
+                            <Image src="/images/e1.webp" alt="Severe weather storm over power grid" fill className="object-cover group-hover:scale-105 transition-transform duration-700" />
                         </div>
                         <div className="relative rounded-2xl overflow-hidden shadow-xl border border-slate-200 dark:border-white/10 col-span-1 row-span-1 group">
-                            <Image src="/images/e2.jpg" alt="Wildfire encroaching infrastructure" fill className="object-cover group-hover:scale-105 transition-transform duration-700" />
+                            <Image src="/images/e2.webp" alt="Wildfire encroaching infrastructure" fill className="object-cover group-hover:scale-105 transition-transform duration-700" />
                         </div>
                         <div className="relative rounded-2xl overflow-hidden shadow-xl border border-slate-200 dark:border-white/10 col-span-1 row-span-1 group">
-                            <Image src="/images/e3.jfif" alt="Iced transmission lines" fill className="object-cover group-hover:scale-105 transition-transform duration-700" />
+                            <Image src="/images/e3.webp" alt="Iced transmission lines" fill className="object-cover group-hover:scale-105 transition-transform duration-700" />
                         </div>
                         <div className="relative rounded-2xl overflow-hidden shadow-xl border border-slate-200 dark:border-white/10 col-span-1 row-span-1 group">
                             <Image src="/images/e4.webp" alt="Climate impact" fill className="object-cover group-hover:scale-105 transition-transform duration-700" />
@@ -731,13 +730,13 @@ const shouldLoadVideo = (index: number) => {
                     {/* 4-Image 2x2 Grid ('a' group) */}
                     <div className="order-1 lg:order-1 grid grid-cols-2 grid-rows-2 gap-4 h-[500px]">
                         <div className="relative rounded-2xl overflow-hidden shadow-xl border border-slate-200 dark:border-white/10 col-span-1 row-span-1 group">
-                            <Image src="/images/a1.jfif" alt="Massive data center racks" fill className="object-cover group-hover:scale-105 transition-transform duration-700" />
+                            <Image src="/images/a1.webp" alt="Massive data center racks" fill className="object-cover group-hover:scale-105 transition-transform duration-700" />
                         </div>
                         <div className="relative rounded-2xl overflow-hidden shadow-xl border border-slate-200 dark:border-white/10 col-span-1 row-span-1 group">
-                            <Image src="/images/a2.jfif" alt="High voltage power substation" fill className="object-cover group-hover:scale-105 transition-transform duration-700" />
+                            <Image src="/images/a2.webp" alt="High voltage power substation" fill className="object-cover group-hover:scale-105 transition-transform duration-700" />
                         </div>
                         <div className="relative rounded-2xl overflow-hidden shadow-xl border border-slate-200 dark:border-white/10 col-span-1 row-span-1 group">
-                            <Image src="/images/a3.jfif" alt="Global energy consumption overlay" fill className="object-cover group-hover:scale-105 transition-transform duration-700" />
+                            <Image src="/images/a3.webp" alt="Global energy consumption overlay" fill className="object-cover group-hover:scale-105 transition-transform duration-700" />
                         </div>
                         <div className="relative rounded-2xl overflow-hidden shadow-xl border border-slate-200 dark:border-white/10 col-span-1 row-span-1 group">
                             <Image src="/images/a4.webp" alt="AI grid demand" fill className="object-cover group-hover:scale-105 transition-transform duration-700" />
@@ -782,16 +781,16 @@ const shouldLoadVideo = (index: number) => {
                     {/* 4-Image 2x2 Grid ('o' group) */}
                     <div className="order-1 lg:order-2 grid grid-cols-2 grid-rows-2 gap-4 h-[500px]">
                         <div className="relative rounded-2xl overflow-hidden shadow-xl border border-slate-200 dark:border-white/10 col-span-1 row-span-1 group">
-                            <Image src="/images/o1.jpg" alt="Aging heavy industrial plant" fill className="object-cover group-hover:scale-105 transition-transform duration-700" />
+                            <Image src="/images/o1.webp" alt="Aging heavy industrial plant" fill className="object-cover group-hover:scale-105 transition-transform duration-700" />
                         </div>
                         <div className="relative rounded-2xl overflow-hidden shadow-xl border border-slate-200 dark:border-white/10 col-span-1 row-span-1 group">
-                            <Image src="/images/o2.jfif" alt="Old substation transformer" fill className="object-cover group-hover:scale-105 transition-transform duration-700" />
+                            <Image src="/images/o2.webp" alt="Old substation transformer" fill className="object-cover group-hover:scale-105 transition-transform duration-700" />
                         </div>
                         <div className="relative rounded-2xl overflow-hidden shadow-xl border border-slate-200 dark:border-white/10 col-span-1 row-span-1 group">
-                            <Image src="/images/o3.jfif" alt="Corroded electrical components" fill className="object-cover group-hover:scale-105 transition-transform duration-700" />
+                            <Image src="/images/o3.webp" alt="Corroded electrical components" fill className="object-cover group-hover:scale-105 transition-transform duration-700" />
                         </div>
                         <div className="relative rounded-2xl overflow-hidden shadow-xl border border-slate-200 dark:border-white/10 col-span-1 row-span-1 group">
-                            <Image src="/images/o4.jfif" alt="Infrastructure wear" fill className="object-cover group-hover:scale-105 transition-transform duration-700" />
+                            <Image src="/images/o4.webp" alt="Infrastructure wear" fill className="object-cover group-hover:scale-105 transition-transform duration-700" />
                         </div>
                     </div>
                 </div>
@@ -873,19 +872,40 @@ const shouldLoadVideo = (index: number) => {
               </p>
             </div>
             
-            {/* Live MVP Card */}
-            <div className="flex justify-center">
-              <div className="bg-slate-50 dark:bg-gray-900/50 border border-emerald-200 dark:border-emerald-500/30 rounded-3xl p-8 md:p-12 text-center max-w-md w-full shadow-2xl shadow-emerald-900/10 dark:shadow-emerald-900/20 transition-colors duration-300">
-                  <div className="flex justify-center mb-6">
-                    <Activity className="w-12 h-12 md:w-16 md:h-16 text-emerald-600 dark:text-emerald-500" />
-                  </div>
-                  <h3 className="text-2xl md:text-3xl font-bold text-slate-900 dark:text-white mb-4">Our Live MVP</h3>
-                  <p className="text-lg text-slate-600 dark:text-gray-400 mb-8">Experience EnergyEminence™ in action. Explore our real-time interactive digital twin.</p>
-                  <Link href="https://www.energyeminence.online/" target="_blank" rel="noopener noreferrer" className="inline-flex items-center text-emerald-600 dark:text-emerald-400 hover:text-emerald-700 dark:hover:text-emerald-300 font-semibold transition-colors">
-                      Access the live platform <ArrowRight className="ml-2 w-5 h-5" />
-                  </Link>
-              </div>
-            </div>
+      {/* Live MVP Showcase Card (60/40 Vertical Layout) */}
+      <div className="bg-[#0a1110] border border-emerald-900/30 rounded-3xl overflow-hidden shadow-2xl flex flex-col group transition-all duration-300 hover:border-emerald-700/50 hover:shadow-emerald-900/20 w-full max-w-md mx-auto lg:ml-auto mt-10 lg:mt-0 h-[500px]">
+              
+        {/* Top: The Map Image (60% Height) */}
+        <div className="relative w-full h-[60%] overflow-hidden bg-black border-b border-emerald-900/30">
+          <Image 
+            src="/images/MVP_face.webp" 
+            alt="EnergyEminence Live MVP Digital Twin Map" 
+            fill 
+            className="object-cover object-center group-hover:scale-105 transition-transform duration-700 opacity-80" 
+          />
+          {/* Subtle bottom gradient to blend the image border */}
+          <div className="absolute inset-x-0 bottom-0 h-16 bg-gradient-to-t from-[#0a1110] to-transparent"></div>
+        </div>
+
+        {/* Bottom: The Content (40% Height) */}
+        <div className="w-full h-[40%] px-6 py-4 flex flex-col items-center justify-center text-center relative z-10">
+          <Activity className="w-8 h-8 text-emerald-400 mb-3 stroke-[2.5]" />
+          <h3 className="text-xl font-bold text-white mb-2 tracking-tight">Our Live MVP</h3>
+          <p className="text-sm text-slate-300 mb-5 leading-relaxed px-4">
+            Experience EnergyEminence™ in action. Explore our real-time interactive digital twin.
+          </p>
+          <Link 
+            href="https://www.kraftgeneai.ca/" 
+            target="_blank" 
+            rel="noopener noreferrer"
+            className="text-emerald-400 text-sm font-semibold flex items-center hover:text-emerald-300 transition-colors group/link"
+          >
+            Access the live platform 
+            <ArrowRight className="ml-2 w-4 h-4 group-hover/link:translate-x-1 transition-transform" />
+          </Link>
+        </div>
+
+      </div>
           </div>
 
           {/* Bottom Row: Founders */}
@@ -904,7 +924,7 @@ const shouldLoadVideo = (index: number) => {
                 {
                   name: "Yu Nong (John)",
                   role: "Co-Founder & CEO",
-                  image: "images/me.jpg",
+                  image: "images/yu-nong-ceo.jpg",
                   linkedin: "https://www.linkedin.com/in/nongyu/",
                   bio: "John blends visionary leadership with expertise in ML, software engineering, and robotics to drive global infrastructure resilience.",
                 },
@@ -1017,18 +1037,28 @@ const shouldLoadVideo = (index: number) => {
               </div>
             </div>
 
-            {/* Right: Interactive Map */}
-            <div className="relative w-full h-[400px] rounded-2xl overflow-hidden border border-slate-200 dark:border-white/10 shadow-xl shadow-emerald-900/5 dark:shadow-emerald-900/10">
-              <iframe 
-                src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d184552.674101416!2d-79.54286524388836!3d43.71837095818981!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x89d4cb90d7c63ba5%3A0x323555502ab4c477!2sToronto%2C%20ON!5e0!3m2!1sen!2sca!4v1700000000000!5m2!1sen!2sca" 
-                width="100%" 
-                height="100%" 
-                style={{ border: 0 }} 
-                allowFullScreen={true} 
-                loading="lazy" 
-                referrerPolicy="no-referrer-when-downgrade"
-                className="filter dark:invert-[90%] dark:hue-rotate-180 transition-all duration-300"
-              />
+            {/* Right: Static Map Facade (Fast Loading) */}
+            <div className="relative w-full h-[400px] rounded-2xl overflow-hidden border border-slate-200 dark:border-white/10 shadow-xl shadow-emerald-900/5 dark:shadow-emerald-900/10 group cursor-pointer">
+              <a href="https://www.google.com/maps/place/Toronto,+ON" target="_blank" rel="noopener noreferrer" className="block w-full h-full">
+                
+                {/* The Map Screenshot */}
+                <Image 
+                  src="/images/toronto-map.PNG" 
+                  alt="Kraftgene AI Office Location" 
+                  fill 
+                  className="object-cover transition-transform duration-700 group-hover:scale-105 filter dark:invert-[90%] dark:hue-rotate-180" 
+                />
+                
+                {/* Hover Overlay */}
+                <div className="absolute inset-0 bg-black/5 dark:bg-white/5 group-hover:bg-transparent transition-colors"></div>
+                
+                {/* Floating "View Map" Button (Appears on hover) */}
+                <div className="absolute bottom-6 right-6 bg-white dark:bg-slate-900 text-slate-900 dark:text-white text-sm font-semibold px-5 py-2.5 rounded-full shadow-xl flex items-center transform translate-y-2 opacity-0 group-hover:translate-y-0 group-hover:opacity-100 transition-all duration-300">
+                  <MapPin className="w-4 h-4 mr-2 text-emerald-600 dark:text-emerald-400" /> 
+                  Open in Google Maps
+                </div>
+
+              </a>
             </div>
 
           </div>
