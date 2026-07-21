@@ -456,6 +456,7 @@ const shouldLoadVideo = (index: number) => {
                   muted 
                   playsInline
                   preload="none" // <-- ADD THIS: Stops background downloading
+                  poster="/images/snowscreen.jfif"
                   className="w-full h-full object-contain opacity-95"
                 >
                   <source src={demoModules[activeModule].videoSrc} type="video/webm" />
@@ -872,9 +873,13 @@ const shouldLoadVideo = (index: number) => {
               </p>
             </div>
             
-      {/* Live MVP Showcase Card (60/40 Vertical Layout) */}
-      <div className="bg-[#0a1110] border border-emerald-900/30 rounded-3xl overflow-hidden shadow-2xl flex flex-col group transition-all duration-300 hover:border-emerald-700/50 hover:shadow-emerald-900/20 w-full max-w-md mx-auto lg:ml-auto mt-10 lg:mt-0 h-[500px]">
-              
+      {/* Live MVP Showcase Card (Entire Card Clickable) */}
+      <Link 
+        href="https://www.energyeminence.online/" 
+        target="_blank" 
+        rel="noopener noreferrer"
+        className="bg-[#0a1110] border border-emerald-900/30 rounded-3xl overflow-hidden shadow-2xl flex flex-col group transition-all duration-300 hover:border-emerald-500/50 hover:shadow-emerald-900/40 w-full max-w-md mx-auto lg:ml-auto mt-10 lg:mt-0 h-[500px] cursor-pointer block"
+      >
         {/* Top: The Map Image (60% Height) */}
         <div className="relative w-full h-[60%] overflow-hidden bg-black border-b border-emerald-900/30">
           <Image 
@@ -894,18 +899,12 @@ const shouldLoadVideo = (index: number) => {
           <p className="text-sm text-slate-300 mb-5 leading-relaxed px-4">
             Experience EnergyEminence™ in action. Explore our real-time interactive digital twin.
           </p>
-          <Link 
-            href="https://www.kraftgeneai.ca/" 
-            target="_blank" 
-            rel="noopener noreferrer"
-            className="text-emerald-400 text-sm font-semibold flex items-center hover:text-emerald-300 transition-colors group/link"
-          >
+          <span className="text-emerald-400 text-sm font-semibold flex items-center group-hover:text-emerald-300 transition-colors">
             Access the live platform 
-            <ArrowRight className="ml-2 w-4 h-4 group-hover/link:translate-x-1 transition-transform" />
-          </Link>
+            <ArrowRight className="ml-2 w-4 h-4 group-hover:translate-x-1.5 transition-transform" />
+          </span>
         </div>
-
-      </div>
+      </Link>
           </div>
 
           {/* Bottom Row: Founders */}
