@@ -417,7 +417,7 @@ const shouldLoadVideo = (index: number) => {
               <div className="pt-12 pl-8">
                 <Link href="https://calendar.app.google/GtTi43tYn5J2QN8G8" target="_blank" rel="noopener noreferrer">
                 <Button size="lg" className="w-full sm:w-auto bg-slate-900 text-white dark:bg-white hover:bg-slate-800 dark:hover:bg-slate-200 dark:text-black h-14 px-10 font-bold text-sm rounded-none pointer-events-auto transition-transform hover:scale-[1.02]">
-                    Book a Demo
+                    Book a Meeting
                   </Button>
                 </Link>
               </div>
