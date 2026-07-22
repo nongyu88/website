@@ -68,6 +68,12 @@ const demoModules = [
     title: "Physics-Informed Prediction Engine",
     description: "Stay ahead of catastrophe. Our predictive AI engine utilizes physics-informed machine learning to forecast node failures and map cascading blackouts before physical infrastructure is actually compromised.",
     videoSrc: "/demo7-prediction.webm"
+  },
+  {
+    id: "08",
+    title: "Multi-Spectrum Thermal Vision",
+    description: "Go beyond standard optical feeds with real-time FLIR and thermal infrared drone ingestion. The AI vision engine continuously scans for intense heat anomalies—detecting overheating transformers and invisible structural fires to trigger immediate Copilot isolation.",
+    videoSrc: "/demo8-thermal.webm" // Make sure to save your thermal demo video with this name in the public folder
   }
 ];
 
