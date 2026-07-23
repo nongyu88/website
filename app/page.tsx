@@ -489,7 +489,7 @@ const shouldLoadVideo = (index: number) => {
                   One Core Engine. Global Scale.
                 </h2>
                 <p className="text-xl text-slate-600 dark:text-gray-400 max-w-3xl mx-auto leading-relaxed">
-                  EnergyEminence bridges the gap between sectors with a highly modular architecture. Our edge-deployed AI agents deliver fast, comprehensive optimization across all facets of critical infrastructure.
+                  EnergyEminence™bridges the gap between sectors with a highly modular architecture. Our edge-deployed AI agents deliver fast, comprehensive optimization across all facets of critical infrastructure.
                 </p>
             </div>
 
@@ -553,7 +553,7 @@ const shouldLoadVideo = (index: number) => {
                                 Ensuring pipeline integrity and maintaining strict regulatory compliance requires more than traditional pressure monitoring. The midstream sector is increasingly adopting artificial intelligence to secure high-risk transport corridors against environmental threats. Modern AI-enhanced systems continuously learn from operational data and integrate statistical pattern recognition to detect and localize leaks with unprecedented speed, identifying anomalies that conventional systems miss entirely.
                             </p>
                             <p className="text-lg text-slate-600 dark:text-gray-400 leading-relaxed">
-                                By mapping complex fluid dynamics and pressure variances, EnergyEminence secures vulnerable networks in real-time. Autonomous drone fleets are deployed to actively monitor remote pipelines, identifying structural threats, landslides, and encroachments long before they escalate. Simultaneously, this automated data ingestion digitizes the tracking process, guaranteeing that operators maintain seamless, real-time environmental compliance with the EPA.
+                                By mapping complex fluid dynamics and pressure variances, EnergyEminence™secures vulnerable networks in real-time. Autonomous drone fleets are deployed to actively monitor remote pipelines, identifying structural threats, landslides, and encroachments long before they escalate. Simultaneously, this automated data ingestion digitizes the tracking process, guaranteeing that operators maintain seamless, real-time environmental compliance with the EPA.
                             </p>
                         </div>
                     </div>
@@ -662,7 +662,7 @@ const shouldLoadVideo = (index: number) => {
                 </div>
                 <h3 className="text-3xl md:text-4xl font-bold text-slate-900 dark:text-white tracking-tight">Accelerating the Clean Transition</h3>
                 <p className="text-lg text-slate-600 dark:text-gray-400 leading-relaxed">
-                  True resilience means evolving how we generate and distribute power. As the world aggressively pursues decarbonization, EnergyEminence serves as the critical intelligence layer necessary to stabilize this massive infrastructure transition.
+                  True resilience means evolving how we generate and distribute power. As the world aggressively pursues decarbonization, EnergyEminence™serves as the critical intelligence layer necessary to stabilize this massive infrastructure transition.
                 </p>
                 <p className="text-lg text-slate-600 dark:text-gray-400 leading-relaxed">
                   We are deeply committed to supporting global clean energy initiatives. By optimizing highly volatile distributed energy resources and automating strict environmental compliance tracking, we are smoothing out the engineering hurdles and paving the way for a sustainable, zero-emission future.
@@ -890,7 +890,7 @@ const shouldLoadVideo = (index: number) => {
         <div className="relative w-full h-[60%] overflow-hidden bg-black border-b border-emerald-900/30">
           <Image 
             src="/images/MVP_face.webp" 
-            alt="EnergyEminence Live MVP Digital Twin Map" 
+            alt="EnergyEminence™Live MVP Digital Twin Map" 
             fill 
             className="object-cover object-center group-hover:scale-105 transition-transform duration-700 opacity-80" 
           />
