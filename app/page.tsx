@@ -414,8 +414,8 @@ export default function HomePage() {
             <h2 className="text-4xl md:text-5xl font-bold tracking-tight mb-6">
               Designed for Mission-Critical Action.
             </h2>
-            <p className="text-lg text-slate-600 dark:text-slate-400 max-w-2xl leading-relaxed mb-10">
-              EnergyEminence™ replaces legacy, reactive telemetry with an active, physics-informed environment built for decisive defensive control.
+            <p className="text-lg text-slate-600 dark:text-slate-400 max-w-3xl leading-relaxed mb-10">
+              The <strong className="text-slate-900 dark:text-white">EnergyEminence™</strong> suite—anchored by its flagship twins, <span className="font-semibold text-emerald-600 dark:text-emerald-400">EnergyEminence - G</span> (Power Grids) and <span className="font-semibold text-blue-600 dark:text-blue-400">EnergyEminence - P</span> (Oil & Gas Pipelines)—replaces legacy, reactive telemetry with an active, physics-informed environment built for decisive defensive control.
             </p>
 
             {/* HORIZONTAL TABS */}
