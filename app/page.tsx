@@ -928,17 +928,19 @@ export default function HomePage() {
         </div>
       </section>
 
-      {/* About & Leadership Section */}
-      <section id="about" className="py-24 bg-white dark:bg-black border-t border-slate-200 dark:border-white/10 transition-colors duration-300">
+{/* About & Leadership Section */}
+<section id="about" className="py-24 bg-white dark:bg-black border-t border-slate-200 dark:border-white/10 transition-colors duration-300">
         <div className="container mx-auto px-4 sm:px-6 lg:px-8">
           
-          {/* Top Row: About & MVP Card */}
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center mb-24">
-            <div>
+          {/* Top Row: About & MVP Cards */}
+          <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 items-center mb-24">
+            
+            {/* Column 1: Text Content */}
+            <div className="lg:pr-4">
               <Badge className="mb-4 bg-emerald-100 dark:bg-emerald-500/10 text-emerald-700 dark:text-emerald-500 border-emerald-200 dark:border-emerald-500/20 px-4 py-1 text-sm">
                 Our Story
               </Badge>
-              <h2 className="text-3xl md:text-4xl font-bold text-slate-900 dark:text-white mb-6">About Kraftgene AI</h2>
+              <h2 className="text-3xl md:text-4xl font-bold text-slate-900 dark:text-white mb-6 tracking-tight">About Kraftgene AI</h2>
               <p className="text-base md:text-lg text-slate-700 dark:text-gray-300 mb-6 leading-relaxed">
                 Founded in Toronto, Ontario, Kraftgene AI develops enterprise artificial intelligence solutions for the energy sector. We build technology that protects critical infrastructure while accelerating environmental sustainability.
                 <br /><br />
@@ -946,38 +948,70 @@ export default function HomePage() {
               </p>
             </div>
             
-      {/* Live MVP Showcase Card (Entire Card Clickable) */}
-      <Link 
-        href="https://www.energyeminence.online/" 
-        target="_blank" 
-        rel="noopener noreferrer"
-        className="bg-[#0a1110] border border-emerald-900/30 rounded-3xl overflow-hidden shadow-2xl flex flex-col group transition-all duration-300 hover:border-emerald-500/50 hover:shadow-emerald-900/40 w-full max-w-md mx-auto lg:ml-auto mt-10 lg:mt-0 h-[500px] cursor-pointer block"
-      >
-        {/* Top: The Map Image (60% Height) */}
-        <div className="relative w-full h-[60%] overflow-hidden bg-black border-b border-emerald-900/30">
-          <Image 
-            src="/images/MVP_face.webp" 
-            alt="EnergyEminence™Live MVP Digital Twin Map" 
-            fill 
-            className="object-cover object-center group-hover:scale-105 transition-transform duration-700 opacity-80" 
-          />
-          {/* Subtle bottom gradient to blend the image border */}
-          <div className="absolute inset-x-0 bottom-0 h-16 bg-gradient-to-t from-[#0a1110] to-transparent"></div>
-        </div>
+            {/* Column 2: Live MVP Showcase Card (Grid) */}
+            <Link 
+              href="https://www.energyeminence.online/" 
+              target="_blank" 
+              rel="noopener noreferrer"
+              className="bg-[#0a1110] border border-emerald-900/30 rounded-3xl overflow-hidden shadow-2xl flex flex-col group transition-all duration-300 hover:border-emerald-500/50 hover:shadow-[0_0_30px_rgba(16,185,129,0.15)] w-full max-w-md mx-auto h-[480px] cursor-pointer"
+            >
+              {/* Top: The Map Image (60% Height) */}
+              <div className="relative w-full h-[60%] overflow-hidden bg-black border-b border-emerald-900/30">
+                <Image 
+                  src="/images/MVP_face.webp" 
+                  alt="EnergyEminence™ Grid MVP" 
+                  fill 
+                  className="object-cover object-center group-hover:scale-105 transition-transform duration-700 opacity-80" 
+                />
+                <div className="absolute inset-x-0 bottom-0 h-16 bg-gradient-to-t from-[#0a1110] to-transparent"></div>
+              </div>
 
-        {/* Bottom: The Content (40% Height) */}
-        <div className="w-full h-[40%] px-6 py-4 flex flex-col items-center justify-center text-center relative z-10">
-          <Activity className="w-8 h-8 text-emerald-400 mb-3 stroke-[2.5]" />
-          <h3 className="text-xl font-bold text-white mb-2 tracking-tight">Our Live MVP</h3>
-          <p className="text-sm text-slate-300 mb-5 leading-relaxed px-4">
-            Experience EnergyEminence™ in action. Explore our real-time interactive digital twin.
-          </p>
-          <span className="text-emerald-400 text-sm font-semibold flex items-center group-hover:text-emerald-300 transition-colors">
-            Access the live platform 
-            <ArrowRight className="ml-2 w-4 h-4 group-hover:translate-x-1.5 transition-transform" />
-          </span>
-        </div>
-      </Link>
+              {/* Bottom: The Content (40% Height) */}
+              <div className="w-full h-[40%] px-6 py-4 flex flex-col items-center justify-center text-center relative z-10">
+                <Zap className="w-8 h-8 text-emerald-400 mb-3 stroke-[2.5]" />
+                <h3 className="text-xl font-bold text-white mb-2 tracking-tight">Power Grid MVP</h3>
+                <p className="text-sm text-slate-300 mb-4 leading-relaxed px-2">
+                  Experience EnergyEminence™ - G. Explore our real-time interactive grid digital twin.
+                </p>
+                <span className="text-emerald-400 text-sm font-semibold flex items-center group-hover:text-emerald-300 transition-colors">
+                  Access Grid Platform 
+                  <ArrowRight className="ml-2 w-4 h-4 group-hover:translate-x-1.5 transition-transform" />
+                </span>
+              </div>
+            </Link>
+
+            {/* Column 3: Live MVP Showcase Card (Pipeline) */}
+            <Link 
+              href="https://www.energyeminence.xyz/" 
+              target="_blank" 
+              rel="noopener noreferrer"
+              className="bg-[#050a14] border border-blue-900/30 rounded-3xl overflow-hidden shadow-2xl flex flex-col group transition-all duration-300 hover:border-blue-500/50 hover:shadow-[0_0_30px_rgba(59,130,246,0.15)] w-full max-w-md mx-auto h-[480px] cursor-pointer"
+            >
+              {/* Top: The Map Image (60% Height) */}
+              <div className="relative w-full h-[60%] overflow-hidden bg-black border-b border-blue-900/30">
+                <Image 
+                  src="/images/pipeline-mvp.webp" 
+                  alt="EnergyEminence™ Pipeline MVP" 
+                  fill 
+                  className="object-cover object-left-top group-hover:scale-105 transition-transform duration-700 opacity-80" 
+                />
+                <div className="absolute inset-x-0 bottom-0 h-16 bg-gradient-to-t from-[#050a14] to-transparent"></div>
+              </div>
+
+              {/* Bottom: The Content (40% Height) */}
+              <div className="w-full h-[40%] px-6 py-4 flex flex-col items-center justify-center text-center relative z-10">
+                <Droplet className="w-8 h-8 text-blue-400 mb-3 stroke-[2.5]" />
+                <h3 className="text-xl font-bold text-white mb-2 tracking-tight">Oil & Gas Pipeline MVP</h3>
+                <p className="text-sm text-slate-300 mb-4 leading-relaxed px-2">
+                  Experience EnergyEminence™ - P. Explore our real-time interactive fluid dynamics twin.
+                </p>
+                <span className="text-blue-400 text-sm font-semibold flex items-center group-hover:text-blue-300 transition-colors">
+                  Access Pipeline Platform 
+                  <ArrowRight className="ml-2 w-4 h-4 group-hover:translate-x-1.5 transition-transform" />
+                </span>
+              </div>
+            </Link>
+
           </div>
 
           {/* Bottom Row: Founders */}
