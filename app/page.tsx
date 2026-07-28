@@ -121,6 +121,12 @@ export default function HomePage() {
       title: "Autonomous AI Copilot Isolation",
       description: "Transition from manual monitoring to AI-assisted defense. The Pipeline Copilot instantly generates and executes an action plan to isolate compromised wildfire nodes and prevent systemic failure.",
       videoSrc: "/cap6.webm"
+    },
+    {
+      id: "07",
+      title: "Physics-Informed Prediction Engine",
+      description: "Prevent failure before it strikes. Powered by physics-informed machine learning, our predictive AI accurately forecasts critical node vulnerabilities and models cascade paths before real-world infrastructure is impacted.",
+      videoSrc: "/cap7.webm"
     }
   ];
 
