@@ -281,10 +281,17 @@ export default function HomePage() {
                     {loginText}
                   </Button>
 
-                {/* OpenAI-Style MVP Button */}
+                {/* Grid MVP Button */}
                 <Link href="https://www.energyeminence.online/" target="_blank" rel="noopener noreferrer">
                    <Button className="bg-white text-black hover:bg-slate-100 dark:bg-white dark:text-black dark:hover:bg-slate-200 border border-slate-200 dark:border-transparent rounded-full h-9 px-5 text-sm font-semibold shadow-sm transition-all flex items-center">
-                     Try our MVP <ArrowUpRight className="ml-1.5 w-4 h-4" />
+                     Grid MVP <ArrowUpRight className="ml-1.5 w-4 h-4" />
+                   </Button>
+                 </Link>
+
+                {/* Pipeline MVP Button */}
+                <Link href="https://www.energyeminence.xyz/" target="_blank" rel="noopener noreferrer">
+                   <Button variant="outline" className="text-slate-900 dark:text-white border-slate-300 dark:border-white/30 rounded-full h-9 px-5 text-sm font-semibold shadow-sm hover:bg-slate-100 dark:hover:bg-white/10 transition-all flex items-center">
+                     Pipeline MVP <ArrowUpRight className="ml-1.5 w-4 h-4" />
                    </Button>
                  </Link>
 
@@ -322,9 +329,15 @@ export default function HomePage() {
                 <Link href="#demo" onClick={() => setIsMobileMenuOpen(false)} className="w-full">
                     <Button variant="ghost" className="w-full justify-start text-base h-10 text-emerald-600 dark:text-emerald-400"><PlayCircle className="w-4 h-4 mr-2"/> Platform</Button>
                 </Link>
-                <Link href="https://www.kraftgeneai.ca/" target="_blank" rel="noopener noreferrer" className="w-full">
+                <Link href="https://www.energyeminence.online/" target="_blank" rel="noopener noreferrer" className="w-full">
                     <Button className="w-full bg-white text-black hover:bg-slate-100 border border-slate-200 dark:border-transparent dark:bg-white dark:text-black dark:hover:bg-slate-200 h-10 font-semibold flex items-center justify-center">
-                      Try our MVP <ArrowUpRight className="ml-1.5 w-4 h-4" />
+                      Grid MVP <ArrowUpRight className="ml-1.5 w-4 h-4" />
+                    </Button>
+                </Link>
+                
+                <Link href="https://www.energyeminence.xyz/" target="_blank" rel="noopener noreferrer" className="w-full">
+                    <Button variant="outline" className="w-full text-slate-900 dark:text-white border-slate-300 dark:border-white/30 h-10 font-semibold flex items-center justify-center">
+                      Pipeline MVP <ArrowUpRight className="ml-1.5 w-4 h-4" />
                     </Button>
                 </Link>
                  <Link href="#contact" onClick={() => setIsMobileMenuOpen(false)} className="w-full">
