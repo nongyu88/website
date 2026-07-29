@@ -7,7 +7,8 @@ import {
   ArrowRight, MapPin, Mail, Zap, ShieldCheck, 
   Brain, Leaf, CheckCircle, Cpu, Network, Map, 
   Menu, X, Droplet, Sun, Layers, PlayCircle, Activity,
-  CloudLightning, AlertTriangle, Database, ArrowUpRight
+  CloudLightning, AlertTriangle, Database, ArrowUpRight,
+  Volume2, VolumeX // <-- Add these two
 } from "lucide-react"
 import Link from "next/link"
 import Image from "next/image"
@@ -27,6 +28,9 @@ export default function HomePage() {
   // Track active module and create refs for the scroll-spy effect
   const [activeModule, setActiveModule] = useState(0);
   const moduleRefs = useRef<(HTMLDivElement | null)[]>([]);
+
+  // Track mute state for the demo videos (false = audio on by default)
+  const [isVideoMuted, setIsVideoMuted] = useState(true);
 
   // --------------------------------------------------------
   // UTILITY POWER GRID MODULES (Original 8 Caps)
@@ -70,16 +74,16 @@ export default function HomePage() {
     },
     {
       id: "07",
-      title: "Physics-Informed Prediction Engine",
-      description: "Stay ahead of catastrophe. Our predictive AI engine utilizes physics-informed machine learning to forecast node failures and map cascading blackouts before physical infrastructure is actually compromised.",
-      videoSrc: "/demo7-prediction.webm"
+      title: "Multi-Spectrum Thermal Vision",
+      description: "Go beyond standard optical feeds with real-time FLIR and thermal infrared drone ingestion. The AI vision engine continuously scans for intense heat anomalies—detecting overheating transformers and invisible structural fires to trigger immediate Copilot isolation.",
+      videoSrc: "/demo7-thermal.webm"
     },
     {
       id: "08",
-      title: "Multi-Spectrum Thermal Vision",
-      description: "Go beyond standard optical feeds with real-time FLIR and thermal infrared drone ingestion. The AI vision engine continuously scans for intense heat anomalies—detecting overheating transformers and invisible structural fires to trigger immediate Copilot isolation.",
-      videoSrc: "/demo8-thermal.webm" 
-    }
+      title: "Physics-Informed Prediction Engine",
+      description: "Stay ahead of catastrophe. Our predictive AI engine utilizes physics-informed machine learning to forecast node failures and map cascading blackouts before physical infrastructure is actually compromised.",
+      videoSrc: "/demo8-prediction.webm" 
+    },
   ];
 
   // --------------------------------------------------------
@@ -424,8 +428,8 @@ export default function HomePage() {
         </div>
       </section>
 
-      {/* Platform Capabilities (Palantir-Style Scroll-Spy Walkthrough) */}
-      <section id="demo" className="py-24 bg-slate-50 dark:bg-[#0A0A0A] text-slate-900 dark:text-white border-t border-slate-200 dark:border-white/5 transition-colors duration-300 relative">
+{/* Platform Capabilities (Palantir-Style Scroll-Spy Walkthrough) */}
+<section id="demo" className="py-24 bg-slate-50 dark:bg-[#0A0A0A] text-slate-900 dark:text-white border-t border-slate-200 dark:border-white/5 transition-colors duration-300 relative">
         <div className="container mx-auto px-4 sm:px-6 lg:px-8">
           
           {/* Section Header & Tabs */}
@@ -540,19 +544,28 @@ export default function HomePage() {
                 </div>
 
                 {/* Dynamic Video Player */}
-                <div className="relative overflow-hidden rounded-md border border-slate-300 dark:border-white/5 bg-white dark:bg-[#050505] aspect-video transition-colors">
+                <div className="relative overflow-hidden rounded-md border border-slate-300 dark:border-white/5 bg-white dark:bg-[#050505] aspect-video transition-colors group">
                   <video 
                     key={`${activeTab}-${activeModule}`}
                     autoPlay 
                     loop 
-                    muted 
+                    muted={isVideoMuted} 
                     playsInline
                     preload="none"
                     poster="/images/snowscreen.jfif"
-                    className="w-full h-full object-contain opacity-95"
+                    className="w-full h-full object-cover opacity-95" 
                   >
                     <source src={currentModules[activeModule]?.videoSrc} type="video/webm" />
                   </video>
+
+                  {/* Audio Toggle Button */}
+                  <button
+                    onClick={() => setIsVideoMuted(!isVideoMuted)}
+                    className="absolute bottom-4 right-4 z-20 p-2.5 rounded-full bg-slate-900/60 dark:bg-black/60 hover:bg-slate-900/80 dark:hover:bg-black/80 text-white backdrop-blur-md transition-all duration-300 opacity-0 group-hover:opacity-100 focus:opacity-100 shadow-lg border border-white/10 flex items-center justify-center"
+                    aria-label={isVideoMuted ? "Unmute video" : "Mute video"}
+                  >
+                    {isVideoMuted ? <VolumeX className="w-5 h-5" /> : <Volume2 className="w-5 h-5" />}
+                  </button>
                 </div>
 
               </div>
