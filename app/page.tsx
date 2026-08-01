@@ -22,6 +22,77 @@ export default function HomePage() {
     "/5.webm", "/6.webm", "/7.webm", "/8.webm"
   ];
 
+  const [currentNewsIdx, setCurrentNewsIdx] = useState(0);
+  const newsTimerRef = useRef<NodeJS.Timeout | null>(null);
+
+  const newsItems = [
+    {
+      id: 1,
+      title: "Kraftgene AI at Toronto Tech Week",
+      content: "We successfully hosted our latest tech showcase at Toronto Tech Week. Thank you to everyone who joined us to discuss the future of critical infrastructure resilience and autonomous AI.",
+      links: [{ url: "https://luma.com/wiupfm5m", text: "View Event Details" }],
+      media: [
+        { type: "image", src: "/images/TTW-1.jpg" },
+        { type: "image", src: "/images/TTW-2.jpg" }
+      ]
+    },
+    {
+      id: 2,
+      title: "EnergyEminence™ - G is Now Live",
+      content: "Experience the future of grid monitoring. Our Power Grid Digital Twin MVP is officially online, interactive, and ready for exploration.",
+      links: [{ url: "https://www.energyeminence.online/", text: "Access Grid MVP" }],
+      media: [
+        { type: "video", src: "/demo1-maps.webm" } // Uses existing utility video
+      ]
+    },
+    {
+      id: 3,
+      title: "EnergyEminence™ - P is Now Live",
+      content: "Explore our real-time interactive fluid dynamics twin. The Oil & Gas Pipeline Digital Twin MVP is officially online for enterprise testing.",
+      links: [{ url: "https://www.energyeminence.xyz/", text: "Access Pipeline MVP" }],
+      media: [
+        { type: "video", src: "/cap5.webm" } // Uses existing pipeline video
+      ]
+    },
+    {
+      id: 4,
+      title: "Networking at StartupFest Montreal",
+      content: "The Kraftgene AI team traveled to Montreal for StartupFest, connecting with industry leaders, investors, and innovators to expand our strategic partnerships across Canada.",
+      links: [],
+      media: [
+        { type: "image", src: "/images/startupfest1.webp" },
+        { type: "image", src: "/images/startupfest2.webp" },
+        { type: "image", src: "/images/startupfest3.webp" }
+      ]
+    },
+    {
+      id: 5,
+      title: "Joining Vector Institute Fast Lane & DaRmod",
+      content: "We are proud to become an active member of the Vector Institute's Fast Lane program and officially join the DaRmod program, accelerating our AI capabilities with world-class research backing.",
+      links: [],
+      media: [
+        { type: "image", src: "/images/vin.png" } 
+      ]
+    }
+  ];
+
+  const nextNewsSlide = () => {
+    setCurrentNewsIdx((prevIdx) => (prevIdx === newsItems.length - 1 ? 0 : prevIdx + 1));
+  };
+
+  const jumpToNews = (index: number) => {
+    setCurrentNewsIdx(index);
+    if (newsTimerRef.current) clearInterval(newsTimerRef.current);
+    newsTimerRef.current = setInterval(nextNewsSlide, 12000);
+  };
+
+  useEffect(() => {
+    newsTimerRef.current = setInterval(nextNewsSlide, 12000); 
+    return () => {
+      if (newsTimerRef.current) clearInterval(newsTimerRef.current);
+    };
+  }, []);
+  
   // Tab State for Mission-Critical Action Section
   const [activeTab, setActiveTab] = useState<"utility" | "pipeline">("utility");
 
@@ -1372,6 +1443,121 @@ export default function HomePage() {
             </div>
           </div>
 
+        </div>
+      </section>
+
+{/* Latest News & Updates Section */}
+<section className="py-24 bg-slate-900 dark:bg-[#0a0a0a] border-t border-slate-800 dark:border-white/10 transition-colors duration-300">
+        <div className="container mx-auto px-4 sm:px-6 lg:px-8 max-w-6xl">
+          
+          <div className="text-center mb-12">
+            <Badge variant="outline" className="mb-4 border-emerald-500 text-emerald-400 bg-emerald-500/10 px-4 py-1.5 uppercase tracking-widest text-xs">
+              Latest News
+            </Badge>
+            <h2 className="text-3xl md:text-4xl font-bold text-white mb-4">
+              Company Updates
+            </h2>
+          </div>
+
+          {/* Carousel Container */}
+          <div className="relative w-full rounded-3xl overflow-hidden bg-black/50 border border-slate-700/50 dark:border-white/10 shadow-2xl h-[550px] md:h-[450px]">
+            
+            {/* Slides */}
+            {newsItems.map((news, index) => (
+              <div
+                key={news.id}
+                className={`absolute inset-0 w-full h-full flex flex-col md:flex-row transition-all duration-1000 ease-in-out ${
+                  index === currentNewsIdx 
+                    ? "opacity-100 translate-x-0 z-10" 
+                    : "opacity-0 translate-x-full z-0 pointer-events-none"
+                }`}
+              >
+                {/* Content Side */}
+                <div className="w-full md:w-1/2 p-8 md:p-12 flex flex-col justify-center h-1/2 md:h-full z-20 relative">
+                  <h3 className="text-2xl md:text-3xl font-bold text-white mb-4 leading-tight">
+                    {news.title}
+                  </h3>
+                  <p className="text-slate-300 text-sm md:text-base leading-relaxed mb-8">
+                    {news.content}
+                  </p>
+                  
+                  {/* Action Links */}
+                  {news.links && news.links.length > 0 && (
+                    <div className="flex flex-wrap gap-4 mt-auto md:mt-0">
+                      {news.links.map((link, i) => (
+                        <a 
+                          key={i}
+                          href={link.url}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="inline-flex items-center text-sm font-semibold text-emerald-400 hover:text-emerald-300 transition-colors group bg-emerald-500/10 px-4 py-2 rounded-full border border-emerald-500/20"
+                        >
+                          {link.text}
+                          <ArrowUpRight className="ml-1.5 w-4 h-4 group-hover:translate-x-0.5 group-hover:-translate-y-0.5 transition-transform" />
+                        </a>
+                      ))}
+                    </div>
+                  )}
+                </div>
+
+                {/* Media Side (Dynamic Grid Support) */}
+                <div className="w-full md:w-1/2 h-1/2 md:h-full relative overflow-hidden bg-slate-900 border-l border-slate-800/50 dark:border-white/5">
+                  <div className="absolute inset-0 bg-gradient-to-r from-black/90 via-black/20 to-transparent z-10 hidden md:block pointer-events-none"></div>
+                  <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/20 to-transparent z-10 md:hidden pointer-events-none"></div>
+                  
+                  <div className={`w-full h-full grid gap-1 p-1 ${
+                    news.media.length === 1 ? 'grid-cols-1' : 
+                    news.media.length === 2 ? 'grid-cols-2' : 
+                    'grid-cols-2 grid-rows-2'
+                  }`}>
+                    {news.media.map((mediaItem, mediaIdx) => (
+                      <div 
+                        key={mediaIdx} 
+                        className={`relative w-full h-full overflow-hidden rounded-md ${
+                          news.media.length === 3 && mediaIdx === 0 ? 'col-span-2 row-span-1' : ''
+                        }`}
+                      >
+                        {mediaItem.type === "video" ? (
+                          <video 
+                            autoPlay 
+                            loop 
+                            muted 
+                            playsInline
+                            className="w-full h-full object-cover opacity-80" 
+                            src={mediaItem.src} 
+                          />
+                        ) : (
+                          <Image 
+                            src={mediaItem.src} 
+                            alt={`News media ${mediaIdx + 1}`}
+                            fill
+                            className="object-cover opacity-80 hover:scale-105 transition-transform duration-1000"
+                          />
+                        )}
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              </div>
+            ))}
+
+            {/* Navigation Widget */}
+            <div className="absolute bottom-6 left-1/2 -translate-x-1/2 z-30 flex items-center space-x-3 bg-black/60 backdrop-blur-md px-5 py-2.5 rounded-full border border-white/10">
+              {newsItems.map((_, index) => (
+                <button
+                  key={index}
+                  onClick={() => jumpToNews(index)}
+                  aria-label={`Go to news slide ${index + 1}`}
+                  className={`h-2 rounded-full transition-all duration-500 cursor-pointer ${
+                    index === currentNewsIdx 
+                      ? "w-8 bg-emerald-500 shadow-[0_0_10px_rgba(16,185,129,0.5)]" 
+                      : "w-2.5 bg-gray-500 hover:bg-gray-400"
+                  }`}
+                />
+              ))}
+            </div>
+
+          </div>
         </div>
       </section>
 
