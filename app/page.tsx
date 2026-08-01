@@ -1046,6 +1046,276 @@ export default function HomePage() {
 
           </div>
 
+{/* Investor & Customer Q&A Section */}
+<section id="faq" className="py-24 bg-slate-50 dark:bg-[#050505] border-t border-slate-200 dark:border-white/10 transition-colors duration-300">
+        <div className="container mx-auto px-4 sm:px-6 lg:px-8 max-w-4xl">
+          <div className="text-center mb-16">
+            <Badge variant="outline" className="mb-6 border-emerald-500 text-emerald-600 dark:text-emerald-400 bg-emerald-50 dark:bg-emerald-500/10 px-4 py-1.5 uppercase tracking-widest text-xs">
+              Investor & Customer Q&A
+            </Badge>
+            <h2 className="text-3xl md:text-5xl font-bold text-slate-900 dark:text-white mb-6">
+              Frequently Asked Questions
+            </h2>
+            <p className="text-slate-600 dark:text-gray-400 text-lg">
+              Everything you need to know about our technology, market focus, and strategic growth.
+            </p>
+          </div>
+
+          <div className="space-y-4">
+            {/* FAQ Item 1 */}
+            <div className="bg-white dark:bg-white/5 border border-slate-200 dark:border-white/10 rounded-2xl overflow-hidden shadow-sm transition-all duration-300">
+              <button 
+                className="w-full text-left px-8 py-6 flex justify-between items-center focus:outline-none hover:bg-slate-50 dark:hover:bg-white/5"
+                onClick={(e) => {
+                  const content = e.currentTarget.nextElementSibling as HTMLElement;
+                  const isExpanded = content.style.maxHeight;
+                  
+                  // Close all other accordions
+                  document.querySelectorAll('.faq-content').forEach((el) => {
+                    (el as HTMLElement).style.maxHeight = "";
+                    el.previousElementSibling?.querySelector('svg')?.classList.remove('rotate-180');
+                  });
+
+                  // Toggle current accordion
+                  if (!isExpanded) {
+                    content.style.maxHeight = content.scrollHeight + "px";
+                    e.currentTarget.querySelector('svg')?.classList.add('rotate-180');
+                  }
+                }}
+              >
+                <h3 className="text-xl font-bold text-slate-900 dark:text-white">
+                  What exactly does EnergyEminence™ do?
+                </h3>
+                <svg className="w-6 h-6 text-emerald-500 transform transition-transform duration-300 shrink-0 ml-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 9l-7 7-7-7"></path></svg>
+              </button>
+              <div className="faq-content max-h-0 overflow-hidden transition-all duration-500 ease-in-out bg-slate-50 dark:bg-transparent">
+                <div className="px-8 pb-6 text-slate-600 dark:text-gray-400 leading-relaxed">
+                  EnergyEminence™ is an advanced AI platform that integrates energy infrastructure monitoring with environmental threat detection, robotics, and agentic AI. This enables sustainable energy management and protects critical assets from catastrophic failure before it happens.
+                </div>
+              </div>
+            </div>
+
+            {/* FAQ Item 2 */}
+            <div className="bg-white dark:bg-white/5 border border-slate-200 dark:border-white/10 rounded-2xl overflow-hidden shadow-sm transition-all duration-300">
+              <button 
+                className="w-full text-left px-8 py-6 flex justify-between items-center focus:outline-none hover:bg-slate-50 dark:hover:bg-white/5"
+                onClick={(e) => {
+                  const content = e.currentTarget.nextElementSibling as HTMLElement;
+                  const isExpanded = content.style.maxHeight;
+                  
+                  document.querySelectorAll('.faq-content').forEach((el) => {
+                    (el as HTMLElement).style.maxHeight = "";
+                    el.previousElementSibling?.querySelector('svg')?.classList.remove('rotate-180');
+                  });
+
+                  if (!isExpanded) {
+                    content.style.maxHeight = content.scrollHeight + "px";
+                    e.currentTarget.querySelector('svg')?.classList.add('rotate-180');
+                  }
+                }}
+              >
+                <h3 className="text-xl font-bold text-slate-900 dark:text-white">
+                  What is the core problem Kraftgene AI is solving?
+                </h3>
+                <svg className="w-6 h-6 text-emerald-500 transform transition-transform duration-300 shrink-0 ml-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 9l-7 7-7-7"></path></svg>
+              </button>
+              <div className="faq-content max-h-0 overflow-hidden transition-all duration-500 ease-in-out bg-slate-50 dark:bg-transparent">
+                <div className="px-8 pb-6 text-slate-600 dark:text-gray-400 leading-relaxed">
+                  Every year, there is approximately $25B in damages resulting from climate-related energy infrastructure failure. Currently, utilities rely on outdated monitoring systems that are fragmented and suffer from significant response delays when environmental threats like wildfires or flash floods occur. Our platform bridges this gap with real-time, autonomous intelligence.
+                </div>
+              </div>
+            </div>
+
+            {/* FAQ Item 3 */}
+            <div className="bg-white dark:bg-white/5 border border-slate-200 dark:border-white/10 rounded-2xl overflow-hidden shadow-sm transition-all duration-300">
+              <button 
+                className="w-full text-left px-8 py-6 flex justify-between items-center focus:outline-none hover:bg-slate-50 dark:hover:bg-white/5"
+                onClick={(e) => {
+                  const content = e.currentTarget.nextElementSibling as HTMLElement;
+                  const isExpanded = content.style.maxHeight;
+                  
+                  document.querySelectorAll('.faq-content').forEach((el) => {
+                    (el as HTMLElement).style.maxHeight = "";
+                    el.previousElementSibling?.querySelector('svg')?.classList.remove('rotate-180');
+                  });
+
+                  if (!isExpanded) {
+                    content.style.maxHeight = content.scrollHeight + "px";
+                    e.currentTarget.querySelector('svg')?.classList.add('rotate-180');
+                  }
+                }}
+              >
+                <h3 className="text-xl font-bold text-slate-900 dark:text-white">
+                  How does Kraftgene AI differentiate from legacy enterprise platforms?
+                </h3>
+                <svg className="w-6 h-6 text-emerald-500 transform transition-transform duration-300 shrink-0 ml-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 9l-7 7-7-7"></path></svg>
+              </button>
+              <div className="faq-content max-h-0 overflow-hidden transition-all duration-500 ease-in-out bg-slate-50 dark:bg-transparent">
+                <div className="px-8 pb-6 text-slate-600 dark:text-gray-400 leading-relaxed">
+                  Unlike broader, generalized data platforms, Kraftgene AI provides a comprehensive solution explicitly designed for energy infrastructure. We are uniquely positioned with an AI-native platform featuring Agentic AI, full integration of environmental intelligence, real-time alerting, and autonomous data collection via drones and robotics.
+                </div>
+              </div>
+            </div>
+
+            {/* FAQ Item 4 */}
+            <div className="bg-white dark:bg-white/5 border border-slate-200 dark:border-white/10 rounded-2xl overflow-hidden shadow-sm transition-all duration-300">
+              <button 
+                className="w-full text-left px-8 py-6 flex justify-between items-center focus:outline-none hover:bg-slate-50 dark:hover:bg-white/5"
+                onClick={(e) => {
+                  const content = e.currentTarget.nextElementSibling as HTMLElement;
+                  const isExpanded = content.style.maxHeight;
+                  
+                  document.querySelectorAll('.faq-content').forEach((el) => {
+                    (el as HTMLElement).style.maxHeight = "";
+                    el.previousElementSibling?.querySelector('svg')?.classList.remove('rotate-180');
+                  });
+
+                  if (!isExpanded) {
+                    content.style.maxHeight = content.scrollHeight + "px";
+                    e.currentTarget.querySelector('svg')?.classList.add('rotate-180');
+                  }
+                }}
+              >
+                <h3 className="text-xl font-bold text-slate-900 dark:text-white">
+                  What is the environmental and social impact of your technology?
+                </h3>
+                <svg className="w-6 h-6 text-emerald-500 transform transition-transform duration-300 shrink-0 ml-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 9l-7 7-7-7"></path></svg>
+              </button>
+              <div className="faq-content max-h-0 overflow-hidden transition-all duration-500 ease-in-out bg-slate-50 dark:bg-transparent">
+                <div className="px-8 pb-6 text-slate-600 dark:text-gray-400 leading-relaxed">
+                  Our platform actively enhances the protection of critical energy infrastructure and monitors vulnerable ecosystems, aiding in proactive risk management. Socially, we aim to ensure stable energy grids for the public, enhance community safety against threats like wildfires, and create dozens of high-skilled engineering and AI jobs as we scale.
+                </div>
+              </div>
+            </div>
+
+            {/* FAQ Item 5 */}
+            <div className="bg-white dark:bg-white/5 border border-slate-200 dark:border-white/10 rounded-2xl overflow-hidden shadow-sm transition-all duration-300">
+              <button 
+                className="w-full text-left px-8 py-6 flex justify-between items-center focus:outline-none hover:bg-slate-50 dark:hover:bg-white/5"
+                onClick={(e) => {
+                  const content = e.currentTarget.nextElementSibling as HTMLElement;
+                  const isExpanded = content.style.maxHeight;
+                  
+                  document.querySelectorAll('.faq-content').forEach((el) => {
+                    (el as HTMLElement).style.maxHeight = "";
+                    el.previousElementSibling?.querySelector('svg')?.classList.remove('rotate-180');
+                  });
+
+                  if (!isExpanded) {
+                    content.style.maxHeight = content.scrollHeight + "px";
+                    e.currentTarget.querySelector('svg')?.classList.add('rotate-180');
+                  }
+                }}
+              >
+                <h3 className="text-xl font-bold text-slate-900 dark:text-white">
+                  How do you ensure the security of critical infrastructure data?
+                </h3>
+                <svg className="w-6 h-6 text-emerald-500 transform transition-transform duration-300 shrink-0 ml-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 9l-7 7-7-7"></path></svg>
+              </button>
+              <div className="faq-content max-h-0 overflow-hidden transition-all duration-500 ease-in-out bg-slate-50 dark:bg-transparent">
+                <div className="px-8 pb-6 text-slate-600 dark:text-gray-400 leading-relaxed">
+                  Security is foundational to our architecture. We utilize enterprise-grade encryption, edge-processing (where data is processed locally to minimize transmission vulnerabilities), and strict access controls. Our digital twins are designed to securely integrate with existing SCADA systems without exposing operational networks to external threats.
+                </div>
+              </div>
+            </div>
+
+            {/* FAQ Item 6 */}
+            <div className="bg-white dark:bg-white/5 border border-slate-200 dark:border-white/10 rounded-2xl overflow-hidden shadow-sm transition-all duration-300">
+              <button 
+                className="w-full text-left px-8 py-6 flex justify-between items-center focus:outline-none hover:bg-slate-50 dark:hover:bg-white/5"
+                onClick={(e) => {
+                  const content = e.currentTarget.nextElementSibling as HTMLElement;
+                  const isExpanded = content.style.maxHeight;
+                  
+                  document.querySelectorAll('.faq-content').forEach((el) => {
+                    (el as HTMLElement).style.maxHeight = "";
+                    el.previousElementSibling?.querySelector('svg')?.classList.remove('rotate-180');
+                  });
+
+                  if (!isExpanded) {
+                    content.style.maxHeight = content.scrollHeight + "px";
+                    e.currentTarget.querySelector('svg')?.classList.add('rotate-180');
+                  }
+                }}
+              >
+                <h3 className="text-xl font-bold text-slate-900 dark:text-white">
+                  What is your business model?
+                </h3>
+                <svg className="w-6 h-6 text-emerald-500 transform transition-transform duration-300 shrink-0 ml-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 9l-7 7-7-7"></path></svg>
+              </button>
+              <div className="faq-content max-h-0 overflow-hidden transition-all duration-500 ease-in-out bg-slate-50 dark:bg-transparent">
+                <div className="px-8 pb-6 text-slate-600 dark:text-gray-400 leading-relaxed">
+                  We operate on a SaaS model with multiple revenue streams. The primary driver is Platform Subscriptions, which are based on coverage area and features. We also generate revenue through Professional Services for custom integration and training, as well as Data Services for premium environmental feeds and custom analysis.
+                </div>
+              </div>
+            </div>
+
+             {/* FAQ Item 7 */}
+             <div className="bg-white dark:bg-white/5 border border-slate-200 dark:border-white/10 rounded-2xl overflow-hidden shadow-sm transition-all duration-300">
+              <button 
+                className="w-full text-left px-8 py-6 flex justify-between items-center focus:outline-none hover:bg-slate-50 dark:hover:bg-white/5"
+                onClick={(e) => {
+                  const content = e.currentTarget.nextElementSibling as HTMLElement;
+                  const isExpanded = content.style.maxHeight;
+                  
+                  document.querySelectorAll('.faq-content').forEach((el) => {
+                    (el as HTMLElement).style.maxHeight = "";
+                    el.previousElementSibling?.querySelector('svg')?.classList.remove('rotate-180');
+                  });
+
+                  if (!isExpanded) {
+                    content.style.maxHeight = content.scrollHeight + "px";
+                    e.currentTarget.querySelector('svg')?.classList.add('rotate-180');
+                  }
+                }}
+              >
+                <h3 className="text-xl font-bold text-slate-900 dark:text-white">
+                  Is your technology open source?
+                </h3>
+                <svg className="w-6 h-6 text-emerald-500 transform transition-transform duration-300 shrink-0 ml-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 9l-7 7-7-7"></path></svg>
+              </button>
+              <div className="faq-content max-h-0 overflow-hidden transition-all duration-500 ease-in-out bg-slate-50 dark:bg-transparent">
+                <div className="px-8 pb-6 text-slate-600 dark:text-gray-400 leading-relaxed">
+                  While our core enterprise platform is proprietary, we strongly believe in building alongside the developer community. We maintain an active presence on GitHub where you can view our public repositories, including web demos and a Mini-MVP of the EnergyEminence Platform, at <a href="https://github.com/KraftgeneAI" target="_blank" rel="noopener noreferrer" className="text-emerald-500 hover:text-emerald-400 hover:underline transition-colors">github.com/KraftgeneAI</a>.
+                </div>
+              </div>
+            </div>
+
+            {/* FAQ Item 8 */}
+            <div className="bg-white dark:bg-white/5 border border-slate-200 dark:border-white/10 rounded-2xl overflow-hidden shadow-sm transition-all duration-300">
+              <button 
+                className="w-full text-left px-8 py-6 flex justify-between items-center focus:outline-none hover:bg-slate-50 dark:hover:bg-white/5"
+                onClick={(e) => {
+                  const content = e.currentTarget.nextElementSibling as HTMLElement;
+                  const isExpanded = content.style.maxHeight;
+                  
+                  document.querySelectorAll('.faq-content').forEach((el) => {
+                    (el as HTMLElement).style.maxHeight = "";
+                    el.previousElementSibling?.querySelector('svg')?.classList.remove('rotate-180');
+                  });
+
+                  if (!isExpanded) {
+                    content.style.maxHeight = content.scrollHeight + "px";
+                    e.currentTarget.querySelector('svg')?.classList.add('rotate-180');
+                  }
+                }}
+              >
+                <h3 className="text-xl font-bold text-slate-900 dark:text-white">
+                  How can I stay updated on Kraftgene AI's latest developments or job openings?
+                </h3>
+                <svg className="w-6 h-6 text-emerald-500 transform transition-transform duration-300 shrink-0 ml-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 9l-7 7-7-7"></path></svg>
+              </button>
+              <div className="faq-content max-h-0 overflow-hidden transition-all duration-500 ease-in-out bg-slate-50 dark:bg-transparent">
+                <div className="px-8 pb-6 text-slate-600 dark:text-gray-400 leading-relaxed">
+                  The best way to follow our journey, read our latest announcements, and check for open roles is by following our official LinkedIn page at <a href="https://www.linkedin.com/company/kraftgeneai" target="_blank" rel="noopener noreferrer" className="text-emerald-500 hover:text-emerald-400 hover:underline transition-colors">linkedin.com/company/kraftgeneai</a>. You can also reach out to us directly via our contact section to subscribe to investor or customer updates.
+                </div>
+              </div>
+            </div>
+
+          </div>
+        </div>
+      </section>
+
           {/* Bottom Row: Founders */}
           <div id="team" className="pt-16 border-t border-slate-200 dark:border-white/10">
             <div className="text-center mb-16">
