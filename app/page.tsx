@@ -32,8 +32,8 @@ export default function HomePage() {
       content: "We successfully hosted our latest tech showcase at Toronto Tech Week. Thank you to everyone who joined us to discuss the future of critical infrastructure resilience and autonomous AI.",
       links: [{ url: "https://luma.com/wiupfm5m", text: "View Event Details" }],
       media: [
-        { type: "image", src: "/images/TTW-1.jpg" },
-        { type: "image", src: "/images/TTW-2.jpg" }
+        { type: "image", src: "/images/TTW-1.webp" },
+        { type: "image", src: "/images/TTW-2.webp" }
       ]
     },
     {
@@ -348,13 +348,14 @@ export default function HomePage() {
                <div className="h-5 w-px bg-slate-200 dark:bg-white/10 mx-2"></div>
                
                <div className="flex items-center gap-3">
-                <Button 
+                <Link href="/login">
+                  <Button 
                     variant="ghost" 
-                    onClick={handleLoginClick}
-                    className="text-slate-500 dark:text-gray-400 hover:text-slate-900 dark:hover:text-white h-9 px-4 text-sm font-medium w-32 transition-all duration-300"
+                    className="text-slate-500 dark:text-gray-400 hover:text-slate-900 dark:hover:text-white h-9 px-4 text-sm font-medium transition-all duration-300"
                   >
-                    {loginText}
+                    Client Login
                   </Button>
+                </Link>
 
                 {/* Grid MVP Button */}
                 <Link href="https://www.energyeminence.online/" target="_blank" rel="noopener noreferrer">
