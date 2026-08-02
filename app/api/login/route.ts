@@ -41,6 +41,9 @@ export async function POST(req: Request) {
       user: { id: user.id, email: user.email, company: user.company },
     });
   } catch (error: any) {
-    return NextResponse.json({ error: error.message }, { status: 500 });
+    console.error("Login API Error:", error);
+    return NextResponse.json({ 
+      error: error?.message || "Internal server error during authentication." 
+    }, { status: 500 });
   }
 }
