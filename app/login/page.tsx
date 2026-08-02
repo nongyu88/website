@@ -3,6 +3,8 @@
 import { useState } from "react"
 import { Button } from "@/components/ui/button"
 import { ShieldCheck } from "lucide-react"
+import { useRouter } from "next/navigation";
+import { useEffect } from "react";
 
 export default function AuthPage() {
   const [isRegistering, setIsRegistering] = useState(false)
@@ -16,6 +18,29 @@ export default function AuthPage() {
   const [error, setError] = useState("")
   const [success, setSuccess] = useState("")
   const [loading, setLoading] = useState(false)
+
+  const router = useRouter();
+
+  useEffect(() => {
+    // 1. Grab the token and the time the user logged in
+    const token = localStorage.getItem("kraftgene_token");
+    const loginTime = localStorage.getItem("login_timestamp");
+
+    if (token && loginTime) {
+      const timeElapsed = Date.now() - parseInt(loginTime);
+      const fifteenMinutes = 15 * 60 * 1000; // 15 minutes in milliseconds
+
+      // 2. If they are within the 15-minute window, bounce them to the dashboard
+      if (timeElapsed < fifteenMinutes) {
+        router.push("/dashboard");
+      } else {
+        // 3. If 15 minutes have passed, clear the stale session so they must log in again
+        localStorage.removeItem("kraftgene_token");
+        localStorage.removeItem("user");
+        localStorage.removeItem("login_timestamp");
+      }
+    }
+  }, [router]);
 
   // Handle Login Submission
   const handleLogin = async (e: React.FormEvent) => {
@@ -42,6 +67,8 @@ export default function AuthPage() {
       // Store signed JWT token & user session
       localStorage.setItem("kraftgene_token", data.token)
       localStorage.setItem("user", JSON.stringify(data.user))
+
+      localStorage.setItem("login_timestamp", Date.now().toString());
 
       // Redirect to authorized dashboard
       window.location.href = "/dashboard"

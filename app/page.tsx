@@ -3,6 +3,7 @@
 import { useState, useEffect, useRef } from "react"
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
+import { useRouter } from "next/navigation";
 import { 
   ArrowRight, MapPin, Mail, Zap, ShieldCheck, 
   Brain, Leaf, CheckCircle, Cpu, Network, Map, 
@@ -25,12 +26,61 @@ export default function HomePage() {
   const [currentNewsIdx, setCurrentNewsIdx] = useState(0);
   const newsTimerRef = useRef<NodeJS.Timeout | null>(null);
 
+  const router = useRouter();
+
+  // ADD THIS STATE:
+  const [clientName, setClientName] = useState<string | null>(null);
+
+  // ADD THIS EFFECT:
+  useEffect(() => {
+    const token = localStorage.getItem("kraftgene_token");
+    const loginTime = localStorage.getItem("login_timestamp");
+    const userStr = localStorage.getItem("user");
+
+    if (token && loginTime && userStr) {
+      const timeElapsed = Date.now() - parseInt(loginTime);
+      const fifteenMinutes = 15 * 60 * 1000;
+
+      // Only show the name if the session is still active
+      if (timeElapsed < fifteenMinutes) {
+        try {
+          const user = JSON.parse(userStr);
+          setClientName(user.company || "Enterprise Client");
+        } catch (e) {
+          console.error("Failed to parse user data");
+        }
+      }
+    }
+  }, []);
+
+  // This function decides where the buttons should take the user
+  const handleProtectedNavigation = (e: React.MouseEvent) => {
+    e.preventDefault();
+    
+    const token = localStorage.getItem("kraftgene_token");
+    const loginTime = localStorage.getItem("login_timestamp");
+
+    if (token && loginTime) {
+      const timeElapsed = Date.now() - parseInt(loginTime);
+      const fifteenMinutes = 15 * 60 * 1000;
+
+      if (timeElapsed < fifteenMinutes) {
+        // User is logged in AND within 15 minutes -> Send to Dashboard
+        router.push("/dashboard");
+        return;
+      }
+    }
+
+    // User is NOT logged in (or session expired) -> Send to Login
+    router.push("/login");
+  };
+
   const newsItems = [
     {
       id: 1,
       title: "Kraftgene AI at Toronto Tech Week",
       content: "We successfully hosted our latest tech showcase at Toronto Tech Week. Thank you to everyone who joined us to discuss the future of critical infrastructure resilience and autonomous AI.",
-      links: [{ url: "https://luma.com/wiupfm5m", text: "View Event Details" }],
+      links: [{ url: "https://luma.com/wiupfm5m", text: "View Event Details", isProtected: false }],
       media: [
         { type: "image", src: "/images/TTW-1.webp" },
         { type: "image", src: "/images/TTW-2.webp" }
@@ -40,18 +90,18 @@ export default function HomePage() {
       id: 2,
       title: "EnergyEminence™ - G is Now Live",
       content: "Experience the future of grid monitoring. Our Power Grid Digital Twin MVP is officially online, interactive, and ready for exploration.",
-      links: [{ url: "https://www.energyeminence.online/", text: "Access Grid MVP" }],
+      links: [{ url: "", text: "Access Grid MVP", isProtected: true }],
       media: [
-        { type: "video", src: "/demo1-maps.webm" } // Uses existing utility video
+        { type: "video", src: "/demo1-maps.webm" } 
       ]
     },
     {
       id: 3,
       title: "EnergyEminence™ - P is Now Live",
       content: "Explore our real-time interactive fluid dynamics twin. The Oil & Gas Pipeline Digital Twin MVP is officially online for enterprise testing.",
-      links: [{ url: "https://www.energyeminence.xyz/", text: "Access Pipeline MVP" }],
+      links: [{ url: "", text: "Access Pipeline MVP", isProtected: true }],
       media: [
-        { type: "video", src: "/cap5.webm" } // Uses existing pipeline video
+        { type: "video", src: "/cap5.webm" } 
       ]
     },
     {
@@ -348,28 +398,31 @@ export default function HomePage() {
                <div className="h-5 w-px bg-slate-200 dark:bg-white/10 mx-2"></div>
                
                <div className="flex items-center gap-3">
-                <Link href="/login">
-                  <Button 
-                    variant="ghost" 
-                    className="text-slate-500 dark:text-gray-400 hover:text-slate-900 dark:hover:text-white h-9 px-4 text-sm font-medium transition-all duration-300"
-                  >
-                    Client Login
-                  </Button>
-                </Link>
+                {/* Dynamic Client Login / Greeting Button */}
+                <Button 
+                  onClick={handleProtectedNavigation}
+                  variant="ghost" 
+                  className="text-slate-500 dark:text-gray-400 hover:text-slate-900 dark:hover:text-white h-9 px-4 text-sm font-medium transition-all duration-300"
+                >
+                  {clientName ? `Hello, welcome ${clientName}!` : "Client Login"}
+                </Button>
 
-                {/* Grid MVP Button */}
-                <Link href="https://www.energyeminence.online/" target="_blank" rel="noopener noreferrer">
-                   <Button className="bg-white text-black hover:bg-slate-100 dark:bg-white dark:text-black dark:hover:bg-slate-200 border border-slate-200 dark:border-transparent rounded-full h-9 px-5 text-sm font-semibold shadow-sm transition-all flex items-center">
-                     Grid MVP <ArrowUpRight className="ml-1.5 w-4 h-4" />
-                   </Button>
-                 </Link>
+                {/* Grid MVP Button (Dynamic) */}
+                <Button 
+                  onClick={handleProtectedNavigation}
+                  className="bg-white text-black hover:bg-slate-100 dark:bg-white dark:text-black dark:hover:bg-slate-200 border border-slate-200 dark:border-transparent rounded-full h-9 px-5 text-sm font-semibold shadow-sm transition-all flex items-center"
+                >
+                  Grid MVP <ArrowUpRight className="ml-1.5 w-4 h-4" />
+                </Button>
 
-                {/* Pipeline MVP Button */}
-                <Link href="https://www.energyeminence.xyz/" target="_blank" rel="noopener noreferrer">
-                   <Button variant="outline" className="text-slate-900 dark:text-white border-slate-300 dark:border-white/30 rounded-full h-9 px-5 text-sm font-semibold shadow-sm hover:bg-slate-100 dark:hover:bg-white/10 transition-all flex items-center">
-                     Pipeline MVP <ArrowUpRight className="ml-1.5 w-4 h-4" />
-                   </Button>
-                 </Link>
+                {/* Pipeline MVP Button (Dynamic) */}
+                <Button 
+                  onClick={handleProtectedNavigation}
+                  variant="outline" 
+                  className="text-slate-900 dark:text-white border-slate-300 dark:border-white/30 rounded-full h-9 px-5 text-sm font-semibold shadow-sm hover:bg-slate-100 dark:hover:bg-white/10 transition-all flex items-center"
+                >
+                  Pipeline MVP <ArrowUpRight className="ml-1.5 w-4 h-4" />
+                </Button>
 
                  <Link href="#contact">
                   <Button className="bg-emerald-600 hover:bg-emerald-700 text-white border-0 h-9 px-5 text-sm font-medium shadow-sm rounded-md transition-all">
@@ -405,17 +458,28 @@ export default function HomePage() {
                 <Link href="#demo" onClick={() => setIsMobileMenuOpen(false)} className="w-full">
                     <Button variant="ghost" className="w-full justify-start text-base h-10 text-emerald-600 dark:text-emerald-400"><PlayCircle className="w-4 h-4 mr-2"/> Platform</Button>
                 </Link>
-                <Link href="https://www.energyeminence.online/" target="_blank" rel="noopener noreferrer" className="w-full">
-                    <Button className="w-full bg-white text-black hover:bg-slate-100 border border-slate-200 dark:border-transparent dark:bg-white dark:text-black dark:hover:bg-slate-200 h-10 font-semibold flex items-center justify-center">
-                      Grid MVP <ArrowUpRight className="ml-1.5 w-4 h-4" />
-                    </Button>
-                </Link>
+                {/* Mobile Grid MVP Button (Dynamic) */}
+                <Button 
+                  onClick={(e) => {
+                    setIsMobileMenuOpen(false);
+                    handleProtectedNavigation(e);
+                  }} 
+                  className="w-full bg-white text-black hover:bg-slate-100 border border-slate-200 dark:border-transparent dark:bg-white dark:text-black dark:hover:bg-slate-200 h-10 font-semibold flex items-center justify-center"
+                >
+                  Grid MVP <ArrowUpRight className="ml-1.5 w-4 h-4" />
+                </Button>
                 
-                <Link href="https://www.energyeminence.xyz/" target="_blank" rel="noopener noreferrer" className="w-full">
-                    <Button variant="outline" className="w-full text-slate-900 dark:text-white border-slate-300 dark:border-white/30 h-10 font-semibold flex items-center justify-center">
-                      Pipeline MVP <ArrowUpRight className="ml-1.5 w-4 h-4" />
-                    </Button>
-                </Link>
+                {/* Mobile Pipeline MVP Button (Dynamic) */}
+                <Button 
+                  onClick={(e) => {
+                    setIsMobileMenuOpen(false);
+                    handleProtectedNavigation(e);
+                  }} 
+                  variant="outline" 
+                  className="w-full text-slate-900 dark:text-white border-slate-300 dark:border-white/30 h-10 font-semibold flex items-center justify-center"
+                >
+                  Pipeline MVP <ArrowUpRight className="ml-1.5 w-4 h-4" />
+                </Button>
                  <Link href="#contact" onClick={() => setIsMobileMenuOpen(false)} className="w-full">
                  <Button className="w-full bg-emerald-600 hover:bg-emerald-700 text-white h-10">Get in Touch</Button>
                 </Link>
@@ -1053,10 +1117,8 @@ export default function HomePage() {
             </div>
             
             {/* Column 2: Live MVP Showcase Card (Grid) */}
-            <Link 
-              href="https://www.energyeminence.online/" 
-              target="_blank" 
-              rel="noopener noreferrer"
+            <div 
+              onClick={handleProtectedNavigation}
               className="bg-[#0a1110] border border-emerald-900/30 rounded-3xl overflow-hidden shadow-2xl flex flex-col group transition-all duration-300 hover:border-emerald-500/50 hover:shadow-[0_0_30px_rgba(16,185,129,0.15)] w-full max-w-md mx-auto h-[480px] cursor-pointer"
             >
               {/* Top: The Map Image (60% Height) */}
@@ -1082,13 +1144,11 @@ export default function HomePage() {
                   <ArrowRight className="ml-2 w-4 h-4 group-hover:translate-x-1.5 transition-transform" />
                 </span>
               </div>
-            </Link>
+            </div>
 
             {/* Column 3: Live MVP Showcase Card (Pipeline) */}
-            <Link 
-              href="https://www.energyeminence.xyz/" 
-              target="_blank" 
-              rel="noopener noreferrer"
+            <div 
+              onClick={handleProtectedNavigation}
               className="bg-[#050a14] border border-blue-900/30 rounded-3xl overflow-hidden shadow-2xl flex flex-col group transition-all duration-300 hover:border-blue-500/50 hover:shadow-[0_0_30px_rgba(59,130,246,0.15)] w-full max-w-md mx-auto h-[480px] cursor-pointer"
             >
               {/* Top: The Map Image (60% Height) */}
@@ -1114,7 +1174,7 @@ export default function HomePage() {
                   <ArrowRight className="ml-2 w-4 h-4 group-hover:translate-x-1.5 transition-transform" />
                 </span>
               </div>
-            </Link>
+            </div>
 
           </div>
 
@@ -1486,16 +1546,28 @@ export default function HomePage() {
                   {news.links && news.links.length > 0 && (
                     <div className="flex flex-wrap gap-4 mt-auto md:mt-0">
                       {news.links.map((link, i) => (
-                        <a 
-                          key={i}
-                          href={link.url}
-                          target="_blank"
-                          rel="noopener noreferrer"
-                          className="inline-flex items-center text-sm font-semibold text-emerald-400 hover:text-emerald-300 transition-colors group bg-emerald-500/10 px-4 py-2 rounded-full border border-emerald-500/20"
-                        >
-                          {link.text}
-                          <ArrowUpRight className="ml-1.5 w-4 h-4 group-hover:translate-x-0.5 group-hover:-translate-y-0.5 transition-transform" />
-                        </a>
+                        // Check if the link requires authentication
+                        link.isProtected ? (
+                          <button 
+                            key={i}
+                            onClick={handleProtectedNavigation}
+                            className="inline-flex items-center text-sm font-semibold text-emerald-400 hover:text-emerald-300 transition-colors group bg-emerald-500/10 px-4 py-2 rounded-full border border-emerald-500/20"
+                          >
+                            {link.text}
+                            <ArrowUpRight className="ml-1.5 w-4 h-4 group-hover:translate-x-0.5 group-hover:-translate-y-0.5 transition-transform" />
+                          </button>
+                        ) : (
+                          <a 
+                            key={i}
+                            href={link.url}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="inline-flex items-center text-sm font-semibold text-emerald-400 hover:text-emerald-300 transition-colors group bg-emerald-500/10 px-4 py-2 rounded-full border border-emerald-500/20"
+                          >
+                            {link.text}
+                            <ArrowUpRight className="ml-1.5 w-4 h-4 group-hover:translate-x-0.5 group-hover:-translate-y-0.5 transition-transform" />
+                          </a>
+                        )
                       ))}
                     </div>
                   )}
