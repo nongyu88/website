@@ -2,12 +2,14 @@
 
 import { useState } from "react"
 import { Button } from "@/components/ui/button"
-import { ShieldCheck } from "lucide-react"
+import { ShieldCheck, Sun, Moon, X } from "lucide-react"
 import { useRouter } from "next/navigation";
 import { useEffect } from "react";
+import Link from 'next/link';
 
 export default function AuthPage() {
   const [isRegistering, setIsRegistering] = useState(false)
+  const [isDarkMode, setIsDarkMode] = useState(true)
   
   // Form Fields
   const [email, setEmail] = useState("")
@@ -113,10 +115,28 @@ export default function AuthPage() {
   }
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-slate-950 px-4">
-      <div className="bg-slate-900 border border-emerald-900/50 p-8 md:p-10 rounded-3xl shadow-2xl w-full max-w-md text-white">
-        
-        {/* Header Icon */}
+    <div className={isDarkMode ? "dark" : ""}>
+      <div className="min-h-screen flex items-center justify-center bg-slate-50 dark:bg-slate-950 px-4 transition-colors duration-300">
+        <div className="relative bg-white dark:bg-slate-900 border border-slate-200 dark:border-emerald-900/50 p-8 md:p-10 rounded-3xl shadow-2xl shadow-slate-200/50 dark:shadow-none w-full max-w-md text-slate-900 dark:text-white transition-colors duration-300">
+          
+          {/* ── TOP RIGHT CONTROLS ── */}
+          <div className="absolute top-4 right-4 flex items-center gap-1">
+            <button
+              onClick={() => setIsDarkMode(!isDarkMode)}
+              type="button"
+              className="p-2 rounded-full text-slate-400 hover:text-slate-600 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-slate-800 transition-all duration-200"
+            >
+              {isDarkMode ? <Sun className="w-5 h-5" /> : <Moon className="w-5 h-5" />}
+            </button>
+            <Link
+              href="https://www.kraftgeneai.ca/"
+              className="p-2 rounded-full text-slate-400 hover:text-slate-600 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-slate-800 transition-all duration-200"
+            >
+              <X className="w-5 h-5" />
+            </Link>
+          </div>
+          
+          {/* Header Icon */}
         <div className="flex justify-center mb-6">
           <div className="w-16 h-16 bg-emerald-500/10 rounded-2xl flex items-center justify-center border border-emerald-500/20">
             <ShieldCheck className="w-8 h-8 text-emerald-400" />
@@ -156,7 +176,7 @@ export default function AuthPage() {
                   value={company}
                   onChange={(e) => setCompany(e.target.value)}
                   placeholder="e.g. Pacific Gas & Electric"
-                  className="w-full bg-slate-950 border border-slate-800 rounded-xl px-4 py-3 text-sm text-white focus:outline-none focus:border-emerald-500 transition-colors"
+                  className="w-full bg-slate-50 dark:bg-slate-950 border border-slate-300 dark:border-slate-800 rounded-xl px-4 py-3 text-sm text-slate-900 dark:text-white focus:outline-none focus:border-emerald-500 transition-colors"
                 />
               </div>
             </div>
@@ -169,7 +189,7 @@ export default function AuthPage() {
               value={email}
               onChange={(e) => setEmail(e.target.value)}
               placeholder="name@company.com"
-              className="w-full bg-slate-950 border border-slate-800 rounded-xl px-4 py-3 text-sm text-white focus:outline-none focus:border-emerald-500 transition-colors"
+              className="w-full bg-slate-50 dark:bg-slate-950 border border-slate-300 dark:border-slate-800 rounded-xl px-4 py-3 text-sm text-slate-900 dark:text-white focus:outline-none focus:border-emerald-500 transition-colors"
               required
             />
           </div>
@@ -181,7 +201,7 @@ export default function AuthPage() {
               value={password}
               onChange={(e) => setPassword(e.target.value)}
               placeholder="••••••••••••"
-              className="w-full bg-slate-950 border border-slate-800 rounded-xl px-4 py-3 text-sm text-white focus:outline-none focus:border-emerald-500 transition-colors"
+              className="w-full bg-slate-50 dark:bg-slate-950 border border-slate-300 dark:border-slate-800 rounded-xl px-4 py-3 text-sm text-slate-900 dark:text-white focus:outline-none focus:border-emerald-500 transition-colors"
               required
             />
           </div>
@@ -213,6 +233,7 @@ export default function AuthPage() {
           </p>
         </div>
 
+        </div>
       </div>
     </div>
   )
