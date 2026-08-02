@@ -25,3 +25,15 @@ yarn-error.log*
 # typescript
 *.tsbuildinfo
 next-env.d.ts
+
+# Virtual environments
+venv/
+env/
+.venv/
+
+/lib/generated/prisma
+
+# AI Coding Tool local caches
+.agents/
+.claude/
+.windsurf/
