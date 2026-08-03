@@ -78,6 +78,7 @@ export default function HomePage() {
   const newsItems = [
     {
       id: 1,
+      date: "May 29, 2026",
       title: "Kraftgene AI at Toronto Tech Week",
       content: "We successfully hosted our latest tech showcase at Toronto Tech Week. Thank you to everyone who joined us to discuss the future of critical infrastructure resilience and autonomous AI.",
       links: [{ url: "https://luma.com/wiupfm5m", text: "View Event Details", isProtected: false }],
@@ -88,6 +89,7 @@ export default function HomePage() {
     },
     {
       id: 2,
+      date: "July 20, 2026",
       title: "EnergyEminence™ - G is Now Live",
       content: "Experience the future of grid monitoring. Our Power Grid Digital Twin MVP is officially online, interactive, and ready for exploration.",
       links: [{ url: "", text: "Access Grid MVP", isProtected: true }],
@@ -97,6 +99,7 @@ export default function HomePage() {
     },
     {
       id: 3,
+      date: "July 27, 2026",
       title: "EnergyEminence™ - P is Now Live",
       content: "Explore our real-time interactive fluid dynamics twin. The Oil & Gas Pipeline Digital Twin MVP is officially online for enterprise testing.",
       links: [{ url: "", text: "Access Pipeline MVP", isProtected: true }],
@@ -106,6 +109,7 @@ export default function HomePage() {
     },
     {
       id: 4,
+      date: "July 11, 2026",
       title: "Networking at StartupFest Montreal",
       content: "The Kraftgene AI team traveled to Montreal for StartupFest, connecting with industry leaders, investors, and innovators to expand our strategic partnerships across Canada.",
       links: [],
@@ -117,15 +121,55 @@ export default function HomePage() {
     },
     {
       id: 5,
+      date: "July 27, 2026",
       title: "Joining Vector Institute Fast Lane & DaRmod",
       content: "We are proud to become an active member of the Vector Institute's Fast Lane program and officially join the DaRmod program, accelerating our AI capabilities with world-class research backing.",
       links: [],
       media: [
-        { type: "image", src: "/images/vin.png" } 
+        { type: "image", src: "/images/fast-lane.png" } 
+      ]
+    },
+    {
+      id: 6,
+      date: "April 11, 2026",
+      title: "Accepted into Microsoft for Startups Founders Hub",
+      content: "We are thrilled to join the Microsoft for Startups Founders Hub, gaining access to industry-leading AI infrastructure and Azure cloud resources to scale EnergyEminence™ globally.",
+      links: [],
+      media: [
+        { type: "image", src: "/images/news-MSforS.jfif" } 
+      ]
+    },
+    {
+      id: 7,
+      date: "December 17, 2025",
+      title: "Accepted into NVIDIA Inception Program",
+      content: "Kraftgene AI is officially part of the NVIDIA Inception global program, empowering our physics-informed predictive models with cutting-edge GPU acceleration.",
+      links: [],
+      media: [
+        { type: "image", src: "/images/news-nvidia-inception.jpeg" } 
+      ]
+    },
+    {
+      id: 8,
+      date: "November 10, 2025",
+      title: "Accepted into AWS Activate Program",
+      content: "We have partnered with AWS through the Activate program, strengthening our digital twin pipeline with enterprise-grade cloud reliability.",
+      links: [],
+      media: [
+        { type: "image", src: "/images/news-aws-activate.jfif" } 
+      ]
+    },
+    {
+      id: 9,
+      date: "May 10, 2026",
+      title: "Accepted into Google for Startups",
+      content: "Kraftgene AI has joined the Google for Startups ecosystem, gaining strategic support to scale our AI-driven critical infrastructure solutions.",
+      links: [],
+      media: [
+        { type: "image", src: "/images/news-google-startup.jfif" } 
       ]
     }
   ];
-
   const nextNewsSlide = () => {
     setCurrentNewsIdx((prevIdx) => (prevIdx === newsItems.length - 1 ? 0 : prevIdx + 1));
   };
@@ -375,8 +419,8 @@ export default function HomePage() {
               </Link>
             </div>
 
-{/* Desktop Navigation */}
-<div className="hidden xl:flex items-center gap-6">
+            {/* Desktop Navigation */}
+            <div className="hidden xl:flex items-center gap-6">
                <div className="flex items-center space-x-2">
                    <Link href="#demo">
                      <Button variant="ghost" className="text-slate-600 dark:text-gray-300 hover:text-emerald-600 dark:hover:text-emerald-400 h-9 px-4 text-sm font-medium rounded-md">
@@ -524,12 +568,12 @@ export default function HomePage() {
             <h1 className="text-4xl md:text-6xl lg:text-7xl font-bold text-slate-900 dark:text-white mb-6 leading-tight tracking-tight">
               The Operating System for <br className="hidden md:block"/>
               <span className="text-transparent bg-clip-text bg-gradient-to-r from-emerald-500 to-teal-400">
-                Critical Grid Resilience
+                Critical Grid Resilience, Oil & Gas Pipelines, & Renewable Energy Management
               </span>
             </h1>
             
             <p className="text-base md:text-xl text-slate-700 dark:text-gray-300 mb-10 max-w-3xl mx-auto px-2">
-              EnergyEminence™ is a physics-backed digital twin that fuses live drone surveillance with an autonomous AI Copilot to instantly detect, isolate, and mitigate catastrophic failures before they happen.
+              EnergyEminence™ is a physics-backed digital twin that fuses live drone surveillance and physics-informed ML as a predictive engine with an autonomous AI Copilot to instantly detect, isolate, and mitigate catastrophic failures before they happen.
             </p>
             
             <div className="flex flex-col sm:flex-row gap-4 justify-center px-4">
@@ -564,8 +608,8 @@ export default function HomePage() {
         </div>
       </section>
 
-{/* Platform Capabilities (Palantir-Style Scroll-Spy Walkthrough) */}
-<section id="demo" className="py-24 bg-slate-50 dark:bg-[#0A0A0A] text-slate-900 dark:text-white border-t border-slate-200 dark:border-white/5 transition-colors duration-300 relative">
+      {/* Platform Capabilities (Palantir-Style Scroll-Spy Walkthrough) */}
+      <section id="demo" className="py-24 bg-slate-50 dark:bg-[#0A0A0A] text-slate-900 dark:text-white border-t border-slate-200 dark:border-white/5 transition-colors duration-300 relative">
         <div className="container mx-auto px-4 sm:px-6 lg:px-8">
           
           {/* Section Header & Tabs */}
@@ -913,8 +957,8 @@ export default function HomePage() {
         </div>
       </section>
 
-{/* Market Urgency Section */}
-<section id="urgency" className="py-32 bg-slate-50 dark:bg-[#050505] border-t border-slate-200 dark:border-white/5 transition-colors duration-300">
+      {/* Market Urgency Section */}
+      <section id="urgency" className="py-32 bg-slate-50 dark:bg-[#050505] border-t border-slate-200 dark:border-white/5 transition-colors duration-300">
         <div className="container mx-auto px-4 sm:px-6 lg:px-8 max-w-7xl">
             
             {/* Section Header */}
@@ -1096,8 +1140,8 @@ export default function HomePage() {
         </div>
       </section>
 
-{/* About & Leadership Section */}
-<section id="about" className="py-24 bg-white dark:bg-black border-t border-slate-200 dark:border-white/10 transition-colors duration-300">
+      {/* About & Leadership Section */}
+      <section id="about" className="py-24 bg-white dark:bg-black border-t border-slate-200 dark:border-white/10 transition-colors duration-300">
         <div className="container mx-auto px-4 sm:px-6 lg:px-8">
           
           {/* Top Row: About & MVP Cards */}
@@ -1178,8 +1222,8 @@ export default function HomePage() {
 
           </div>
 
-{/* Investor & Customer Q&A Section */}
-<section id="faq" className="py-24 bg-slate-50 dark:bg-[#050505] border-t border-slate-200 dark:border-white/10 transition-colors duration-300">
+      {/* Investor & Customer Q&A Section */}
+      <section id="faq" className="py-24 bg-slate-50 dark:bg-[#050505] border-t border-slate-200 dark:border-white/10 transition-colors duration-300">
         <div className="container mx-auto px-4 sm:px-6 lg:px-8 max-w-4xl">
           <div className="text-center mb-16">
             <Badge variant="outline" className="mb-6 border-emerald-500 text-emerald-600 dark:text-emerald-400 bg-emerald-50 dark:bg-emerald-500/10 px-4 py-1.5 uppercase tracking-widest text-xs">
@@ -1507,21 +1551,21 @@ export default function HomePage() {
         </div>
       </section>
 
-{/* Latest News & Updates Section */}
-<section className="py-24 bg-slate-900 dark:bg-[#0a0a0a] border-t border-slate-800 dark:border-white/10 transition-colors duration-300">
+      {/* Latest News & Updates Section */}
+      <section className="py-24 bg-slate-50 dark:bg-[#0a0a0a] border-t border-slate-200 dark:border-white/10 transition-colors duration-300">
         <div className="container mx-auto px-4 sm:px-6 lg:px-8 max-w-6xl">
           
           <div className="text-center mb-12">
-            <Badge variant="outline" className="mb-4 border-emerald-500 text-emerald-400 bg-emerald-500/10 px-4 py-1.5 uppercase tracking-widest text-xs">
+            <Badge variant="outline" className="mb-4 border-emerald-500 text-emerald-600 dark:text-emerald-400 bg-emerald-50 dark:bg-emerald-500/10 px-4 py-1.5 uppercase tracking-widest text-xs">
               Latest News
             </Badge>
-            <h2 className="text-3xl md:text-4xl font-bold text-white mb-4">
+            <h2 className="text-3xl md:text-4xl font-bold text-slate-900 dark:text-white mb-4">
               Company Updates
             </h2>
           </div>
 
           {/* Carousel Container */}
-          <div className="relative w-full rounded-3xl overflow-hidden bg-black/50 border border-slate-700/50 dark:border-white/10 shadow-2xl h-[550px] md:h-[450px]">
+          <div className="relative w-full rounded-3xl overflow-hidden bg-white dark:bg-black/50 border border-slate-200 dark:border-white/10 shadow-xl dark:shadow-2xl h-[550px] md:h-[450px] transition-colors duration-300">
             
             {/* Slides */}
             {newsItems.map((news, index) => (
@@ -1535,10 +1579,14 @@ export default function HomePage() {
               >
                 {/* Content Side */}
                 <div className="w-full md:w-1/2 p-8 md:p-12 flex flex-col justify-center h-1/2 md:h-full z-20 relative">
-                  <h3 className="text-2xl md:text-3xl font-bold text-white mb-4 leading-tight">
+                  {/* Date display */}
+                  <p className="text-emerald-600 dark:text-emerald-400 text-sm font-semibold tracking-widest uppercase mb-3">
+                    {news.date}
+                  </p>
+                  <h3 className="text-2xl md:text-3xl font-bold text-slate-900 dark:text-white mb-4 leading-tight transition-colors">
                     {news.title}
                   </h3>
-                  <p className="text-slate-300 text-sm md:text-base leading-relaxed mb-8">
+                  <p className="text-slate-600 dark:text-slate-300 text-sm md:text-base leading-relaxed mb-8 transition-colors">
                     {news.content}
                   </p>
                   
@@ -1546,12 +1594,11 @@ export default function HomePage() {
                   {news.links && news.links.length > 0 && (
                     <div className="flex flex-wrap gap-4 mt-auto md:mt-0">
                       {news.links.map((link, i) => (
-                        // Check if the link requires authentication
                         link.isProtected ? (
                           <button 
                             key={i}
                             onClick={handleProtectedNavigation}
-                            className="inline-flex items-center text-sm font-semibold text-emerald-400 hover:text-emerald-300 transition-colors group bg-emerald-500/10 px-4 py-2 rounded-full border border-emerald-500/20"
+                            className="inline-flex items-center text-sm font-semibold text-emerald-600 dark:text-emerald-400 hover:text-emerald-700 dark:hover:text-emerald-300 transition-colors group bg-emerald-50 dark:bg-emerald-500/10 px-4 py-2 rounded-full border border-emerald-200 dark:border-emerald-500/20"
                           >
                             {link.text}
                             <ArrowUpRight className="ml-1.5 w-4 h-4 group-hover:translate-x-0.5 group-hover:-translate-y-0.5 transition-transform" />
@@ -1562,7 +1609,7 @@ export default function HomePage() {
                             href={link.url}
                             target="_blank"
                             rel="noopener noreferrer"
-                            className="inline-flex items-center text-sm font-semibold text-emerald-400 hover:text-emerald-300 transition-colors group bg-emerald-500/10 px-4 py-2 rounded-full border border-emerald-500/20"
+                            className="inline-flex items-center text-sm font-semibold text-emerald-600 dark:text-emerald-400 hover:text-emerald-700 dark:hover:text-emerald-300 transition-colors group bg-emerald-50 dark:bg-emerald-500/10 px-4 py-2 rounded-full border border-emerald-200 dark:border-emerald-500/20"
                           >
                             {link.text}
                             <ArrowUpRight className="ml-1.5 w-4 h-4 group-hover:translate-x-0.5 group-hover:-translate-y-0.5 transition-transform" />
@@ -1574,9 +1621,10 @@ export default function HomePage() {
                 </div>
 
                 {/* Media Side (Dynamic Grid Support) */}
-                <div className="w-full md:w-1/2 h-1/2 md:h-full relative overflow-hidden bg-slate-900 border-l border-slate-800/50 dark:border-white/5">
-                  <div className="absolute inset-0 bg-gradient-to-r from-black/90 via-black/20 to-transparent z-10 hidden md:block pointer-events-none"></div>
-                  <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/20 to-transparent z-10 md:hidden pointer-events-none"></div>
+                <div className="w-full md:w-1/2 h-1/2 md:h-full relative overflow-hidden bg-slate-50 dark:bg-slate-900/50 border-l border-slate-200 dark:border-white/5 transition-colors">
+                  {/* Fade overlays that adapt to light/dark mode */}
+                  <div className="absolute inset-0 bg-gradient-to-r from-white via-white/80 dark:from-black/90 dark:via-black/20 to-transparent z-10 hidden md:block pointer-events-none transition-colors"></div>
+                  <div className="absolute inset-0 bg-gradient-to-t from-white via-white/80 dark:from-black/90 dark:via-black/20 to-transparent z-10 md:hidden pointer-events-none transition-colors"></div>
                   
                   <div className={`w-full h-full grid gap-1 p-1 ${
                     news.media.length === 1 ? 'grid-cols-1' : 
@@ -1596,7 +1644,8 @@ export default function HomePage() {
                             loop 
                             muted 
                             playsInline
-                            className="w-full h-full object-cover opacity-80" 
+                            // Pipeline Video (ID 3) shifts right to preserve the thermal camera view
+                            className={`w-full h-full object-cover opacity-90 dark:opacity-80 ${news.id === 3 ? 'object-right' : 'object-center'}`} 
                             src={mediaItem.src} 
                           />
                         ) : (
@@ -1604,7 +1653,12 @@ export default function HomePage() {
                             src={mediaItem.src} 
                             alt={`News media ${mediaIdx + 1}`}
                             fill
-                            className="object-cover opacity-80 hover:scale-105 transition-transform duration-1000"
+                            // Events (ID 1 & 4) use object-cover, everything else uses object-contain with padding
+                            className={`hover:scale-105 transition-transform duration-1000 ${
+                              (news.id === 1 || news.id === 4) 
+                                ? 'object-cover opacity-90 dark:opacity-80' 
+                                : 'object-contain p-6 opacity-100'
+                            }`}
                           />
                         )}
                       </div>
@@ -1615,7 +1669,7 @@ export default function HomePage() {
             ))}
 
             {/* Navigation Widget */}
-            <div className="absolute bottom-6 left-1/2 -translate-x-1/2 z-30 flex items-center space-x-3 bg-black/60 backdrop-blur-md px-5 py-2.5 rounded-full border border-white/10">
+            <div className="absolute bottom-6 left-1/2 -translate-x-1/2 z-30 flex items-center space-x-3 bg-white/90 dark:bg-black/60 backdrop-blur-md px-5 py-2.5 rounded-full border border-slate-200 dark:border-white/10 shadow-sm transition-colors">
               {newsItems.map((_, index) => (
                 <button
                   key={index}
@@ -1623,8 +1677,8 @@ export default function HomePage() {
                   aria-label={`Go to news slide ${index + 1}`}
                   className={`h-2 rounded-full transition-all duration-500 cursor-pointer ${
                     index === currentNewsIdx 
-                      ? "w-8 bg-emerald-500 shadow-[0_0_10px_rgba(16,185,129,0.5)]" 
-                      : "w-2.5 bg-gray-500 hover:bg-gray-400"
+                      ? "w-8 bg-emerald-500 shadow-[0_0_10px_rgba(16,185,129,0.3)] dark:shadow-[0_0_10px_rgba(16,185,129,0.5)]" 
+                      : "w-2.5 bg-slate-300 hover:bg-slate-400 dark:bg-gray-500 dark:hover:bg-gray-400"
                   }`}
                 />
               ))}
