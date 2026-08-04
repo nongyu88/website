@@ -7,8 +7,9 @@ import { useRouter } from "next/navigation";
 import { useEffect } from "react";
 import Link from 'next/link';
 import { useSearchParams } from "next/navigation";
+import { Suspense } from "react"
 
-export default function AuthPage() {
+function AuthForm() {
   const [isRegistering, setIsRegistering] = useState(false)
   const [isDarkMode, setIsDarkMode] = useState(true)
   
@@ -257,5 +258,13 @@ export default function AuthPage() {
         </div>
       </div>
     </div>
+  )
+}
+
+export default function AuthPage() {
+  return (
+    <Suspense fallback={<div className="min-h-screen bg-slate-950 flex items-center justify-center text-slate-400">Loading login...</div>}>
+      <AuthForm />
+    </Suspense>
   )
 }
