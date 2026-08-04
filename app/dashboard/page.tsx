@@ -6,12 +6,13 @@ import Image from "next/image"
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
 import { 
-  ShieldCheck, Zap, Droplet, ArrowUpRight, 
+  ShieldCheck, Zap, Droplet, ArrowUpRight, Settings,
   LogOut, Activity, Lock, Building2, User,
   Sun, Moon, AlertTriangle, ServerCrash
 } from "lucide-react"
 import OnboardingWizard from "@/components/OnboardingWizard"
 import SubscriptionPlans from "@/components/SubscriptionPlans" // <-- ADD THIS
+import { useTheme } from "next-themes";
 
 interface UserData {
   id: string
@@ -26,17 +27,12 @@ interface UserData {
 export default function DashboardPage() {
   const [user, setUser] = useState<UserData | null>(null)
   const [loading, setLoading] = useState(true)
-  const [isDark, setIsDark] = useState(true)
-
-  useEffect(() => {
-    if (isDark) {
-      document.documentElement.classList.add('dark')
-    } else {
-      document.documentElement.classList.remove('dark')
-    }
-  }, [isDark])
   
-  const toggleTheme = () => setIsDark(!isDark)
+  const { theme, setTheme } = useTheme();
+
+  const toggleTheme = () => {
+    setTheme(theme === "dark" ? "light" : "dark");
+  };
 
   useEffect(() => {
     const storedUser = localStorage.getItem("user")
@@ -113,8 +109,13 @@ export default function DashboardPage() {
               className="p-2 rounded-full hover:bg-slate-200 dark:hover:bg-white/10 transition-colors"
               aria-label="Toggle theme"
             >
-              {isDark ? <Sun className="w-4 h-4 text-slate-400" /> : <Moon className="w-4 h-4 text-slate-600" />}
+              {theme === "dark" ? <Sun className="w-4 h-4 text-slate-400" /> : <Moon className="w-4 h-4 text-slate-600" />}
             </button>
+
+            {/* --- NEW: Settings Link --- */}
+            <Link href="/dashboard/settings" className="p-2 rounded-full text-slate-400 hover:text-slate-900 dark:hover:text-white hover:bg-slate-200 dark:hover:bg-white/10 transition-colors">
+                <Settings className="w-4 h-4" />
+            </Link>
 
             <div className="hidden md:flex items-center space-x-2 text-sm text-slate-600 dark:text-slate-400 bg-slate-100 dark:bg-white/5 border border-slate-200 dark:border-white/10 px-3 py-1.5 rounded-full">
               <User className="w-4 h-4 text-emerald-600 dark:text-emerald-400" />
@@ -270,12 +271,12 @@ export default function DashboardPage() {
             Need technical assistance? Contact <a href="mailto:customer@kraftgeneai.ca" className="text-emerald-600 dark:text-emerald-400 hover:underline">customer@kraftgeneai.ca</a>
           </div>
         </div>
-{/* Only show the upgrade UI if their plan is 'none' or 'inactive' */}
-{(!user?.planTier || user?.planTier === 'none' || user?.subscriptionStatus !== 'active') && (
-          <div className="mt-16 pt-12 border-t border-slate-200 dark:border-white/10">
-             <SubscriptionPlans userEmail={user?.email} />
-          </div>
-        )}
+        {/* Only show the upgrade UI if their plan is 'none' or 'inactive' */}
+        {(!user?.planTier || user?.planTier === 'none' || user?.subscriptionStatus !== 'active') && (
+            <div className="mt-16 pt-12 border-t border-slate-200 dark:border-white/10">
+              <SubscriptionPlans userEmail={user?.email} />
+            </div>
+          )}
       </main>
 
     </div>

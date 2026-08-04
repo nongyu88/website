@@ -6,6 +6,7 @@ import { ShieldCheck, Sun, Moon, X } from "lucide-react"
 import { useRouter } from "next/navigation";
 import { useEffect } from "react";
 import Link from 'next/link';
+import { useSearchParams } from "next/navigation";
 
 export default function AuthPage() {
   const [isRegistering, setIsRegistering] = useState(false)
@@ -22,6 +23,15 @@ export default function AuthPage() {
   const [loading, setLoading] = useState(false)
 
   const router = useRouter();
+
+  const searchParams = useSearchParams();
+  const inviteToken = searchParams?.get('invite');
+
+  useEffect(() => {
+    if (inviteToken) {
+      setIsRegistering(true);
+    }
+  }, [inviteToken]);
 
   useEffect(() => {
     // 1. Grab the token and the time the user logged in
@@ -92,7 +102,12 @@ export default function AuthPage() {
       const res = await fetch("/api/register", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ email, password, company }),
+        body: JSON.stringify({ 
+          email, 
+          password, 
+          company,
+          inviteToken: inviteToken // <-- Passes the token to your API
+        }),
       })
 
       // Safely check if the response is JSON before parsing
@@ -185,7 +200,7 @@ export default function AuthPage() {
           )}
 
           <div>
-            <label className="block text-xs font-medium text-slate-400 mb-1.5">Enterprise Email</label>
+            <label className="block text-xs font-medium text-slate-400 mb-1.5">Email</label>
             <input
               type="email"
               value={email}
