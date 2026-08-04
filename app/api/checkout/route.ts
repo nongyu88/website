@@ -4,11 +4,8 @@ import { NextResponse } from 'next/server';
 import Stripe from 'stripe';
 import { prisma } from '@/lib/prisma';
 
-// Initialize Stripe with a placeholder key
-const stripe = new Stripe(process.env.STRIPE_SECRET_KEY || '', {
-    // Add 'as any' to satisfy TypeScript, or press Ctrl+Space inside 
-    // the quotes to let VS Code auto-complete the exact date it wants.
-    apiVersion: '2023-10-16' as any, 
+const stripe = new Stripe(process.env.STRIPE_SECRET_KEY || 'sk_test_placeholder', { 
+  apiVersion: '2024-04-10' as any 
 });
 
 export async function POST(request: Request) {
