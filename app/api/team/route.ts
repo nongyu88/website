@@ -27,6 +27,28 @@ export async function GET(request: Request) {
   }
 }
 
+export async function DELETE(req: Request) {
+  try {
+    const { requesterEmail, targetEmail } = await req.json();
+
+    // Verify requester has permission (Admin or Owner)
+    const requester = await prisma.user.findUnique({ where: { email: requesterEmail } });
+    if (!requester || (requester.role !== "Owner" && requester.role !== "Admin")) {
+      return NextResponse.json({ error: "Unauthorized" }, { status: 403 });
+    }
+
+    // Remove the user from the organization (sets organizationId to null)
+    await prisma.user.update({
+      where: { email: targetEmail },
+      data: { organizationId: null, role: "Viewer" } // Downgrade their role when kicked out
+    });
+
+    return NextResponse.json({ success: true }, { status: 200 });
+  } catch (error: any) {
+    return NextResponse.json({ error: error.message }, { status: 500 });
+  }
+}
+
 // UPDATE A TEAMMATE'S ROLE
 export async function PUT(request: Request) {
   try {

@@ -17,6 +17,10 @@ model Organization {
   stripeSubscriptionId String?  @unique
   planName             String   @default("Free")
   subscriptionStatus   String   @default("incomplete")
+
+  companySize   String?
+  taxId         String?
+  businessLogo  String? @db.NVarChar(Max)
 }
 
 model User {

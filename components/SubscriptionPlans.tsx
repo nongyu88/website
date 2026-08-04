@@ -3,6 +3,7 @@
 import React, { useState } from 'react';
 import { Check, Sparkles, Cloud, Activity, ShieldCheck, Database } from 'lucide-react';
 import { Button } from '@/components/ui/button';
+import Link from "next/link";
 
 // Add the props interface
 export default function SubscriptionPlans({ userEmail }: { userEmail?: string }) {

@@ -221,7 +221,7 @@ const handleImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
           </section>
 
           {/* SECTION 2: COMPANY DETAILS */}
-          <section className="bg-white dark:bg-[#111113] border border-slate-200 dark:border-white/10 rounded-2xl p-6 md:p-8 shadow-sm dark:shadow-none">
+          {/* <section className="bg-white dark:bg-[#111113] border border-slate-200 dark:border-white/10 rounded-2xl p-6 md:p-8 shadow-sm dark:shadow-none">
             <h2 className="text-lg font-bold text-slate-900 dark:text-white mb-6 border-b border-slate-200 dark:border-white/5 pb-4">Enterprise Details</h2>
             
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
@@ -277,10 +277,10 @@ const handleImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
                 </select>
               </div>
             </div>
-          </section>
+          </section> */}
 
           {/* SECTION 3: COMMUNICATION PREFS */}
-          <section className="bg-white dark:bg-[#111113] border border-slate-200 dark:border-white/10 rounded-2xl p-6 md:p-8 shadow-sm dark:shadow-none">
+          {/* <section className="bg-white dark:bg-[#111113] border border-slate-200 dark:border-white/10 rounded-2xl p-6 md:p-8 shadow-sm dark:shadow-none">
             <h2 className="text-lg font-bold text-slate-900 dark:text-white mb-6 border-b border-slate-200 dark:border-white/5 pb-4">Communication Preferences</h2>
             
             <div className="space-y-6">
@@ -314,7 +314,7 @@ const handleImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
                 </div>
               </label>
             </div>
-          </section>
+          </section> */}
 
         </form>
       </main>

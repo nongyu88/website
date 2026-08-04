@@ -11,7 +11,7 @@ import {
   Sun, Moon, AlertTriangle, ServerCrash
 } from "lucide-react"
 import OnboardingWizard from "@/components/OnboardingWizard"
-import SubscriptionPlans from "@/components/SubscriptionPlans" // <-- ADD THIS
+// import SubscriptionPlans from "@/components/SubscriptionPlans" // <-- ADD THIS
 import { useTheme } from "next-themes";
 
 interface UserData {
@@ -272,11 +272,11 @@ export default function DashboardPage() {
           </div>
         </div>
         {/* Only show the upgrade UI if their plan is 'none' or 'inactive' */}
-        {(!user?.planTier || user?.planTier === 'none' || user?.subscriptionStatus !== 'active') && (
+        {/* {(!user?.planTier || user?.planTier === 'none' || user?.subscriptionStatus !== 'active') && (
             <div className="mt-16 pt-12 border-t border-slate-200 dark:border-white/10">
               <SubscriptionPlans userEmail={user?.email} />
             </div>
-          )}
+          )} */}
       </main>
 
     </div>

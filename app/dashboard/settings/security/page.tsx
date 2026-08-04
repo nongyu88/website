@@ -46,6 +46,9 @@ const [teamMembers, setTeamMembers] = useState<any[]>([])
 const [currentUserRole, setCurrentUserRole] = useState("Viewer")
 const [loadingTeam, setLoadingTeam] = useState(true)
 
+const [isRemoveModalOpen, setIsRemoveModalOpen] = useState(false)
+const [memberToRemove, setMemberToRemove] = useState<string | null>(null)
+
 // Fetch the current user and their team on load
 useEffect(() => {
   const storedUser = localStorage.getItem("user")
@@ -95,6 +98,45 @@ const handleRoleChange = async (targetUserId: string, newRole: string) => {
     ));
   } catch (error) {
     alert("Error updating role. You might not have permission.");
+  }
+};
+
+const handleRemoveMember = async (targetEmail: string) => {
+  if (confirm(`Are you sure you want to remove ${targetEmail} from the team?`)) {
+    try {
+      const res = await fetch('/api/team', {
+        method: 'DELETE',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ requesterEmail: userEmail, targetEmail })
+      });
+      
+      if (!res.ok) throw new Error("Failed to remove member");
+      
+      // Instantly remove them from the UI
+      setTeamMembers(prev => prev.filter(m => m.email !== targetEmail));
+    } catch (error) {
+      alert("Error removing user. You may not have permission.");
+    }
+  }
+};
+
+const confirmRemoveMember = async () => {
+  if (!memberToRemove) return;
+  
+  try {
+    const res = await fetch('/api/team', {
+      method: 'DELETE',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ requesterEmail: userEmail, targetEmail: memberToRemove })
+    });
+    
+    if (!res.ok) throw new Error("Failed to remove member");
+    
+    setTeamMembers(prev => prev.filter(m => m.email !== memberToRemove));
+    setIsRemoveModalOpen(false);
+    setMemberToRemove(null);
+  } catch (error) {
+    alert("Error removing user. You may not have permission.");
   }
 };
 
@@ -266,11 +308,14 @@ const handleRoleChange = async (targetUserId: string, newRole: string) => {
                         <td className="py-4 text-right">
                           {(currentUserRole === "Owner" || currentUserRole === "Admin") && member.email !== userEmail && (
                              <button 
-                              onClick={() => alert("Remove user functionality pending.")}
-                              className="text-red-500 dark:text-red-400 hover:text-red-600 dark:hover:text-red-300 transition-colors text-xs font-medium"
-                            >
-                              Remove
-                            </button>
+                             onClick={() => {
+                               setMemberToRemove(member.email);
+                               setIsRemoveModalOpen(true);
+                             }}
+                             className="text-red-500 dark:text-red-400 hover:text-red-600 dark:hover:text-red-300 transition-colors text-xs font-medium"
+                           >
+                             Remove
+                           </button>
                           )}
                         </td>
                       </tr>
@@ -327,6 +372,27 @@ const handleRoleChange = async (targetUserId: string, newRole: string) => {
                   {passwordLoading ? "Updating..." : "Save Password"}
                 </Button>
               </form>
+            </div>
+          </div>
+        )}
+
+        {/* Remove User Confirmation Modal */}
+        {isRemoveModalOpen && (
+          <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/40 dark:bg-black/60 backdrop-blur-sm p-4">
+            <div className="bg-white dark:bg-[#111113] border border-slate-200 dark:border-white/10 rounded-2xl w-full max-w-md p-6 shadow-2xl relative">
+              <h3 className="text-xl font-bold text-slate-900 dark:text-white mb-2">Remove Team Member</h3>
+              <p className="text-slate-500 dark:text-slate-400 mb-6">
+                Are you sure you want to remove <span className="font-bold text-slate-700 dark:text-slate-300">{memberToRemove}</span> from the team? They will lose all access to this organization.
+              </p>
+              
+              <div className="flex justify-end space-x-3">
+                <Button variant="outline" onClick={() => setIsRemoveModalOpen(false)} className="border-slate-200 dark:border-white/10 text-slate-700 dark:text-slate-300">
+                  Cancel
+                </Button>
+                <Button onClick={confirmRemoveMember} className="bg-red-600 hover:bg-red-500 text-white">
+                  Remove User
+                </Button>
+              </div>
             </div>
           </div>
         )}

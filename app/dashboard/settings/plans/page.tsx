@@ -16,6 +16,15 @@ export default function PlansAndFeesPage() {
   const [subscriptionStatus, setSubscriptionStatus] = useState<string>("inactive")
   const [activePriceId, setActivePriceId] = useState<string>("") // Tracks exact Price ID
 
+  const [isAdmin, setIsAdmin] = useState(false);
+
+  useEffect(() => {
+    const userObj = JSON.parse(localStorage.getItem("user") || "{}");
+    const role = String(userObj.role || "viewer").toLowerCase(); // Converts "Owner" to "owner"
+    
+    setIsAdmin(role === "admin" || role === "owner");
+  }, []);
+
   useEffect(() => {
     const fetchUserData = async () => {
       const storedUser = localStorage.getItem("user")
@@ -25,11 +34,20 @@ export default function PlansAndFeesPage() {
       try {
         const res = await fetch(`/api/user/profile?email=${parsedUser.email}&t=${Date.now()}`, { cache: 'no-store' })
         const data = await res.json()
+        if (data.user) {
+          // Force update the admin state based on the REAL database role!
+          const realRole = String(data.user.role || "viewer").toLowerCase();
+          setIsAdmin(realRole === "admin" || realRole === "owner");
+          
+          // Secretly update localStorage so the rest of the app catches up
+          localStorage.setItem("user", JSON.stringify({ ...parsedUser, role: realRole }));
+        }
+
         if (data.user?.organization) {
           setActivePlanName(data.user.organization.planName || "Free")
           setSubscriptionStatus(data.user.organization.subscriptionStatus || "inactive")
           if (data.user.organization.planName) {
-            setSelectedPlan(data.user.organization.planName) // Snaps purple outline to real active plan!
+            setSelectedPlan(data.user.organization.planName)
           }
         }
         if (data.activePriceId) {
@@ -43,44 +61,56 @@ export default function PlansAndFeesPage() {
   }, [])
 
   const handleSubscribe = async (priceId: string, planName: string) => {
-    setCheckoutLoading(planName)
+    // 1. Open blank window IMMEDIATELY
+    const checkoutWindow = window.open('about:blank', '_blank');
+    setCheckoutLoading(planName);
+
     try {
-      const user = JSON.parse(localStorage.getItem("user") || "{}")
-      if (!user.email) throw new Error("Session error.")
+      const user = JSON.parse(localStorage.getItem("user") || "{}");
+      if (!user.email) throw new Error("Session error.");
 
       const res = await fetch('/api/stripe/checkout', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ email: user.email, priceId })
-      })
-      const data = await res.json()
+      });
+      const data = await res.json();
       
-      if (data.url) window.open(data.url, '_blank') // OPENS IN NEW TAB
-      else alert(data.error || "Failed to load checkout.")
+      if (data.url && checkoutWindow) {
+        // 2. Redirect the already-opened window
+        checkoutWindow.location.href = data.url; 
+      } else {
+        checkoutWindow?.close();
+        alert(data.error || "Failed to load checkout.");
+      }
     } catch (err: any) {
-      alert(err.message || "A network error occurred.")
+      checkoutWindow?.close();
+      alert(err.message || "A network error occurred.");
     } finally {
-      setCheckoutLoading("")
+      setCheckoutLoading("");
     }
   }
 
   const handleManageBilling = async () => {
-    setPortalLoading(true)
+    setPortalLoading(true);
     try {
-      const user = JSON.parse(localStorage.getItem("user") || "{}")
+      const user = JSON.parse(localStorage.getItem("user") || "{}");
       const res = await fetch('/api/stripe/portal', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ email: user.email })
-      })
-      const data = await res.json()
+      });
+      const data = await res.json();
       
-      if (data.url) window.open(data.url, '_blank') // Open portal in new tab
-      else alert(data.error || "Failed to load portal.")
+      if (data.url) {
+        window.location.href = data.url; // <--- This redirects in the same tab!
+      } else {
+        alert(data.error || "Failed to load billing portal.");
+      }
     } catch (err) {
-      alert("Network error.")
+      alert("Network error.");
     } finally {
-      setPortalLoading(false)
+      setPortalLoading(false);
     }
   }
 
@@ -215,10 +245,10 @@ export default function PlansAndFeesPage() {
               <div 
                 key={index}
                 onClick={() => setSelectedPlan(plan.name)}
-                className={`rounded-2xl p-6 border flex flex-col justify-between transition-all duration-300 cursor-pointer ${isSelected ? 'bg-white dark:bg-[#111113] border-purple-500 shadow-lg shadow-purple-500/10 relative' : 'bg-white dark:bg-[#111113] border-slate-200 dark:border-white/10 hover:border-slate-300 dark:hover:border-white/20'}`}
+                className={`rounded-2xl p-6 border flex flex-col justify-between transition-all duration-300 cursor-pointer ${isSelected ? 'bg-white dark:bg-[#111113] border-slate-900 dark:border-white shadow-md relative' : 'bg-white dark:bg-[#111113] border-slate-200 dark:border-white/10 hover:border-slate-300 dark:hover:border-white/20'}`}
               >
                 {isCurrentPlan && (
-                  <span className="absolute -top-3 left-1/2 -translate-x-1/2 bg-purple-600 text-white text-[10px] font-bold px-3 py-1 rounded-full uppercase tracking-wider">
+                  <span className="absolute -top-3 left-1/2 -translate-x-1/2 bg-slate-900 dark:bg-white text-white dark:text-slate-900 text-[10px] font-bold px-3 py-1 rounded-full uppercase tracking-wider shadow-sm">
                     Current Plan
                   </span>
                 )}
@@ -244,15 +274,26 @@ export default function PlansAndFeesPage() {
                 </div>
 
                 <Button 
-                  disabled={isCurrentPlan || checkoutLoading === plan.name}
+                  disabled={isCurrentPlan || checkoutLoading === plan.name || !isAdmin}
                   onClick={(e) => {
-                    e.stopPropagation(); // Prevent card click from double-firing
-                    if (!isCurrentPlan) handleSubscribe(billingCycle === "monthly" ? plan.stripePriceMonthly : plan.stripePriceAnnually, plan.name);
+                    e.stopPropagation();
+                    if (!isAdmin) {
+                      alert("Only Organization Admins can manage billing tiers.");
+                      return;
+                    }
+                    if (!isCurrentPlan) {
+                      handleSubscribe(
+                        billingCycle === "monthly" ? plan.stripePriceMonthly : plan.stripePriceAnnually,
+                        plan.name
+                      );
+                    }
                   }}
-                  className={`w-full text-xs font-semibold h-10 ${isCurrentPlan ? 'bg-slate-100 dark:bg-slate-800 text-slate-400 cursor-not-allowed border-0' : 'bg-purple-600 hover:bg-purple-500 text-white'}`}
-                >
-                  {checkoutLoading === plan.name ? "Redirecting..." : isCurrentPlan ? "Current Active Plan" : plan.buttonText}
-                </Button>
+                  className={`w-full text-xs font-semibold h-10 ${
+                    !isAdmin ? 'opacity-50 cursor-not-allowed bg-slate-700 text-slate-400' : ''
+                  }`}
+  >
+                  {!isAdmin ? "Admin Permission Required" : isCurrentPlan ? "Current Active Plan" : plan.buttonText}
+              </Button>
               </div>
             )
           })}
