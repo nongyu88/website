@@ -1,44 +1,57 @@
 import { NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
+import Stripe from 'stripe';
 
-// FETCH FRESH USER PROFILE FROM AZURE SQL DB
+const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!, { apiVersion: '2024-04-10' as any });
+
 export async function GET(request: Request) {
-    try {
-      const { searchParams } = new URL(request.url);
-      const email = searchParams.get('email');
-  
-      if (!email) {
-        return NextResponse.json({ error: "Email required" }, { status: 400 });
-      }
-  
-      const user = await prisma.user.findUnique({
-        where: { email },
-        select: {
-          id: true,
-          email: true,
-          firstName: true,
-          lastName: true,
-          company: true,
-          website: true,
-          industry: true,
-          region: true,
-          avatarUrl: true,
-          notifySecurityAlerts: true,
-          notifyProductUpdates: true,
-          role: true,
-        }
-      });
-  
-      if (!user) {
-        return NextResponse.json({ error: "User not found" }, { status: 404 });
-      }
-  
-      return NextResponse.json({ user }, { status: 200 });
-    } catch (error: any) {
-      console.error("Fetch Profile Error:", error);
-      return NextResponse.json({ error: "Failed to fetch profile" }, { status: 500 });
+  try {
+    const { searchParams } = new URL(request.url);
+    const email = searchParams.get('email');
+
+    if (!email) {
+      return NextResponse.json({ error: "Email is required" }, { status: 400 });
     }
+
+    const user = await prisma.user.findUnique({
+      where: { email },
+      select: {
+        id: true,
+        email: true,
+        firstName: true,
+        lastName: true,
+        company: true,
+        website: true,
+        industry: true,
+        region: true,
+        avatarUrl: true,
+        notifySecurityAlerts: true,
+        notifyProductUpdates: true,
+        role: true,
+        organization: true,
+      }
+    });
+
+    if (!user) {
+      return NextResponse.json({ error: "User not found" }, { status: 404 });
+    }
+
+    // Fetch the active Stripe Price ID directly from Stripe if subscription exists
+    let activePriceId = null;
+    if (user.organization?.stripeSubscriptionId) {
+      try {
+        const sub = await stripe.subscriptions.retrieve(user.organization.stripeSubscriptionId);
+        activePriceId = sub.items.data[0]?.price?.id || null;
+      } catch (e) {
+        console.error("Error retrieving Stripe subscription:", e);
+      }
+    }
+
+    return NextResponse.json({ user, activePriceId });
+  } catch (error: any) {
+    return NextResponse.json({ error: error.message }, { status: 500 });
   }
+}
 
 
 export async function PUT(request: Request) {

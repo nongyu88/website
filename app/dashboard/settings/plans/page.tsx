@@ -7,8 +7,82 @@ import { Button } from "@/components/ui/button"
 
 export default function PlansAndFeesPage() {
   const [isDarkMode, setIsDarkMode] = useState(true)
-  const [currentPlan, setCurrentPlan] = useState("Enterprise")
   const [billingCycle, setBillingCycle] = useState<"monthly" | "annually">("annually")
+  const [selectedPlan, setSelectedPlan] = useState<string>("Enterprise Convergence")
+  const [checkoutLoading, setCheckoutLoading] = useState<string>("")
+  const [portalLoading, setPortalLoading] = useState(false)
+  
+  const [activePlanName, setActivePlanName] = useState<string>("Free")
+  const [subscriptionStatus, setSubscriptionStatus] = useState<string>("inactive")
+  const [activePriceId, setActivePriceId] = useState<string>("") // Tracks exact Price ID
+
+  useEffect(() => {
+    const fetchUserData = async () => {
+      const storedUser = localStorage.getItem("user")
+      if (!storedUser) return
+      const parsedUser = JSON.parse(storedUser)
+
+      try {
+        const res = await fetch(`/api/user/profile?email=${parsedUser.email}&t=${Date.now()}`, { cache: 'no-store' })
+        const data = await res.json()
+        if (data.user?.organization) {
+          setActivePlanName(data.user.organization.planName || "Free")
+          setSubscriptionStatus(data.user.organization.subscriptionStatus || "inactive")
+          if (data.user.organization.planName) {
+            setSelectedPlan(data.user.organization.planName) // Snaps purple outline to real active plan!
+          }
+        }
+        if (data.activePriceId) {
+          setActivePriceId(data.activePriceId) // Sets active Price ID from Stripe
+        }
+      } catch (err) {
+        console.error("Failed to fetch current plan", err)
+      }
+    }
+    fetchUserData()
+  }, [])
+
+  const handleSubscribe = async (priceId: string, planName: string) => {
+    setCheckoutLoading(planName)
+    try {
+      const user = JSON.parse(localStorage.getItem("user") || "{}")
+      if (!user.email) throw new Error("Session error.")
+
+      const res = await fetch('/api/stripe/checkout', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email: user.email, priceId })
+      })
+      const data = await res.json()
+      
+      if (data.url) window.open(data.url, '_blank') // OPENS IN NEW TAB
+      else alert(data.error || "Failed to load checkout.")
+    } catch (err: any) {
+      alert(err.message || "A network error occurred.")
+    } finally {
+      setCheckoutLoading("")
+    }
+  }
+
+  const handleManageBilling = async () => {
+    setPortalLoading(true)
+    try {
+      const user = JSON.parse(localStorage.getItem("user") || "{}")
+      const res = await fetch('/api/stripe/portal', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email: user.email })
+      })
+      const data = await res.json()
+      
+      if (data.url) window.open(data.url, '_blank') // Open portal in new tab
+      else alert(data.error || "Failed to load portal.")
+    } catch (err) {
+      alert("Network error.")
+    } finally {
+      setPortalLoading(false)
+    }
+  }
 
   useEffect(() => {
     const savedTheme = localStorage.getItem("theme")
@@ -29,7 +103,9 @@ export default function PlansAndFeesPage() {
         "Standard support (24/7)"
       ],
       current: false,
-      buttonText: "Switch to Grid Twin"
+      buttonText: "Get Grid Digital Twin",
+      stripePriceMonthly: "price_1U0drsCnK1WH2hz2ETrB7CUj",
+      stripePriceAnnually: "price_1U0dwrCnK1WH2hz2vRXdFtze"
     },
     {
       name: "Pipeline Twin",
@@ -44,7 +120,9 @@ export default function PlansAndFeesPage() {
         "Standard support (24/7)"
       ],
       current: false,
-      buttonText: "Switch to Pipeline Twin"
+      buttonText: "Get Pipeline Digital Twin",
+      stripePriceMonthly: "price_1U0dumCnK1WH2hz29ta30zW3",
+      stripePriceAnnually: "price_1U0dxfCnK1WH2hz2B6V9AMUl"
     },
     {
       name: "Enterprise Convergence",
@@ -59,14 +137,10 @@ export default function PlansAndFeesPage() {
         "Dedicated account engineer & SLA"
       ],
       current: true,
-      buttonText: "Current Active Plan"
+      buttonText: "Get Enterprise Convergence",
+      stripePriceMonthly: "price_1U0dvJCnK1WH2hz2XZ6Zlfnm",
+      stripePriceAnnually: "price_1U0dyKCnK1WH2hz2aIY9w2Om"
     }
-  ]
-
-  const invoices = [
-    { id: "INV-2026-008", date: "Aug 1, 2026", amount: "$2,400.00", status: "Paid" },
-    { id: "INV-2026-007", date: "Jul 1, 2026", amount: "$2,400.00", status: "Paid" },
-    { id: "INV-2026-006", date: "Jun 1, 2026", amount: "$2,400.00", status: "Paid" }
   ]
 
   return (
@@ -85,22 +159,28 @@ export default function PlansAndFeesPage() {
 
         <main className="max-w-5xl mx-auto px-6 py-8 space-y-8">
           
-          {/* SECTION 1: CURRENT SUBSCRIPTION BANNER */}
-          <section className="bg-gradient-to-r from-purple-900/30 to-indigo-900/30 border border-purple-500/30 rounded-2xl p-6 md:p-8 flex flex-col md:flex-row items-start md:items-center justify-between gap-6">
-            <div>
-              <div className="flex items-center space-x-2 text-purple-600 dark:text-purple-400 font-semibold text-sm mb-1">
-                <Sparkles className="w-4 h-4" />
-                <span>Active Plan</span>
-              </div>
-              <h2 className="text-2xl font-bold text-slate-900 dark:text-white">Enterprise Convergence Tier</h2>
-              <p className="text-sm text-slate-500 dark:text-slate-400 mt-1">Your next billing date is <strong>September 1, 2026</strong> ($2,400/month, billed annually).</p>
+        <section className="bg-gradient-to-r from-purple-900/30 to-indigo-900/30 border border-purple-500/30 rounded-2xl p-6 md:p-8 flex flex-col md:flex-row items-start md:items-center justify-between gap-6">
+          <div>
+            <div className="flex items-center space-x-2 text-purple-600 dark:text-purple-400 font-semibold text-sm mb-1">
+              <Sparkles className="w-4 h-4" />
+              <span>{subscriptionStatus === "active" ? "Active Plan" : "No Active Subscription"}</span>
             </div>
-            <div className="flex items-center space-x-3">
-              <Button variant="outline" className="border-purple-500/50 text-purple-600 dark:text-purple-300 hover:bg-purple-500/10">
-                Manage Payment Method
-              </Button>
-            </div>
-          </section>
+            <h2 className="text-2xl font-bold text-slate-900 dark:text-white">{activePlanName} Tier</h2>
+            {subscriptionStatus === "active" && (
+              <p className="text-sm text-slate-500 dark:text-slate-400 mt-1">Your billing is managed via Stripe securely.</p>
+            )}
+          </div>
+          <div className="flex items-center space-x-3">
+            <Button 
+              onClick={handleManageBilling}
+              disabled={portalLoading}
+              variant="outline" 
+              className="border-purple-500/50 text-purple-600 dark:text-purple-300 hover:bg-purple-500/10"
+            >
+              {portalLoading ? "Loading..." : "Manage Billing & Invoices"}
+            </Button>
+          </div>
+        </section>
 
           {/* BILLING CYCLE TOGGLE */}
           <div className="flex justify-center my-8">
@@ -123,12 +203,21 @@ export default function PlansAndFeesPage() {
 
           {/* SECTION 2: PLANS GRID */}
           <section className="grid grid-cols-1 md:grid-cols-3 gap-6">
-            {plans.map((plan, index) => (
+            {plans.map((plan, index) => {
+              const targetPriceId = billingCycle === "monthly" ? plan.stripePriceMonthly : plan.stripePriceAnnually;
+              // Matches against live activePriceId or falls back to plan name match on same cycle
+              const isCurrentPlan = activePriceId 
+                ? activePriceId === targetPriceId 
+                : (activePlanName === plan.name && billingCycle === "annually");
+              const isSelected = selectedPlan === plan.name;
+
+            return (
               <div 
                 key={index}
-                className={`rounded-2xl p-6 border flex flex-col justify-between transition-all duration-300 ${plan.current ? 'bg-white dark:bg-[#111113] border-purple-500 shadow-lg shadow-purple-500/10 relative' : 'bg-white dark:bg-[#111113] border-slate-200 dark:border-white/10'}`}
+                onClick={() => setSelectedPlan(plan.name)}
+                className={`rounded-2xl p-6 border flex flex-col justify-between transition-all duration-300 cursor-pointer ${isSelected ? 'bg-white dark:bg-[#111113] border-purple-500 shadow-lg shadow-purple-500/10 relative' : 'bg-white dark:bg-[#111113] border-slate-200 dark:border-white/10 hover:border-slate-300 dark:hover:border-white/20'}`}
               >
-                {plan.current && (
+                {isCurrentPlan && (
                   <span className="absolute -top-3 left-1/2 -translate-x-1/2 bg-purple-600 text-white text-[10px] font-bold px-3 py-1 rounded-full uppercase tracking-wider">
                     Current Plan
                   </span>
@@ -155,54 +244,18 @@ export default function PlansAndFeesPage() {
                 </div>
 
                 <Button 
-                  disabled={plan.current}
-                  className={`w-full text-xs font-semibold h-10 ${plan.current ? 'bg-slate-100 dark:bg-slate-800 text-slate-400 cursor-not-allowed' : 'bg-purple-600 hover:bg-purple-500 text-white'}`}
+                  disabled={isCurrentPlan || checkoutLoading === plan.name}
+                  onClick={(e) => {
+                    e.stopPropagation(); // Prevent card click from double-firing
+                    if (!isCurrentPlan) handleSubscribe(billingCycle === "monthly" ? plan.stripePriceMonthly : plan.stripePriceAnnually, plan.name);
+                  }}
+                  className={`w-full text-xs font-semibold h-10 ${isCurrentPlan ? 'bg-slate-100 dark:bg-slate-800 text-slate-400 cursor-not-allowed border-0' : 'bg-purple-600 hover:bg-purple-500 text-white'}`}
                 >
-                  {plan.buttonText}
+                  {checkoutLoading === plan.name ? "Redirecting..." : isCurrentPlan ? "Current Active Plan" : plan.buttonText}
                 </Button>
               </div>
-            ))}
-          </section>
-
-          {/* SECTION 3: INVOICE HISTORY */}
-          <section className="bg-white dark:bg-[#111113] border border-slate-200 dark:border-white/10 rounded-2xl p-6 md:p-8 shadow-sm dark:shadow-none transition-colors duration-300">
-            <div className="flex items-center space-x-3 mb-6 border-b border-slate-100 dark:border-white/5 pb-4">
-              <FileText className="w-5 h-5 text-purple-500 dark:text-purple-400" />
-              <h2 className="text-lg font-bold text-slate-900 dark:text-white">Billing History & Invoices</h2>
-            </div>
-
-            <div className="overflow-x-auto">
-              <table className="w-full text-left border-collapse text-xs">
-                <thead>
-                  <tr className="border-b border-slate-200 dark:border-white/10 text-slate-500">
-                    <th className="py-3 font-medium">Invoice Number</th>
-                    <th className="py-3 font-medium">Date</th>
-                    <th className="py-3 font-medium">Amount</th>
-                    <th className="py-3 font-medium">Status</th>
-                    <th className="py-3 font-medium text-right">Receipt</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {invoices.map((inv) => (
-                    <tr key={inv.id} className="border-b border-slate-100 dark:border-white/5 last:border-0 hover:bg-slate-50 dark:hover:bg-[#1A1A1D] transition-colors">
-                      <td className="py-3 font-semibold text-slate-900 dark:text-white">{inv.id}</td>
-                      <td className="py-3 text-slate-500">{inv.date}</td>
-                      <td className="py-3 text-slate-900 dark:text-white font-medium">{inv.amount}</td>
-                      <td className="py-3">
-                        <span className="px-2 py-0.5 rounded-full text-[10px] font-semibold bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border border-emerald-500/20">
-                          {inv.status}
-                        </span>
-                      </td>
-                      <td className="py-3 text-right">
-                        <button className="text-purple-600 dark:text-purple-400 hover:underline flex items-center justify-end ml-auto">
-                          <Download className="w-3.5 h-3.5 mr-1" /> PDF
-                        </button>
-                      </td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-            </div>
+            )
+          })}
           </section>
 
         </main>
