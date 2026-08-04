@@ -6,11 +6,68 @@ datasource db {
   provider = "sqlserver"
 }
 
+model Organization {
+  id                   String   @id @default(uuid())
+  name                 String
+  users                User[]
+  invites              Invite[]
+
+  // --- NEW STRIPE BILLING FIELDS ---
+  stripeCustomerId     String?  @unique
+  stripeSubscriptionId String?  @unique
+  planName             String   @default("Free")
+  subscriptionStatus   String   @default("incomplete")
+
+  companySize   String?
+  taxId         String?
+  businessLogo  String? @db.NVarChar(Max)
+}
+
 model User {
-  id        String   @id @default(uuid())
-  email     String   @unique
-  password  String
-  company   String?
-  isApproved Boolean  @default(false)
-  createdAt DateTime @default(now())
+  id                     String   @id @default(uuid())
+  email                  String   @unique
+  password               String
+  company                String?
+  isApproved             Boolean  @default(false)
+  createdAt              DateTime @default(now())
+
+  hasCompletedOnboarding Boolean  @default(false)
+  industry               String?  
+  region                 String?  
+  alertFocus             String?  
+
+  // --- NEW: EXTENDED PROFILE FIELDS ---
+  firstName              String?
+  lastName               String?
+  website                String?
+  avatarUrl              String?  // Will store the URL of their uploaded logo/photo
+  
+  // --- NEW: COMMUNICATION PREFS ---
+  notifySecurityAlerts   Boolean  @default(true)
+  notifyProductUpdates   Boolean  @default(false)
+
+  // --- SUBSCRIPTION & BILLING FIELDS (Updated for SQL Server) ---
+  planTier               String    @default("none") // 'none', 'core', 'professional', 'enterprise'
+  subscriptionStatus     String    @default("inactive") // 'active', 'past_due', 'canceled', 'inactive'
+  stripeCustomerId       String?   // Removed @unique to fix SQL Server NULL constraint
+  stripeSubscriptionId   String?   // Removed @unique to fix SQL Server NULL constraint
+  currentPeriodEnd       DateTime? 
+
+
+  role           String        @default("Viewer") // 'Owner', 'Admin', 'Viewer'
+  organizationId String?
+  organization   Organization? @relation(fields: [organizationId], references: [id])
+}
+
+
+// 3. Create a secure vault for pending invites
+model Invite {
+  id             String       @id @default(uuid())
+  email          String
+  role           String
+  token          String       @unique // A secure random string
+  status         String       @default("pending") // 'pending', 'accepted'
+  organizationId String
+  organization   Organization @relation(fields: [organizationId], references: [id])
+  createdAt      DateTime     @default(now())
 }

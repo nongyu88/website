@@ -5,7 +5,7 @@ import nodemailer from "nodemailer";
 
 export async function POST(req: Request) {
   try {
-    const { email, password, company } = await req.json();
+    const { email, password, company, inviteToken } = await req.json();
 
     // 1. Existing logic: Check if user exists & hash password
     const existingUser = await prisma.user.findUnique({ where: { email } });
@@ -14,13 +14,31 @@ export async function POST(req: Request) {
     }
     const hashedPassword = await bcrypt.hash(password, 10);
 
-    // 2. Existing logic: Create the user in the database
+    let assignedRole = "Owner";
+    let orgId = null;
+    let isApprovedStatus = false; // Default to pending for public signups
+
+    // 2. NEW LOGIC: Catch the invite token
+    if (inviteToken) {
+      const invite = await prisma.invite.findUnique({ where: { token: inviteToken } });
+      if (invite && invite.status === "pending" && invite.email.toLowerCase() === email.toLowerCase()) {
+        assignedRole = invite.role;
+        orgId = invite.organizationId;
+        isApprovedStatus = false; // Auto-approve invited teammates
+        
+        await prisma.invite.update({ where: { id: invite.id }, data: { status: "accepted" } });
+      }
+    }
+
+    // 3. Create the user in the database
     const newUser = await prisma.user.create({
       data: {
         email,
         password: hashedPassword,
         company: company || "Unknown",
-        isApproved: false, // Default to pending
+        role: assignedRole,
+        organizationId: orgId,
+        isApproved: isApprovedStatus,
       },
     });
 
