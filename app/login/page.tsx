@@ -172,12 +172,14 @@ export default function AuthPage() {
               <label className="block text-xs font-medium text-slate-400 mb-1.5">Company Name</label>
               <div className="relative">
                 <input
-                  type="text"
-                  value={company}
-                  onChange={(e) => setCompany(e.target.value)}
-                  placeholder="e.g. Pacific Gas & Electric"
-                  className="w-full bg-slate-50 dark:bg-slate-950 border border-slate-300 dark:border-slate-800 rounded-xl px-4 py-3 text-sm text-slate-900 dark:text-white focus:outline-none focus:border-emerald-500 transition-colors"
-                />
+                    type="text"
+                    value={company}
+                    onChange={(e) => setCompany(e.target.value)}
+                    disabled={loading} // <-- ADD THIS
+                    placeholder="e.g. Pacific Gas & Electric"
+                    // v-- Add 'disabled:opacity-50 disabled:cursor-not-allowed' to the end of className
+                    className="w-full bg-slate-50 dark:bg-slate-950 border border-slate-300 dark:border-slate-800 rounded-xl px-4 py-3 text-sm text-slate-900 dark:text-white focus:outline-none focus:border-emerald-500 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                  />
               </div>
             </div>
           )}
@@ -188,8 +190,10 @@ export default function AuthPage() {
               type="email"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
+              disabled={loading} // <-- ADD THIS
               placeholder="name@company.com"
-              className="w-full bg-slate-50 dark:bg-slate-950 border border-slate-300 dark:border-slate-800 rounded-xl px-4 py-3 text-sm text-slate-900 dark:text-white focus:outline-none focus:border-emerald-500 transition-colors"
+              // v-- Add 'disabled:opacity-50 disabled:cursor-not-allowed' to the end of className
+              className="w-full bg-slate-50 dark:bg-slate-950 border border-slate-300 dark:border-slate-800 rounded-xl px-4 py-3 text-sm text-slate-900 dark:text-white focus:outline-none focus:border-emerald-500 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
               required
             />
           </div>
@@ -200,8 +204,10 @@ export default function AuthPage() {
               type="password"
               value={password}
               onChange={(e) => setPassword(e.target.value)}
+              disabled={loading} // <-- ADD THIS
               placeholder="••••••••••••"
-              className="w-full bg-slate-50 dark:bg-slate-950 border border-slate-300 dark:border-slate-800 rounded-xl px-4 py-3 text-sm text-slate-900 dark:text-white focus:outline-none focus:border-emerald-500 transition-colors"
+              // v-- Add 'disabled:opacity-50 disabled:cursor-not-allowed' to the end of className
+              className="w-full bg-slate-50 dark:bg-slate-950 border border-slate-300 dark:border-slate-800 rounded-xl px-4 py-3 text-sm text-slate-900 dark:text-white focus:outline-none focus:border-emerald-500 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
               required
             />
           </div>

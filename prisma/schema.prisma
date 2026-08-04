@@ -7,10 +7,22 @@ datasource db {
 }
 
 model User {
-  id        String   @id @default(uuid())
-  email     String   @unique
-  password  String
-  company   String?
-  isApproved Boolean  @default(false)
-  createdAt DateTime @default(now())
+  id                     String   @id @default(uuid())
+  email                  String   @unique
+  password               String
+  company                String?
+  isApproved             Boolean  @default(false)
+  createdAt              DateTime @default(now())
+
+  hasCompletedOnboarding Boolean  @default(false)
+  industry               String?  
+  region                 String?  
+  alertFocus             String?  
+
+  // --- SUBSCRIPTION & BILLING FIELDS (Updated for SQL Server) ---
+  planTier               String    @default("none") // 'none', 'core', 'professional', 'enterprise'
+  subscriptionStatus     String    @default("inactive") // 'active', 'past_due', 'canceled', 'inactive'
+  stripeCustomerId       String?   // Removed @unique to fix SQL Server NULL constraint
+  stripeSubscriptionId   String?   // Removed @unique to fix SQL Server NULL constraint
+  currentPeriodEnd       DateTime? 
 }

@@ -54,13 +54,20 @@ export async function POST(req: Request) {
       { expiresIn: "24h" }
     );
 
+    // REPLACE your existing return statement with this:
     return NextResponse.json({
       message: "Login successful",
       token,
-      user: { id: user.id, email: user.email, company: user.company },
+      user: { 
+        id: user.id, 
+        email: user.email, 
+        company: user.company,
+        hasCompletedOnboarding: user.hasCompletedOnboarding, // <-- ADDED THIS
+        industry: user.industry // <-- ADDED THIS
+      },
     });
-    
-  } catch (error: any) {
+
+    } catch (error: any) {
     return NextResponse.json({ error: `FATAL API CRASH: ${error.message}` }, { status: 500 });
-  }
+    }
 }
