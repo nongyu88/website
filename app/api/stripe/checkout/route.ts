@@ -27,46 +27,31 @@ export async function POST(request: Request) {
       return NextResponse.json({ error: "User not found." }, { status: 404 });
     }
 
-// Use the Organization's Stripe Customer ID first, fallback to the User's Customer ID
-let stripeCustomerId = user.organization?.stripeCustomerId || user.stripeCustomerId;
+    // 2. Determine and reuse the single Stripe Customer ID
+    let customerId = user.organization?.stripeCustomerId || user.stripeCustomerId;
 
-// If neither exists, create a new customer in Stripe and attach it to the SOLO USER
-if (!stripeCustomerId) {
-  const customer = await stripe.customers.create({ email: user.email });
-  stripeCustomerId = customer.id;
-  
-  // Save it to the User record since they don't have an Org yet
-  await prisma.user.update({
-    where: { id: user.id },
-    data: { stripeCustomerId: stripeCustomerId }
-  });
-}
-
-// Now proceed to create the checkout session using `stripeCustomerId`...
-    // 2. Determine the Stripe Customer ID
-    let customerId = user.organization?.stripeCustomerId;
-
-    // If they don't have a Stripe Customer ID yet, create one!
+    // If no Stripe Customer ID exists yet, create ONE customer and attach to both
     if (!customerId) {
       const customer = await stripe.customers.create({
         email: user.email,
         name: user.company || "Enterprise Account",
         metadata: {
-          organizationId: user.organizationId,
+          organizationId: user.organizationId || "",
         }
       });
       
       customerId = customer.id;
 
-      // Save the new Stripe Customer ID to Organization if present, otherwise to the Solo User
+      // Persist the single customer ID to User
+      await prisma.user.update({
+        where: { id: user.id },
+        data: { stripeCustomerId: customerId }
+      });
+
+      // Also persist to Organization if user belongs to one
       if (user.organization?.id) {
         await prisma.organization.update({
           where: { id: user.organization.id },
-          data: { stripeCustomerId: customerId }
-        });
-      } else {
-        await prisma.user.update({
-          where: { id: user.id },
           data: { stripeCustomerId: customerId }
         });
       }
