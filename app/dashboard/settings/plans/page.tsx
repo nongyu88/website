@@ -2,8 +2,15 @@
 
 import { useState, useEffect } from "react"
 import Link from "next/link"
-import { ArrowLeft, CreditCard, Check, Zap, Shield, FileText, Download, Sparkles } from "lucide-react"
+import { ArrowLeft, Check, Sparkles } from "lucide-react"
 import { Button } from "@/components/ui/button"
+
+// NEW: Define the strict object structure matching our database
+interface ActivePlanData {
+  name: string;
+  priceId: string;
+  cycle: string;
+}
 
 export default function PlansAndFeesPage() {
   const [isDarkMode, setIsDarkMode] = useState(true)
@@ -12,25 +19,34 @@ export default function PlansAndFeesPage() {
   const [checkoutLoading, setCheckoutLoading] = useState<string>("")
   const [portalLoading, setPortalLoading] = useState(false)
   
+  // Controls the greyed-out state while fetching data
+  const [isPageLoading, setIsPageLoading] = useState(true)
+
   const [activePlanName, setActivePlanName] = useState<string>("Free")
   const [subscriptionStatus, setSubscriptionStatus] = useState<string>("inactive")
-  const [activePriceId, setActivePriceId] = useState<string>("") // Tracks exact Price ID
+  const [activePriceId, setActivePriceId] = useState<string>("")
 
   const [isAdmin, setIsAdmin] = useState(false);
-
   const [user, setUser] = useState<any>(null);
+  
+  // State now holds our detailed objects!
+  const [activePlans, setActivePlans] = useState<ActivePlanData[]>([]);
 
   useEffect(() => {
     const userObj = JSON.parse(localStorage.getItem("user") || "{}");
-    const role = String(userObj.role || "viewer").toLowerCase(); // Converts "Owner" to "owner"
+    const role = String(userObj.role || "viewer").toLowerCase();
     
     setIsAdmin(role === "admin" || role === "owner");
   }, []);
 
   useEffect(() => {
     const fetchUserData = async () => {
+      setIsPageLoading(true); 
       const storedUser = localStorage.getItem("user")
-      if (!storedUser) return
+      if (!storedUser) {
+        setIsPageLoading(false);
+        return;
+      }
       const parsedUser = JSON.parse(storedUser)
 
       try {
@@ -42,45 +58,61 @@ export default function PlansAndFeesPage() {
           const realRole = String(data.user.role || "viewer").toLowerCase();
           setIsAdmin(realRole === "admin" || realRole === "owner");
           
-          // Secretly update localStorage so the rest of the app catches up
           localStorage.setItem("user", JSON.stringify({ ...parsedUser, role: realRole }));
         }
 
-        if (data.user?.organization) {
-          setActivePlanName(data.user.organization.planName || "Free")
-          setSubscriptionStatus(data.user.organization.subscriptionStatus || "inactive")
-          if (data.user.organization.planName) {
-            setSelectedPlan(data.user.organization.planName)
-          }
+        // Helper to parse the JSON and map legacy strings to objects if needed
+        const parsePlans = (rawPlans: any): ActivePlanData[] => {
+          if (!rawPlans) return [];
+          try {
+            const parsed = typeof rawPlans === 'string' ? JSON.parse(rawPlans) : rawPlans;
+            if (Array.isArray(parsed)) {
+              return parsed.map((p: any) => {
+                // If it's an old string record, convert it to an object safely
+                if (typeof p === 'string') return { name: p, priceId: "", cycle: "Unknown" };
+                return p;
+              });
+            }
+          } catch (err) {}
+          return [];
+        };
+
+        let fetchedPlans = parsePlans(data.user?.organization?.activePlans);
+
+        if (fetchedPlans.length === 0) {
+          fetchedPlans = parsePlans(data.user?.activePlans);
         }
+
+        setActivePlans(fetchedPlans);
+
         if (data.activePriceId) {
-          setActivePriceId(data.activePriceId) // Sets active Price ID from Stripe
+          setActivePriceId(data.activePriceId)
         }
       } catch (err) {
         console.error("Failed to fetch current plan", err)
+      } finally {
+        setIsPageLoading(false); 
       }
     }
     fetchUserData()
   }, [])
 
   const handleSubscribe = async (priceId: string, planName: string) => {
-    // 1. Open blank window IMMEDIATELY
     const checkoutWindow = window.open('about:blank', '_blank');
     setCheckoutLoading(planName);
 
     try {
-      const user = JSON.parse(localStorage.getItem("user") || "{}");
-      if (!user.email) throw new Error("Session error.");
+      const userObj = JSON.parse(localStorage.getItem("user") || "{}");
+      if (!userObj.email) throw new Error("Session error.");
 
       const res = await fetch('/api/stripe/checkout', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ email: user.email, priceId })
+        body: JSON.stringify({ email: userObj.email, priceId })
       });
       const data = await res.json();
       
       if (data.url && checkoutWindow) {
-        // 2. Redirect the already-opened window
         checkoutWindow.location.href = data.url; 
       } else {
         checkoutWindow?.close();
@@ -97,16 +129,16 @@ export default function PlansAndFeesPage() {
   const handleManageBilling = async () => {
     setPortalLoading(true);
     try {
-      const user = JSON.parse(localStorage.getItem("user") || "{}");
+      const userObj = JSON.parse(localStorage.getItem("user") || "{}");
       const res = await fetch('/api/stripe/portal', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ email: user.email })
+        body: JSON.stringify({ email: userObj.email })
       });
       const data = await res.json();
       
       if (data.url) {
-        window.location.href = data.url; // <--- This redirects in the same tab!
+        window.location.href = data.url;
       } else {
         alert(data.error || "Failed to load billing portal.");
       }
@@ -122,9 +154,9 @@ export default function PlansAndFeesPage() {
     if (savedTheme === "light") setIsDarkMode(false)
   }, [])
 
-const plans = [
+  const plans = [
     {
-      id: "grid", // <-- ADD THIS
+      id: "grid",
       name: "Utility Grid Twin",
       priceMonthly: "$1,200",
       priceAnnually: "$1,000",
@@ -136,13 +168,12 @@ const plans = [
         "5 Team seats included",
         "Standard support (24/7)"
       ],
-      current: false,
       buttonText: "Get Grid Digital Twin",
       stripePriceMonthly: "price_1U0drsCnK1WH2hz2ETrB7CUj",
       stripePriceAnnually: "price_1U0dwrCnK1WH2hz2vRXdFtze"
     },
     {
-      id: "pipeline", // <-- ADD THIS
+      id: "pipeline",
       name: "Pipeline Twin",
       priceMonthly: "$1,500",
       priceAnnually: "$1,250",
@@ -154,13 +185,12 @@ const plans = [
         "5 Team seats included",
         "Standard support (24/7)"
       ],
-      current: false,
       buttonText: "Get Pipeline Digital Twin",
       stripePriceMonthly: "price_1U0dumCnK1WH2hz29ta30zW3",
       stripePriceAnnually: "price_1U0dxfCnK1WH2hz2B6V9AMUl"
     },
     {
-      id: "enterprise", // <-- ADD THIS
+      id: "enterprise",
       name: "Enterprise Convergence",
       priceMonthly: "$2,800",
       priceAnnually: "$2,400",
@@ -172,22 +202,15 @@ const plans = [
         "Unlimited Team seats",
         "Dedicated account engineer & SLA"
       ],
-      current: true,
       buttonText: "Get Enterprise Convergence",
       stripePriceMonthly: "price_1U0dvJCnK1WH2hz2XZ6Zlfnm",
       stripePriceAnnually: "price_1U0dyKCnK1WH2hz2aIY9w2Om"
     }
   ]
 
-  // Filter plans based on the user's business industry
   const filteredPlans = plans.filter(plan => {
-    // If no industry is set, show everything as a fallback
     if (!user?.industry) return true;
-    
-    // If they selected 'both', only show the Enterprise Convergence plan
     if (user?.industry === 'both') return plan.id === 'enterprise';
-    
-    // Otherwise, strictly match the plan to their industry ('grid' or 'pipeline')
     return plan.id === user?.industry;
   });
 
@@ -207,21 +230,36 @@ const plans = [
 
         <main className="max-w-5xl mx-auto px-6 py-8 space-y-8">
           
+        {/* TOP ACTIVE SUBSCRIPTION BANNER */}
         <section className="bg-gradient-to-r from-purple-900/30 to-indigo-900/30 border border-purple-500/30 rounded-2xl p-6 md:p-8 flex flex-col md:flex-row items-start md:items-center justify-between gap-6">
           <div>
-            <div className="flex items-center space-x-2 text-purple-600 dark:text-purple-400 font-semibold text-sm mb-1">
+            <div className="flex items-center space-x-2 text-purple-600 dark:text-purple-400 font-semibold text-sm mb-3">
               <Sparkles className="w-4 h-4" />
-              <span>{subscriptionStatus === "active" ? "Active Plan" : "No Active Subscription"}</span>
+              <span>{activePlans.length > 0 ? "Active Subscriptions" : "No Active Subscription"}</span>
             </div>
-            <h2 className="text-2xl font-bold text-slate-900 dark:text-white">{activePlanName} Tier</h2>
-            {subscriptionStatus === "active" && (
-              <p className="text-sm text-slate-500 dark:text-slate-400 mt-1">Your billing is managed via Stripe securely.</p>
+            
+            {activePlans.length > 0 ? (
+              <div className="flex flex-col space-y-2">
+                {activePlans.map((planObj, i) => (
+                  <h2 key={i} className="text-xl md:text-2xl font-bold text-slate-900 dark:text-white flex items-center">
+                    <span className="w-2.5 h-2.5 rounded-full bg-emerald-500 mr-3 shrink-0"></span>
+                    {/* Render directly from our detailed JSON object */}
+                    {planObj.name}{planObj.cycle && planObj.cycle !== "Unknown" ? ` (${planObj.cycle})` : ""} Tier
+                  </h2>
+                ))}
+              </div>
+            ) : (
+              <h2 className="text-2xl font-bold text-slate-900 dark:text-white">Free Tier</h2>
+            )}
+            
+            {activePlans.length > 0 && (
+              <p className="text-sm text-slate-500 dark:text-slate-400 mt-4">Your billing is managed via Stripe securely.</p>
             )}
           </div>
           <div className="flex items-center space-x-3">
             <Button 
               onClick={handleManageBilling}
-              disabled={portalLoading}
+              disabled={portalLoading || isPageLoading}
               variant="outline" 
               className="border-purple-500/50 text-purple-600 dark:text-purple-300 hover:bg-purple-500/10"
             >
@@ -253,10 +291,13 @@ const plans = [
           <section className={`grid grid-cols-1 gap-6 ${filteredPlans.length === 1 ? 'max-w-md mx-auto' : 'md:grid-cols-3'}`}>
           {filteredPlans.map((plan) => {
               const targetPriceId = billingCycle === "monthly" ? plan.stripePriceMonthly : plan.stripePriceAnnually;
-              // Matches against live activePriceId or falls back to plan name match on same cycle
-              const isCurrentPlan = activePriceId 
-                ? activePriceId === targetPriceId 
-                : (activePlanName === plan.name && billingCycle === "annually");
+              
+              // Only disable if the user's activePlans array has an object with THIS EXACT price ID
+              const isExactCurrentPlan = activePlans.some(p => p.priceId === targetPriceId);
+              
+              // Check if they own any cycle of this plan so we can prompt an upgrade if they view yearly
+              const ownsPlanAnyCycle = activePlans.some(p => p.name === plan.name);
+
               const isSelected = selectedPlan === plan.name;
 
             return (
@@ -265,7 +306,7 @@ const plans = [
                 onClick={() => setSelectedPlan(plan.name)}
                 className={`rounded-2xl p-6 border flex flex-col justify-between transition-all duration-300 cursor-pointer ${isSelected ? 'bg-white dark:bg-[#111113] border-slate-900 dark:border-white shadow-md relative' : 'bg-white dark:bg-[#111113] border-slate-200 dark:border-white/10 hover:border-slate-300 dark:hover:border-white/20'}`}
               >
-                {isCurrentPlan && (
+                {isExactCurrentPlan && (
                   <span className="absolute -top-3 left-1/2 -translate-x-1/2 bg-slate-900 dark:bg-white text-white dark:text-slate-900 text-[10px] font-bold px-3 py-1 rounded-full uppercase tracking-wider shadow-sm">
                     Current Plan
                   </span>
@@ -292,26 +333,31 @@ const plans = [
                 </div>
 
                 <Button 
-                  disabled={isCurrentPlan || checkoutLoading === plan.name || !isAdmin}
+                  disabled={isPageLoading || isExactCurrentPlan || checkoutLoading === plan.name || !isAdmin}
                   onClick={(e) => {
                     e.stopPropagation();
                     if (!isAdmin) {
                       alert("Only Organization Admins can manage billing tiers.");
                       return;
                     }
-                    if (!isCurrentPlan) {
-                      handleSubscribe(
-                        billingCycle === "monthly" ? plan.stripePriceMonthly : plan.stripePriceAnnually,
-                        plan.name
-                      );
+                    if (!isExactCurrentPlan) {
+                      handleSubscribe(targetPriceId, plan.name);
                     }
                   }}
                   className={`w-full text-xs font-semibold h-10 ${
                     !isAdmin ? 'opacity-50 cursor-not-allowed bg-slate-700 text-slate-400' : ''
                   }`}
-  >
-                  {!isAdmin ? "Admin Permission Required" : isCurrentPlan ? "Current Active Plan" : plan.buttonText}
-              </Button>
+                >
+                  {isPageLoading 
+                    ? "Loading..." 
+                    : !isAdmin 
+                      ? "Admin Permission Required" 
+                      : isExactCurrentPlan 
+                        ? "Current Active Plan" 
+                        : (ownsPlanAnyCycle && billingCycle === "annually")
+                          ? "Upgrade to Annual"
+                          : plan.buttonText}
+                </Button>
               </div>
             )
           })}

@@ -257,10 +257,10 @@ user?.organization?.subscriptionStatus === 'active' ||
                   <div className="w-12 h-12 bg-emerald-100 dark:bg-emerald-500/10 rounded-2xl flex items-center justify-center border border-emerald-200 dark:border-emerald-500/20">
                     <Zap className="w-6 h-6 text-emerald-600 dark:text-emerald-400" />
                   </div>
-                  <Badge className={`text-[10px] uppercase font-bold border ${
+                  <Badge className={`text-[10px] uppercase font-bold border transition-colors ${
                     isSubscribed 
-                      ? "bg-emerald-100 text-emerald-900 dark:bg-emerald-900/50 dark:text-emerald-300 border-emerald-300 dark:border-emerald-700/50" 
-                      : "bg-slate-200 dark:bg-slate-800 text-slate-800 dark:text-slate-300 border-slate-300 dark:border-slate-600 shadow-sm"
+                      ? "bg-emerald-100 text-emerald-900 hover:bg-emerald-200 dark:bg-emerald-900/50 dark:text-emerald-300 dark:hover:bg-emerald-900/70 border-emerald-300 dark:border-emerald-700/50" 
+                      : "bg-slate-200 dark:bg-slate-800 text-slate-800 dark:text-slate-300 hover:bg-slate-300 dark:hover:bg-slate-700 border-slate-300 dark:border-slate-600 shadow-sm"
                   }`}>
                     {isSubscribed ? "Active | Enterprise" : "Locked"}
                   </Badge>
@@ -299,10 +299,10 @@ user?.organization?.subscriptionStatus === 'active' ||
                   <div className="w-12 h-12 bg-blue-100 dark:bg-blue-500/10 rounded-2xl flex items-center justify-center border border-blue-200 dark:border-blue-500/20">
                     <Droplet className="w-6 h-6 text-blue-600 dark:text-blue-400" />
                   </div>
-                  <Badge className={`text-[10px] uppercase font-bold border ${
+                  <Badge className={`text-[10px] uppercase font-bold border transition-colors ${
                     isSubscribed 
-                      ? "bg-blue-100 text-blue-900 dark:bg-blue-900/50 dark:text-blue-300 border-blue-300 dark:border-blue-700/50" 
-                      : "bg-slate-200 dark:bg-slate-800 text-slate-800 dark:text-slate-300 border-slate-300 dark:border-slate-600 shadow-sm"
+                      ? "bg-blue-100 text-blue-900 hover:bg-blue-100 dark:bg-blue-900/50 dark:text-blue-300 dark:hover:bg-blue-900/70 border-blue-300 dark:border-blue-700/50" 
+                      : "bg-slate-200 dark:bg-slate-800 text-slate-800 dark:text-slate-300 hover:bg-slate-300 dark:hover:bg-slate-700 border-slate-300 dark:border-slate-600 shadow-sm"
                   }`}>
                     {isSubscribed ? "Active | Enterprise" : "Locked"}
                   </Badge>

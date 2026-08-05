@@ -19,16 +19,25 @@ export async function POST(request: Request) {
     const inviter = await prisma.user.findUnique({ where: { email: inviterEmail } });
     if (!inviter) return NextResponse.json({ error: "Inviter not found." }, { status: 404 });
 
-    // 2. SAFEGUARD: If this is an older test user without an organization, auto-create one!
+    // 2. SAFEGUARD: If this is an older test user without an organization, auto-create one and MIGRATE plans!
     let orgId = inviter.organizationId;
     if (!orgId) {
       const newOrg = await prisma.organization.create({
-        data: { name: inviter.company || "Enterprise Account" }
+        data: { 
+          name: inviter.company || "Enterprise Account",
+          // MIGRATE SOLO USER'S PLANS & STRIPE DETAILS TO THE NEW ORG:
+          activePlans: inviter.activePlans || "[]",
+          stripeCustomerId: inviter.stripeCustomerId,
+          stripeSubscriptionId: inviter.stripeSubscriptionId,
+          subscriptionStatus: inviter.subscriptionStatus || "inactive"
+        }
       });
+
       await prisma.user.update({
         where: { id: inviter.id },
         data: { organizationId: newOrg.id, role: "Owner" }
       });
+
       orgId = newOrg.id;
     }
 
