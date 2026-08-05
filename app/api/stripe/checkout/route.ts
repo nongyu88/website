@@ -72,6 +72,10 @@ if (!stripeCustomerId) {
       }
     }
 
+    // Safely format base URL without trailing slash
+    const rawBaseUrl = process.env.NEXT_PUBLIC_BASE_URL || 'http://localhost:3000';
+    const baseUrl = rawBaseUrl.replace(/\/$/, '');
+
     // 3. Create the Stripe Checkout Session
     const session = await stripe.checkout.sessions.create({
       customer: customerId,
@@ -83,8 +87,8 @@ if (!stripeCustomerId) {
         },
       ],
       mode: 'subscription', // Because this is a recurring monthly/annual plan
-      success_url: `${process.env.NEXT_PUBLIC_BASE_URL}/dashboard/settings/plans?success=true`,
-      cancel_url: `${process.env.NEXT_PUBLIC_BASE_URL}/dashboard/settings/plans?canceled=true`,
+      success_url: `${baseUrl}/dashboard/settings/plans?success=true`,
+      cancel_url: `${baseUrl}/dashboard/settings/plans?canceled=true`,
       metadata: {
         organizationId: user.organizationId, // Pass this so the Webhook knows who paid!
       }

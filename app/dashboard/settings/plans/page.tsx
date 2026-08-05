@@ -4,6 +4,7 @@ import { useState, useEffect } from "react"
 import Link from "next/link"
 import { ArrowLeft, Check, Sparkles } from "lucide-react"
 import { Button } from "@/components/ui/button"
+import { Suspense } from "react";
 
 // NEW: Define the strict object structure matching our database
 interface ActivePlanData {
@@ -12,7 +13,7 @@ interface ActivePlanData {
   cycle: string;
 }
 
-export default function PlansAndFeesPage() {
+function PlansContent() {
   const [isDarkMode, setIsDarkMode] = useState(true)
   const [billingCycle, setBillingCycle] = useState<"monthly" | "annually">("annually")
   const [addonBillingCycle, setAddonBillingCycle] = useState<"monthly" | "annually">("annually")
@@ -581,4 +582,17 @@ export default function PlansAndFeesPage() {
 </div>
 </div>
 )
+}
+
+
+export default function PlansAndFeesPage() {
+  return (
+    <Suspense fallback={
+      <div className="min-h-screen bg-slate-950 flex items-center justify-center text-white font-mono">
+        Loading Subscription Plans...
+      </div>
+    }>
+      <PlansContent />
+    </Suspense>
+  );
 }
