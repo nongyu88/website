@@ -34,13 +34,13 @@ export async function POST(request: Request) {
       );
     }
 
-    // Look for NEXT_PUBLIC_BASE_URL (Azure) first, then origin headers, then localhost fallback
-    const domain = process.env.NEXT_PUBLIC_BASE_URL || request.headers.get('origin') || "http://localhost:3000";
+    const rawBaseUrl = process.env.NEXT_PUBLIC_BASE_URL || 'http://localhost:3000';
+    const baseUrl = rawBaseUrl.replace(/\/$/, '');
 
     // Create Stripe Customer Portal Session
     const portalSession = await stripe.billingPortal.sessions.create({
       customer: stripeCustomerId,
-      return_url: `${domain}/dashboard/settings/plans`,
+      return_url: `${baseUrl}/dashboard/settings/plans`,
     });
 
     return NextResponse.json({ url: portalSession.url });
