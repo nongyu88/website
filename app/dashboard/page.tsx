@@ -24,6 +24,7 @@ interface UserData {
   planTier?: string
   subscriptionStatus?: string
   activePlans?: string // <-- Added to fix TypeScript error
+  token?: string
 
   organization?: {
     planName?: string
@@ -57,13 +58,21 @@ export default function DashboardPage() {
         const data = await res.json()
         
         if (data.user) {
+          // Grab token from API response, fallback to parsed user, or existing local storage
+          const sessionToken = data.token || data.user.token || parsedUser.token || localStorage.getItem("kraftgene_token") || "";
+
           const updatedUser = {
             ...parsedUser,
             ...data.user,
+            token: sessionToken, // Sync to user state
             hasCompletedOnboarding: data.user.hasCompletedOnboarding ?? parsedUser.hasCompletedOnboarding ?? true
           }
           setUser(updatedUser)
           localStorage.setItem("user", JSON.stringify(updatedUser))
+
+          if (sessionToken) {
+            localStorage.setItem("kraftgene_token", sessionToken)
+          }
         } else {
           setUser(parsedUser)
         }
@@ -79,46 +88,68 @@ export default function DashboardPage() {
     fetchFreshData()
   }, [])
 
-// Parse active plans array first
-const activePlansRaw = user?.organization?.activePlans || user?.activePlans || "[]";
-let activePlansArr: any[] = [];
-try {
-  activePlansArr = typeof activePlansRaw === 'string' ? JSON.parse(activePlansRaw) : activePlansRaw;
-} catch (e) {}
+  // Parse active plans array first
+  const activePlansRaw = user?.organization?.activePlans || user?.activePlans || "[]";
+  let activePlansArr: any[] = [];
+  try {
+    activePlansArr = typeof activePlansRaw === 'string' ? JSON.parse(activePlansRaw) : activePlansRaw;
+  } catch (e) {}
 
-// Check Add-on Services
-const hasDigitalTwins = activePlansArr.some((p: any) => p.name === "Digital Twins Services" || p === "Digital Twins Services");
-const hasProfessional = activePlansArr.some((p: any) => p.name === "Professional Services" || p === "Professional Services");
-const hasData = activePlansArr.some((p: any) => p.name === "Data Services" || p === "Data Services");
+  // Check Add-on Services
+  const hasDigitalTwins = activePlansArr.some((p: any) => p.name === "Digital Twins Services" || p === "Digital Twins Services");
+  const hasProfessional = activePlansArr.some((p: any) => p.name === "Professional Services" || p === "Professional Services");
+  const hasData = activePlansArr.some((p: any) => p.name === "Data Services" || p === "Data Services");
 
-// Check Core Platform Subscriptions directly inside activePlans array
-const hasGridPlan = activePlansArr.some((p: any) => p.name === "Utility Grid Twin" || p === "Utility Grid Twin");
-const hasPipelinePlan = activePlansArr.some((p: any) => p.name === "Pipeline Twin" || p === "Pipeline Twin");
-const hasEnterprisePlan = activePlansArr.some((p: any) => p.name === "Enterprise Convergence" || p === "Enterprise Convergence");
+  // Check Core Platform Subscriptions directly inside activePlans array
+  const hasGridPlan = activePlansArr.some((p: any) => p.name === "Utility Grid Twin" || p === "Utility Grid Twin");
+  const hasPipelinePlan = activePlansArr.some((p: any) => p.name === "Pipeline Twin" || p === "Pipeline Twin");
+  const hasEnterprisePlan = activePlansArr.some((p: any) => p.name === "Enterprise Convergence" || p === "Enterprise Convergence");
 
-// General active status check fallback
-const isGeneralActive = 
-  user?.subscriptionStatus === 'active' || 
-  user?.organization?.subscriptionStatus === 'active' || 
-  (user?.organization?.planName && user?.organization?.planName !== 'Free');
+  // General active status check fallback
+  const isGeneralActive = 
+    user?.subscriptionStatus === 'active' || 
+    user?.organization?.subscriptionStatus === 'active' || 
+    (user?.organization?.planName && user?.organization?.planName !== 'Free');
 
-// Specific unlock permissions for Grid and Pipeline platforms
-const isGridSubscribed = hasGridPlan || hasEnterprisePlan || isGeneralActive;
-const isPipelineSubscribed = hasPipelinePlan || hasEnterprisePlan || isGeneralActive;
+  // Specific unlock permissions for Grid and Pipeline platforms
+  const isGridSubscribed = hasGridPlan || hasEnterprisePlan || isGeneralActive;
+  const isPipelineSubscribed = hasPipelinePlan || hasEnterprisePlan || isGeneralActive;
 
-const handleLogout = () => {
-    localStorage.removeItem("user")
-    localStorage.removeItem("kraftgene_token")
-    window.location.href = "/login"
-  }
+  const handleLogout = () => {
+      localStorage.removeItem("user")
+      localStorage.removeItem("kraftgene_token")
+      window.location.href = "/login"
+    }
+
+  // Helper to guarantee we find the token
+  const getRobustToken = () => {
+    let token = localStorage.getItem("kraftgene_token");
+    if (token) return token;
+
+    if (user?.token) return user.token;
+
+    // Fallback: Check if it was stored as a cookie during login
+    const cookieMatch = document.cookie.match(new RegExp('(^| )kraftgene_token=([^;]+)'));
+    if (cookieMatch) return cookieMatch[2];
+
+    return "";
+  };
 
   const handleLaunchGrid = () => {
-    const token = localStorage.getItem("kraftgene_token") || ""
+    const token = getRobustToken();
+    if (!token) {
+      alert("Authentication token missing. Please sign out and log back in to generate a secure session.");
+      return;
+    }
     window.open(`https://www.energyeminence.online/?auth_token=${encodeURIComponent(token)}`, '_blank')
   }
 
   const handleLaunchPipeline = () => {
-    const token = localStorage.getItem("kraftgene_token") || ""
+    const token = getRobustToken();
+    if (!token) {
+      alert("Authentication token missing. Please sign out and log back in to generate a secure session.");
+      return;
+    }
     
     window.open(`https://www.energyeminence.xyz/?auth_token=${encodeURIComponent(token)}`, '_blank')
   }
