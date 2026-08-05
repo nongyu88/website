@@ -34,7 +34,8 @@ export async function POST(request: Request) {
       );
     }
 
-    const domain = process.env.NEXT_PUBLIC_APP_URL || "http://localhost:3000";
+    // Look for NEXT_PUBLIC_BASE_URL (Azure) first, then origin headers, then localhost fallback
+    const domain = process.env.NEXT_PUBLIC_BASE_URL || request.headers.get('origin') || "http://localhost:3000";
 
     // Create Stripe Customer Portal Session
     const portalSession = await stripe.billingPortal.sessions.create({
