@@ -1,75 +1,84 @@
 export const dynamic = 'force-dynamic';
 
-import { NextResponse } from "next/server";
+import { NextResponse } from 'next/server';
+import { prisma } from '@/lib/prisma';
+import bcrypt from 'bcryptjs';
+import jwt from 'jsonwebtoken';
 
-export async function POST(req: Request) {
+export async function POST(request: Request) {
   try {
-    const { email, password } = await req.json();
+    const { email, password, inviteToken } = await request.json();
 
-    if (!process.env.DATABASE_URL) {
-      return NextResponse.json({ error: "CRITICAL: DATABASE_URL is missing in Azure Environment Variables." }, { status: 500 });
+    if (!email || !password) {
+      return NextResponse.json({ error: "Email and password are required." }, { status: 400 });
     }
 
-    // 1. DYNAMIC IMPORTS: Load the Client and the SQL Server Adapter
-    const { PrismaClient } = await import("@prisma/client");
-    const { PrismaMssql } = await import("@prisma/adapter-mssql");
-    const bcrypt = require("bcryptjs");
-    const jwt = require("jsonwebtoken");
-
-    // 2. Instantiate the MSSQL Adapter with your connection string
-    const adapter = new PrismaMssql(process.env.DATABASE_URL);
-    
-    // 3. Pass the adapter to PrismaClient to satisfy Prisma 7 requirements
-    const prisma = new PrismaClient({ adapter });
-
-    // 4. Safely test the database query
-    let user;
-    try {
-      user = await prisma.user.findUnique({ where: { email } });
-    } catch (dbError: any) {
-      return NextResponse.json({ error: `DATABASE ERROR: ${dbError.message}` }, { status: 500 });
-    }
-
-    if (!user) {
-      return NextResponse.json({ error: "Invalid email or password" }, { status: 401 });
-    }
-
-    // 5. Verify hashed password
-    const isValid = await bcrypt.compare(password, user.password);
-    if (!isValid) {
-      return NextResponse.json({ error: "Invalid email or password" }, { status: 401 });
-    }
-
-    // 6. Strict approval check
-    if (user.isApproved !== true) {
-      return NextResponse.json(
-        { error: "Account registered successfully, but is pending staff approval." },
-        { status: 403 }
-      );
-    }
-
-    // 7. Generate signed JWT Token
-    const JWT_SECRET = "kraftgene_super_secret_key_2026_x89z!";
-    const token = jwt.sign(
-      { userId: user.id, email: user.email, company: user.company },
-      JWT_SECRET,
-      { expiresIn: "24h" }
-    );
-
-    // REPLACE your existing return statement with this:
-    return NextResponse.json({
-      message: "Login successful",
-      token,
-      user: { 
-        id: user.id, 
-        email: user.email, 
-        company: user.company,
-        hasCompletedOnboarding: user.hasCompletedOnboarding, // <-- ADDED THIS
-        industry: user.industry // <-- ADDED THIS
-      },
+    // 1. Find the existing user
+    const user = await prisma.user.findUnique({
+      where: { email },
+      include: { organization: true }
     });
 
-    } catch (error: any) {
-    return NextResponse.json({ error: `FATAL API CRASH: ${error.message}` }, { status: 500 });
+    if (!user) {
+      return NextResponse.json({ error: "Invalid email or password." }, { status: 401 });
     }
+
+    // 2. Verify password (using bcrypt or direct match)
+    let isValid = false;
+    try {
+      isValid = await bcrypt.compare(password, user.password);
+    } catch {
+      isValid = user.password === password;
+    }
+
+    if (!isValid) {
+      return NextResponse.json({ error: "Invalid email or password." }, { status: 401 });
+    }
+
+    // 3. 🚨 PROCESS INVITE TOKEN FOR EXISTING USERS
+    if (inviteToken) {
+      const invite = await prisma.invite.findUnique({
+        where: { token: inviteToken }
+      });
+
+      if (invite) {
+        // Link User B to User A's organization!
+        await prisma.user.update({
+          where: { id: user.id },
+          data: {
+            organizationId: invite.organizationId,
+            role: invite.role,
+          }
+        });
+
+        // Delete the invite token so it cannot be reused
+        await prisma.invite.delete({
+          where: { id: invite.id }
+        });
+      }
+    }
+
+    // 4. Fetch updated user details including the new Organization
+    const updatedUser = await prisma.user.findUnique({
+      where: { id: user.id },
+      include: { organization: true }
+    });
+
+    // 5. Generate session JWT token
+    const token = jwt.sign(
+      { userId: user.id, email: user.email },
+      process.env.JWT_SECRET || 'kraftgene_secret_key',
+      { expiresIn: '1d' }
+    );
+
+    return NextResponse.json({
+      success: true,
+      token,
+      user: updatedUser
+    }, { status: 200 });
+
+  } catch (error: any) {
+    console.error("Login Error:", error);
+    return NextResponse.json({ error: "Failed to authenticate." }, { status: 500 });
+  }
 }

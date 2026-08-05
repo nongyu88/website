@@ -33,6 +33,11 @@ export async function GET(request: Request) {
         notifyProductUpdates: true,
         role: true,
         organization: true,
+        // 🚨 CRITICAL FIX: Include subscription & plan fields for solo users!
+        activePlans: true,
+        subscriptionStatus: true,
+        stripeCustomerId: true,
+        stripeSubscriptionId: true,
       }
     });
 
@@ -40,11 +45,13 @@ export async function GET(request: Request) {
       return NextResponse.json({ error: "User not found" }, { status: 404 });
     }
 
-    // Fetch the active Stripe Price ID directly from Stripe if subscription exists
+    // Fetch active Stripe Price ID (Checks Org first, then falls back to solo User)
     let activePriceId = null;
-    if (user.organization?.stripeSubscriptionId) {
+    const subId = user.organization?.stripeSubscriptionId || user.stripeSubscriptionId;
+
+    if (subId) {
       try {
-        const sub = await stripe.subscriptions.retrieve(user.organization.stripeSubscriptionId);
+        const sub = await stripe.subscriptions.retrieve(subId);
         activePriceId = sub.items.data[0]?.price?.id || null;
       } catch (e) {
         console.error("Error retrieving Stripe subscription:", e);

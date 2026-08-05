@@ -17,16 +17,32 @@ export async function POST(request: Request) {
       return NextResponse.json({ error: "Missing required fields" }, { status: 400 });
     }
 
-    // 1. Get the user and their organization from the database
+    // Fetch the user and include their organization if they have one
     const user = await prisma.user.findUnique({
-      where: { email },
+      where: { email: email },
       include: { organization: true }
     });
 
-    if (!user || !user.organizationId) {
-      return NextResponse.json({ error: "User or Organization not found" }, { status: 404 });
+    if (!user) {
+      return NextResponse.json({ error: "User not found." }, { status: 404 });
     }
 
+// Use the Organization's Stripe Customer ID first, fallback to the User's Customer ID
+let stripeCustomerId = user.organization?.stripeCustomerId || user.stripeCustomerId;
+
+// If neither exists, create a new customer in Stripe and attach it to the SOLO USER
+if (!stripeCustomerId) {
+  const customer = await stripe.customers.create({ email: user.email });
+  stripeCustomerId = customer.id;
+  
+  // Save it to the User record since they don't have an Org yet
+  await prisma.user.update({
+    where: { id: user.id },
+    data: { stripeCustomerId: stripeCustomerId }
+  });
+}
+
+// Now proceed to create the checkout session using `stripeCustomerId`...
     // 2. Determine the Stripe Customer ID
     let customerId = user.organization?.stripeCustomerId;
 
@@ -42,11 +58,18 @@ export async function POST(request: Request) {
       
       customerId = customer.id;
 
-      // Save the new Stripe Customer ID to your database
-      await prisma.organization.update({
-        where: { id: user.organizationId },
-        data: { stripeCustomerId: customerId }
-      });
+      // Save the new Stripe Customer ID to Organization if present, otherwise to the Solo User
+      if (user.organization?.id) {
+        await prisma.organization.update({
+          where: { id: user.organization.id },
+          data: { stripeCustomerId: customerId }
+        });
+      } else {
+        await prisma.user.update({
+          where: { id: user.id },
+          data: { stripeCustomerId: customerId }
+        });
+      }
     }
 
     // 3. Create the Stripe Checkout Session
