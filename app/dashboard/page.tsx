@@ -21,12 +21,14 @@ interface UserData {
   company?: string
   hasCompletedOnboarding?: boolean
   industry?: string // 'grid' | 'pipeline' | 'both'
-  planTier?: string             // <-- ADD THIS
-  subscriptionStatus?: string   // <-- ADD THIS
+  planTier?: string
+  subscriptionStatus?: string
+  activePlans?: string // <-- Added to fix TypeScript error
 
   organization?: {
     planName?: string
     subscriptionStatus?: string
+    activePlans?: string // <-- Added to fix TypeScript error
   }
 }
 
@@ -83,7 +85,19 @@ user?.subscriptionStatus === 'active' ||
 user?.organization?.subscriptionStatus === 'active' || 
 (user?.organization?.planName && user?.organization?.planName !== 'Free');
 
-  const handleLogout = () => {
+// Parse active plans to check for specific additional services
+const activePlansRaw = user?.organization?.activePlans || user?.activePlans || "[]";
+let activePlansArr: any[] = [];
+try {
+activePlansArr = typeof activePlansRaw === 'string' ? JSON.parse(activePlansRaw) : activePlansRaw;
+} catch (e) {}
+
+// Safely check if the user owns the service (works with strings or objects)
+const hasDigitalTwins = activePlansArr.some((p: any) => p.name === "Digital Twins Services" || p === "Digital Twins Services");
+const hasProfessional = activePlansArr.some((p: any) => p.name === "Professional Services" || p === "Professional Services");
+const hasData = activePlansArr.some((p: any) => p.name === "Data Services" || p === "Data Services");
+
+const handleLogout = () => {
     localStorage.removeItem("user")
     localStorage.removeItem("kraftgene_token")
     window.location.href = "/login"
@@ -192,55 +206,88 @@ user?.organization?.subscriptionStatus === 'active' ||
   
   <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
     
-    {/* Digital Twins Services */}
-    <div className="bg-white dark:bg-[#111113] border border-slate-200 dark:border-white/10 rounded-2xl p-6 flex flex-col relative overflow-hidden group hover:border-blue-500/50 transition-colors">
-      <div className="absolute top-4 right-4 bg-slate-100 dark:bg-white/5 p-2 rounded-full">
-        <Lock className="w-4 h-4 text-slate-400" />
-      </div>
+{/* Digital Twins Services */}
+<div className={`bg-white dark:bg-[#111113] border rounded-2xl p-6 flex flex-col relative overflow-hidden group transition-colors ${hasDigitalTwins ? 'border-blue-500/50 dark:border-blue-500/30' : 'border-slate-200 dark:border-white/10 hover:border-blue-500/50'}`}>
+      {!hasDigitalTwins && (
+        <div className="absolute top-4 right-4 bg-slate-100 dark:bg-white/5 p-2 rounded-full">
+          <Lock className="w-4 h-4 text-slate-400" />
+        </div>
+      )}
       <div className="w-12 h-12 bg-blue-500/10 rounded-xl flex items-center justify-center mb-4">
         <Cpu className="w-6 h-6 text-blue-500" />
       </div>
-      <h3 className="text-lg font-bold text-slate-900 dark:text-white mb-2">Digital Twins Services</h3>
+      <div className="flex items-center justify-between mb-2">
+        <h3 className="text-lg font-bold text-slate-900 dark:text-white">Digital Twins Services</h3>
+        {hasDigitalTwins && <Badge className="bg-blue-500/10 text-blue-600 border-blue-500/20 text-[10px]">ACTIVE</Badge>}
+      </div>
       <p className="text-sm text-slate-500 dark:text-slate-400 mb-6 flex-grow">
         Advanced physical asset modeling and custom environmental integration for your specific infrastructure.
       </p>
-      <Link href="/dashboard/settings/plans" className="text-sm font-bold text-blue-600 dark:text-blue-400 flex items-center group-hover:text-blue-500 transition-colors">
-        Upgrade to Pro <ArrowRight className="w-4 h-4 ml-1" />
-      </Link>
+      {hasDigitalTwins ? (
+        <button onClick={() => window.open('https://your-digital-twins-url.com', '_blank')} className="text-sm font-bold text-blue-600 dark:text-blue-400 flex items-center group-hover:text-blue-500 transition-colors">
+          Launch Digital Twins <ArrowUpRight className="w-4 h-4 ml-1" />
+        </button>
+      ) : (
+        <Link href="/dashboard/settings/plans#digital-twins" className="text-sm font-bold text-slate-500 hover:text-blue-500 transition-colors flex items-center">
+          Upgrade to Pro <ArrowRight className="w-4 h-4 ml-1" />
+        </Link>
+      )}
     </div>
 
     {/* Professional Services */}
-    <div className="bg-white dark:bg-[#111113] border border-slate-200 dark:border-white/10 rounded-2xl p-6 flex flex-col relative overflow-hidden group hover:border-purple-500/50 transition-colors">
-      <div className="absolute top-4 right-4 bg-slate-100 dark:bg-white/5 p-2 rounded-full">
-        <Lock className="w-4 h-4 text-slate-400" />
-      </div>
+    <div className={`bg-white dark:bg-[#111113] border rounded-2xl p-6 flex flex-col relative overflow-hidden group transition-colors ${hasProfessional ? 'border-purple-500/50 dark:border-purple-500/30' : 'border-slate-200 dark:border-white/10 hover:border-purple-500/50'}`}>
+      {!hasProfessional && (
+        <div className="absolute top-4 right-4 bg-slate-100 dark:bg-white/5 p-2 rounded-full">
+          <Lock className="w-4 h-4 text-slate-400" />
+        </div>
+      )}
       <div className="w-12 h-12 bg-purple-500/10 rounded-xl flex items-center justify-center mb-4">
         <Briefcase className="w-6 h-6 text-purple-500" />
       </div>
-      <h3 className="text-lg font-bold text-slate-900 dark:text-white mb-2">Professional Services</h3>
+      <div className="flex items-center justify-between mb-2">
+        <h3 className="text-lg font-bold text-slate-900 dark:text-white">Professional Services</h3>
+        {hasProfessional && <Badge className="bg-purple-500/10 text-purple-600 border-purple-500/20 text-[10px]">ACTIVE</Badge>}
+      </div>
       <p className="text-sm text-slate-500 dark:text-slate-400 mb-6 flex-grow">
         Dedicated client training, seamless system API integration, and full digital transformation consulting.
       </p>
-      <Link href="/dashboard/settings/plans" className="text-sm font-bold text-purple-600 dark:text-purple-400 flex items-center group-hover:text-purple-500 transition-colors">
-        View Enterprise Plans <ArrowRight className="w-4 h-4 ml-1" />
-      </Link>
+      {hasProfessional ? (
+        <button onClick={() => window.open('https://your-professional-services-url.com', '_blank')} className="text-sm font-bold text-purple-600 dark:text-purple-400 flex items-center group-hover:text-purple-500 transition-colors">
+          Access Pro Services <ArrowUpRight className="w-4 h-4 ml-1" />
+        </button>
+      ) : (
+        <Link href="/dashboard/settings/plans#professional-services" className="text-sm font-bold text-slate-500 hover:text-purple-500 transition-colors flex items-center">
+          View Enterprise Plans <ArrowRight className="w-4 h-4 ml-1" />
+        </Link>
+      )}
     </div>
 
     {/* Data Services */}
-    <div className="bg-white dark:bg-[#111113] border border-slate-200 dark:border-white/10 rounded-2xl p-6 flex flex-col relative overflow-hidden group hover:border-amber-500/50 transition-colors">
-      <div className="absolute top-4 right-4 bg-slate-100 dark:bg-white/5 p-2 rounded-full">
-        <Lock className="w-4 h-4 text-slate-400" />
-      </div>
+    <div className={`bg-white dark:bg-[#111113] border rounded-2xl p-6 flex flex-col relative overflow-hidden group transition-colors ${hasData ? 'border-amber-500/50 dark:border-amber-500/30' : 'border-slate-200 dark:border-white/10 hover:border-amber-500/50'}`}>
+      {!hasData && (
+        <div className="absolute top-4 right-4 bg-slate-100 dark:bg-white/5 p-2 rounded-full">
+          <Lock className="w-4 h-4 text-slate-400" />
+        </div>
+      )}
       <div className="w-12 h-12 bg-amber-500/10 rounded-xl flex items-center justify-center mb-4">
         <Database className="w-6 h-6 text-amber-500" />
       </div>
-      <h3 className="text-lg font-bold text-slate-900 dark:text-white mb-2">Data Services</h3>
+      <div className="flex items-center justify-between mb-2">
+        <h3 className="text-lg font-bold text-slate-900 dark:text-white">Data Services</h3>
+        {hasData && <Badge className="bg-amber-500/10 text-amber-600 border-amber-500/20 text-[10px]">ACTIVE</Badge>}
+      </div>
       <p className="text-sm text-slate-500 dark:text-slate-400 mb-6 flex-grow">
         Real-time robotic data acquisition, live UAV drone feeds, and continuous asset health telemetry.
       </p>
-      <button onClick={() => alert("Contact Sales Triggered")} className="text-sm font-bold text-amber-600 dark:text-amber-400 flex items-center group-hover:text-amber-500 transition-colors text-left">
-        Contact Sales <ArrowRight className="w-4 h-4 ml-1" />
-      </button>
+      {hasData ? (
+        <button onClick={() => window.open('https://your-data-services-url.com', '_blank')} className="text-sm font-bold text-amber-600 dark:text-amber-400 flex items-center group-hover:text-amber-500 transition-colors">
+          Open Data Console <ArrowUpRight className="w-4 h-4 ml-1" />
+        </button>
+      ) : (
+        <Link href="/dashboard/settings/plans#data-services" className="text-sm font-bold text-slate-500 hover:text-amber-500 transition-colors flex items-center">
+          Explore Data Services <ArrowRight className="w-4 h-4 ml-1" />
+        </Link>
+      )}
     </div>
 
   </div>

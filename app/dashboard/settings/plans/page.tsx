@@ -15,6 +15,7 @@ interface ActivePlanData {
 export default function PlansAndFeesPage() {
   const [isDarkMode, setIsDarkMode] = useState(true)
   const [billingCycle, setBillingCycle] = useState<"monthly" | "annually">("annually")
+  const [addonBillingCycle, setAddonBillingCycle] = useState<"monthly" | "annually">("annually")
   const [selectedPlan, setSelectedPlan] = useState<string>("Enterprise Convergence")
   const [checkoutLoading, setCheckoutLoading] = useState<string>("")
   const [portalLoading, setPortalLoading] = useState(false)
@@ -152,7 +153,66 @@ export default function PlansAndFeesPage() {
   useEffect(() => {
     const savedTheme = localStorage.getItem("theme")
     if (savedTheme === "light") setIsDarkMode(false)
+
+    // Handle deep-linking from dashboard card buttons (e.g., #additional-services)
+    if (window.location.hash) {
+      setTimeout(() => {
+        const el = document.querySelector(window.location.hash);
+        if (el) el.scrollIntoView({ behavior: 'smooth' });
+      }, 300);
+    }
   }, [])
+
+  const additionalServices = [
+    {
+      id: "digital-twins",
+      name: "Digital Twins Services",
+      description: "Advanced physical asset modeling and custom environmental integration for your specific infrastructure.",
+      features: [
+        "Real-time asset telemetry",
+        "Custom 3D spatial environments",
+        "IoT sensor aggregation",
+        "Dedicated API endpoints"
+      ],
+      buttonText: "Subscribe to Digital Twins",
+      priceMonthly: "$500",
+      priceAnnually: "$400",
+      stripePriceMonthly: "price_1U13FiCnK1WH2hz2EwrOlA7u",
+      stripePriceAnnually: "price_1U13G8CnK1WH2hz2d1Khdn3z",
+    },
+    {
+      id: "professional-services",
+      name: "Professional Services",
+      description: "Dedicated client training, seamless system API integration, and full digital transformation consulting.",
+      features: [
+        "Dedicated account manager",
+        "Custom API integration",
+        "Weekly strategy syncs",
+        "Priority 24/7 routing"
+      ],
+      buttonText: "Subscribe to Pro Services",
+      priceMonthly: "$800",
+      priceAnnually: "$633",
+      stripePriceMonthly: "price_1U13HSCnK1WH2hz2zqnZI8xB",
+      stripePriceAnnually: "price_1U13HqCnK1WH2hz2QKrXe9En",
+    },
+    {
+      id: "data-services",
+      name: "Data Services",
+      description: "Real-time robotic data acquisition, live UAV drone feeds, and continuous asset health telemetry.",
+      features: [
+        "Live UAV drone feeds",
+        "Robotic data acquisition",
+        "Historical telemetry retention",
+        "Custom export pipelines"
+      ],
+      buttonText: "Subscribe to Data Services",
+      priceMonthly: "$600",
+      priceAnnually: "$475",
+      stripePriceMonthly: "price_1U13ICCnK1WH2hz2IeK3uYsE",
+      stripePriceAnnually: "price_1U13IOCnK1WH2hz22xIIcIpH",
+    }
+  ];
 
   const plans = [
     {
@@ -238,9 +298,9 @@ export default function PlansAndFeesPage() {
               <span>{activePlans.length > 0 ? "Active Subscriptions" : "No Active Subscription"}</span>
             </div>
             
-            {activePlans.length > 0 ? (
+            {activePlans.filter(p => plans.some(main => main.name === p.name)).length > 0 ? (
               <div className="flex flex-col space-y-2">
-                {activePlans.map((planObj, i) => (
+                {activePlans.filter(p => plans.some(main => main.name === p.name)).map((planObj, i) => (
                   <h2 key={i} className="text-xl md:text-2xl font-bold text-slate-900 dark:text-white flex items-center">
                     <span className="w-2.5 h-2.5 rounded-full bg-emerald-500 mr-3 shrink-0"></span>
                     {/* Render directly from our detailed JSON object */}
@@ -361,10 +421,148 @@ export default function PlansAndFeesPage() {
               </div>
             )
           })}
-          </section>
+</section>
 
-        </main>
-      </div>
-    </div>
-  )
+          {/* SECTION 3: ADDITIONAL ENTERPRISE SERVICES */}
+          <div id="additional-services" className="pt-12 mt-12 border-t border-slate-200 dark:border-white/10 space-y-8">
+            <div className="text-center md:text-left mb-4">
+              <h2 className="text-2xl font-bold text-slate-900 dark:text-white">Additional Enterprise Services</h2>
+              <p className="text-sm text-slate-500 dark:text-slate-400 mt-2">
+                Modular add-ons to enhance your core infrastructure operations. Available regardless of your primary subscription tier.
+              </p>
+            </div>
+
+            {/* ADD-ON ACTIVE SUBSCRIPTIONS BANNER */}
+            <section className="bg-gradient-to-r from-purple-900/30 to-indigo-900/30 border border-purple-500/30 rounded-2xl p-6 md:p-8 flex flex-col md:flex-row items-start md:items-center justify-between gap-6">
+              <div>
+                <div className="flex items-center space-x-2 text-purple-600 dark:text-purple-400 font-semibold text-sm mb-3">
+                  <Sparkles className="w-4 h-4" />
+                  <span>{activePlans.filter(p => additionalServices.some(as => as.name === p.name)).length > 0 ? "Active Add-on Subscriptions" : "No Active Add-ons"}</span>
+                </div>
+                
+                {activePlans.filter(p => additionalServices.some(as => as.name === p.name)).length > 0 ? (
+                  <div className="flex flex-col space-y-2">
+                    {activePlans.filter(p => additionalServices.some(as => as.name === p.name)).map((planObj, i) => (
+                      <h2 key={i} className="text-xl md:text-2xl font-bold text-slate-900 dark:text-white flex items-center">
+                        <span className="w-2.5 h-2.5 rounded-full bg-emerald-500 mr-3 shrink-0"></span>
+                        {planObj.name}{planObj.cycle && planObj.cycle !== "Unknown" ? ` (${planObj.cycle})` : ""}
+                      </h2>
+                    ))}
+                  </div>
+                ) : (
+                  <h2 className="text-xl font-bold text-slate-900 dark:text-white">Expand your capabilities below</h2>
+                )}
+                
+                {activePlans.filter(p => additionalServices.some(as => as.name === p.name)).length > 0 && (
+                  <p className="text-sm text-slate-500 dark:text-slate-400 mt-4">Your billing is managed via Stripe securely.</p>
+                )}
+              </div>
+              <div className="flex items-center space-x-3">
+                <Button 
+                  onClick={handleManageBilling}
+                  disabled={portalLoading || isPageLoading}
+                  variant="outline" 
+                  className="border-purple-500/50 text-purple-600 dark:text-purple-300 hover:bg-purple-500/10"
+                >
+                  {portalLoading ? "Loading..." : "Manage Billing & Invoices"}
+                </Button>
+              </div>
+            </section>
+
+            {/* ADD-ON BILLING CYCLE TOGGLE */}
+            <div className="flex justify-center my-8">
+              <div className="bg-slate-200 dark:bg-[#111113] p-1 rounded-xl border border-slate-300 dark:border-white/10 flex items-center">
+                <button
+                  onClick={() => setAddonBillingCycle("monthly")}
+                  className={`px-4 py-2 text-xs font-semibold rounded-lg transition-colors ${addonBillingCycle === "monthly" ? "bg-white dark:bg-purple-600 text-slate-900 dark:text-white shadow-sm" : "text-slate-500 hover:text-slate-900 dark:hover:text-white"}`}
+                >
+                  Monthly Billing
+                </button>
+                <button
+                  onClick={() => setAddonBillingCycle("annually")}
+                  className={`px-4 py-2 text-xs font-semibold rounded-lg transition-colors flex items-center space-x-1 ${addonBillingCycle === "annually" ? "bg-white dark:bg-purple-600 text-slate-900 dark:text-white shadow-sm" : "text-slate-500 hover:text-slate-900 dark:hover:text-white"}`}
+                >
+                  <span>Annual Billing</span>
+                  <span className="bg-emerald-500/20 text-emerald-600 dark:text-emerald-400 text-[10px] px-1.5 py-0.5 rounded-full border border-emerald-500/30">Save 20%</span>
+                </button>
+              </div>
+            </div>
+
+            {/* VERTICAL CENTERED CARDS */}
+            <section className="flex flex-col space-y-8 max-w-md mx-auto">
+            {additionalServices.map((plan) => {
+                const targetPriceId = addonBillingCycle === "monthly" ? plan.stripePriceMonthly : plan.stripePriceAnnually;
+                const isExactCurrentPlan = activePlans.some(p => p.priceId === targetPriceId);
+                const ownsPlanAnyCycle = activePlans.some(p => p.name === plan.name);
+                const isSelected = selectedPlan === plan.name;
+
+              return (
+                <div 
+                  key={plan.id}
+                  id={plan.id}
+                  onClick={() => setSelectedPlan(plan.name)}
+                  className={`rounded-2xl p-6 border flex flex-col justify-between transition-all duration-300 cursor-pointer w-full ${isSelected ? 'bg-white dark:bg-[#111113] border-slate-900 dark:border-white shadow-md relative' : 'bg-white dark:bg-[#111113] border-slate-200 dark:border-white/10 hover:border-slate-300 dark:hover:border-white/20'}`}
+                >
+                  {isExactCurrentPlan && (
+                    <span className="absolute -top-3 left-1/2 -translate-x-1/2 bg-slate-900 dark:bg-white text-white dark:text-slate-900 text-[10px] font-bold px-3 py-1 rounded-full uppercase tracking-wider shadow-sm">
+                      Current Plan
+                    </span>
+                  )}
+                  <div>
+                    <h3 className="text-lg font-bold text-slate-900 dark:text-white mb-2">{plan.name}</h3>
+                    <p className="text-xs text-slate-500 dark:text-slate-400 mb-6 min-h-[36px]">{plan.description}</p>
+                    
+                    <div className="mb-6">
+                      <span className="text-3xl font-extrabold text-slate-900 dark:text-white">
+                        {addonBillingCycle === "annually" ? plan.priceAnnually : plan.priceMonthly}
+                      </span>
+                      <span className="text-slate-500 text-xs"> / month</span>
+                    </div>
+
+                    <ul className="space-y-3 mb-8">
+                      {plan.features.map((feat, fIdx) => (
+                        <li key={fIdx} className="text-xs text-slate-600 dark:text-slate-300 flex items-center">
+                          <Check className="w-4 h-4 text-emerald-500 mr-2 shrink-0" />
+                          <span>{feat}</span>
+                        </li>
+                      ))}
+                    </ul>
+                  </div>
+
+                  <Button 
+                    disabled={isPageLoading || isExactCurrentPlan || checkoutLoading === plan.name || !isAdmin}
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      if (!isAdmin) {
+                        alert("Only Organization Admins can manage billing tiers.");
+                        return;
+                      }
+                      if (!isExactCurrentPlan) {
+                        handleSubscribe(targetPriceId, plan.name);
+                      }
+                    }}
+                    className={`w-full text-xs font-semibold h-10 ${
+                      !isAdmin ? 'opacity-50 cursor-not-allowed bg-slate-700 text-slate-400' : ''
+                    }`}
+                  >
+                    {isPageLoading 
+                      ? "Loading..." 
+                      : !isAdmin 
+                        ? "Admin Permission Required" 
+                        : isExactCurrentPlan 
+                          ? "Current Active Plan" 
+                          : (ownsPlanAnyCycle && addonBillingCycle === "annually")
+                            ? "Upgrade to Annual"
+                            : plan.buttonText}
+                  </Button>
+                </div>
+              )
+            })}
+            </section>
+          </div>
+
+</main>
+</div>
+</div>
+)
 }
