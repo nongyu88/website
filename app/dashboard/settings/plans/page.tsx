@@ -317,14 +317,22 @@ export default function PlansAndFeesPage() {
             )}
           </div>
           <div className="flex items-center space-x-3">
-            <Button 
-              onClick={handleManageBilling}
-              disabled={portalLoading || isPageLoading}
-              variant="outline" 
-              className="border-purple-500/50 text-purple-600 dark:text-purple-300 hover:bg-purple-500/10"
-            >
-              {portalLoading ? "Loading..." : "Manage Billing & Invoices"}
-            </Button>
+                <Button 
+                  onClick={() => {
+                    if (!isAdmin) {
+                      alert("Only Organization Admins can access billing management.");
+                      return;
+                    }
+                    handleManageBilling();
+                  }}
+                  disabled={portalLoading || isPageLoading || !isAdmin}
+                  variant="outline" 
+                  className={`border-purple-500/50 text-purple-600 dark:text-purple-300 hover:bg-purple-500/10 ${
+                    !isAdmin ? 'opacity-50 cursor-not-allowed' : ''
+                  }`}
+                >
+                  {portalLoading ? "Loading..." : !isAdmin ? "Admin Required" : "Manage Billing & Invoices"}
+                </Button>
           </div>
         </section>
 
@@ -458,13 +466,21 @@ export default function PlansAndFeesPage() {
                 )}
               </div>
               <div className="flex items-center space-x-3">
-                <Button 
-                  onClick={handleManageBilling}
-                  disabled={portalLoading || isPageLoading}
+              <Button 
+                  onClick={() => {
+                    if (!isAdmin) {
+                      alert("Only Organization Admins can access billing management.");
+                      return;
+                    }
+                    handleManageBilling();
+                  }}
+                  disabled={portalLoading || isPageLoading || !isAdmin}
                   variant="outline" 
-                  className="border-purple-500/50 text-purple-600 dark:text-purple-300 hover:bg-purple-500/10"
+                  className={`border-purple-500/50 text-purple-600 dark:text-purple-300 hover:bg-purple-500/10 ${
+                    !isAdmin ? 'opacity-50 cursor-not-allowed' : ''
+                  }`}
                 >
-                  {portalLoading ? "Loading..." : "Manage Billing & Invoices"}
+                  {portalLoading ? "Loading..." : !isAdmin ? "Admin Required" : "Manage Billing & Invoices"}
                 </Button>
               </div>
             </section>
