@@ -29,17 +29,21 @@ function AuthForm() {
   const inviteToken = searchParams?.get('invite');
 
   useEffect(() => {
-    if (inviteToken) {
-      setIsRegistering(true);
-    }
-  }, [inviteToken]);
-
-  useEffect(() => {
     // 1. Grab the token and the time the user logged in
     const token = localStorage.getItem("kraftgene_token");
     const loginTime = localStorage.getItem("login_timestamp");
 
     if (token && loginTime) {
+      // 🚨 FIX 1: If there is an invite token in the URL, DO NOT auto-redirect!
+      // We must clear their local session and force them to authenticate 
+      // so the form submits the token to the backend.
+      if (inviteToken) {
+        localStorage.removeItem("kraftgene_token");
+        localStorage.removeItem("user");
+        localStorage.removeItem("login_timestamp");
+        return; 
+      }
+
       const timeElapsed = Date.now() - parseInt(loginTime);
       const fifteenMinutes = 15 * 60 * 1000; // 15 minutes in milliseconds
 
@@ -53,7 +57,7 @@ function AuthForm() {
         localStorage.removeItem("login_timestamp");
       }
     }
-  }, [router]);
+  }, [router, inviteToken]);
 
   // Handle Login Submission
   const handleLogin = async (e: React.FormEvent) => {
@@ -66,7 +70,8 @@ function AuthForm() {
       const res = await fetch("/api/login", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ email, password }),
+        // 🚨 FIX 2: Pass the invite token to the login route so existing users can accept invites!
+        body: JSON.stringify({ email, password, inviteToken: inviteToken }),
       })
 
       // Safely check if the response is JSON before parsing
@@ -119,7 +124,6 @@ function AuthForm() {
         throw new Error(data?.error || `Server error: received status ${res.status}. Ensure the API route exists.`)
       }
 
-      // Change this line:
       setSuccess("Registration received! Your account is pending staff review. You will be able to log in once approved.")
       setIsRegistering(false) // Switch back to login form
       setPassword("")
