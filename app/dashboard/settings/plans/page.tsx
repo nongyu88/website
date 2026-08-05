@@ -100,28 +100,27 @@ function PlansContent() {
   }, [])
 
   const handleSubscribe = async (priceId: string, planName: string) => {
-    const checkoutWindow = window.open('about:blank', '_blank');
     setCheckoutLoading(planName);
 
     try {
       const userObj = JSON.parse(localStorage.getItem("user") || "{}");
-      if (!userObj.email) throw new Error("Session error.");
+      if (!userObj.email) throw new Error("Session error. Please re-login.");
 
       const res = await fetch('/api/stripe/checkout', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ email: userObj.email, priceId })
       });
+      
       const data = await res.json();
       
-      if (data.url && checkoutWindow) {
+      if (data.url) {
+        // Redirect current tab directly to Stripe
         window.location.href = data.url;
       } else {
-        checkoutWindow?.close();
         alert(data.error || "Failed to load checkout.");
       }
     } catch (err: any) {
-      checkoutWindow?.close();
       alert(err.message || "A network error occurred.");
     } finally {
       setCheckoutLoading("");
