@@ -64,10 +64,10 @@ export async function POST(request: Request) {
       include: { organization: true }
     });
 
-    // 5. Generate session JWT token
+    // 5. Generate session JWT token matching Python backend secret
     const token = jwt.sign(
       { userId: user.id, email: user.email },
-      process.env.JWT_SECRET || 'kraftgene_secret_key',
+      process.env.JWT_SECRET || 'kraftgene_super_secret_key_2026_x89z!',
       { expiresIn: '1d' }
     );
 
