@@ -18,6 +18,8 @@ export default function PlansAndFeesPage() {
 
   const [isAdmin, setIsAdmin] = useState(false);
 
+  const [user, setUser] = useState<any>(null);
+
   useEffect(() => {
     const userObj = JSON.parse(localStorage.getItem("user") || "{}");
     const role = String(userObj.role || "viewer").toLowerCase(); // Converts "Owner" to "owner"
@@ -35,7 +37,8 @@ export default function PlansAndFeesPage() {
         const res = await fetch(`/api/user/profile?email=${parsedUser.email}&t=${Date.now()}`, { cache: 'no-store' })
         const data = await res.json()
         if (data.user) {
-          // Force update the admin state based on the REAL database role!
+          setUser(data.user);
+
           const realRole = String(data.user.role || "viewer").toLowerCase();
           setIsAdmin(realRole === "admin" || realRole === "owner");
           
@@ -119,8 +122,9 @@ export default function PlansAndFeesPage() {
     if (savedTheme === "light") setIsDarkMode(false)
   }, [])
 
-  const plans = [
+const plans = [
     {
+      id: "grid", // <-- ADD THIS
       name: "Utility Grid Twin",
       priceMonthly: "$1,200",
       priceAnnually: "$1,000",
@@ -138,6 +142,7 @@ export default function PlansAndFeesPage() {
       stripePriceAnnually: "price_1U0dwrCnK1WH2hz2vRXdFtze"
     },
     {
+      id: "pipeline", // <-- ADD THIS
       name: "Pipeline Twin",
       priceMonthly: "$1,500",
       priceAnnually: "$1,250",
@@ -155,6 +160,7 @@ export default function PlansAndFeesPage() {
       stripePriceAnnually: "price_1U0dxfCnK1WH2hz2B6V9AMUl"
     },
     {
+      id: "enterprise", // <-- ADD THIS
       name: "Enterprise Convergence",
       priceMonthly: "$2,800",
       priceAnnually: "$2,400",
@@ -172,6 +178,18 @@ export default function PlansAndFeesPage() {
       stripePriceAnnually: "price_1U0dyKCnK1WH2hz2aIY9w2Om"
     }
   ]
+
+  // Filter plans based on the user's business industry
+  const filteredPlans = plans.filter(plan => {
+    // If no industry is set, show everything as a fallback
+    if (!user?.industry) return true;
+    
+    // If they selected 'both', only show the Enterprise Convergence plan
+    if (user?.industry === 'both') return plan.id === 'enterprise';
+    
+    // Otherwise, strictly match the plan to their industry ('grid' or 'pipeline')
+    return plan.id === user?.industry;
+  });
 
   return (
     <div className={isDarkMode ? "dark" : ""}>
@@ -232,8 +250,8 @@ export default function PlansAndFeesPage() {
           </div>
 
           {/* SECTION 2: PLANS GRID */}
-          <section className="grid grid-cols-1 md:grid-cols-3 gap-6">
-            {plans.map((plan, index) => {
+          <section className={`grid grid-cols-1 gap-6 ${filteredPlans.length === 1 ? 'max-w-md mx-auto' : 'md:grid-cols-3'}`}>
+          {filteredPlans.map((plan) => {
               const targetPriceId = billingCycle === "monthly" ? plan.stripePriceMonthly : plan.stripePriceAnnually;
               // Matches against live activePriceId or falls back to plan name match on same cycle
               const isCurrentPlan = activePriceId 
@@ -243,7 +261,7 @@ export default function PlansAndFeesPage() {
 
             return (
               <div 
-                key={index}
+                key={plan.id}
                 onClick={() => setSelectedPlan(plan.name)}
                 className={`rounded-2xl p-6 border flex flex-col justify-between transition-all duration-300 cursor-pointer ${isSelected ? 'bg-white dark:bg-[#111113] border-slate-900 dark:border-white shadow-md relative' : 'bg-white dark:bg-[#111113] border-slate-200 dark:border-white/10 hover:border-slate-300 dark:hover:border-white/20'}`}
               >

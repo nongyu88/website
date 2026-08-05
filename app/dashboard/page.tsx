@@ -13,6 +13,7 @@ import {
 import OnboardingWizard from "@/components/OnboardingWizard"
 // import SubscriptionPlans from "@/components/SubscriptionPlans" // <-- ADD THIS
 import { useTheme } from "next-themes";
+import { Cpu, Briefcase, Database, ArrowRight} from "lucide-react";
 
 interface UserData {
   id: string
@@ -22,6 +23,11 @@ interface UserData {
   industry?: string // 'grid' | 'pipeline' | 'both'
   planTier?: string             // <-- ADD THIS
   subscriptionStatus?: string   // <-- ADD THIS
+
+  organization?: {
+    planName?: string
+    subscriptionStatus?: string
+  }
 }
 
 export default function DashboardPage() {
@@ -35,21 +41,47 @@ export default function DashboardPage() {
   };
 
   useEffect(() => {
-    const storedUser = localStorage.getItem("user")
-    if (!storedUser) {
-      window.location.href = "/login"
-      return
+    const fetchFreshData = async () => {
+      const storedUser = localStorage.getItem("user")
+      if (!storedUser) {
+        window.location.href = "/login"
+        return
+      }
+
+      try {
+        const parsedUser = JSON.parse(storedUser)
+        // Fetch fresh data from DB to get the latest industry & subscription status
+        const res = await fetch(`/api/user/profile?email=${parsedUser.email}&t=${Date.now()}`, { cache: 'no-store' })
+        const data = await res.json()
+        
+        if (data.user) {
+          const updatedUser = {
+            ...parsedUser,
+            ...data.user,
+            hasCompletedOnboarding: data.user.hasCompletedOnboarding ?? parsedUser.hasCompletedOnboarding ?? true
+          }
+          setUser(updatedUser)
+          localStorage.setItem("user", JSON.stringify(updatedUser))
+        } else {
+          setUser(parsedUser)
+        }
+      } catch {
+        // Fallback to local storage if fetch fails
+        const parsedUser = JSON.parse(storedUser)
+        setUser(parsedUser)
+      } finally {
+        setLoading(false)
+      }
     }
 
-    try {
-      const parsedUser = JSON.parse(storedUser)
-      setUser(parsedUser)
-    } catch {
-      window.location.href = "/login"
-    } finally {
-      setLoading(false)
-    }
+    fetchFreshData()
   }, [])
+
+// Check both the root user object and the organization object for active status
+const isSubscribed = 
+user?.subscriptionStatus === 'active' || 
+user?.organization?.subscriptionStatus === 'active' || 
+(user?.organization?.planName && user?.organization?.planName !== 'Free');
 
   const handleLogout = () => {
     localStorage.removeItem("user")
@@ -79,12 +111,10 @@ export default function DashboardPage() {
     )
   }
 
-// --- REPLACE YOUR EXISTING GATE WITH THIS ---
-  // GATE: If user has not completed onboarding, show the wizard first!
-  if (user && !user.hasCompletedOnboarding) {
+  // GATE: Only show wizard if explicitly set to false
+  if (user && user.hasCompletedOnboarding === false) {
     return <OnboardingWizard />
   }
-  // --------------------------------------------
 
   return (
     <div className="min-h-screen bg-slate-50 dark:bg-slate-950 text-slate-900 dark:text-white transition-colors duration-300 selection:bg-emerald-500/30">
@@ -146,55 +176,75 @@ export default function DashboardPage() {
               Welcome back{user?.company ? `, ${user.company}` : ""}
             </h1>
             <p className="text-slate-600 dark:text-slate-400 text-sm md:text-base leading-relaxed">
-              Your dashboard is tailored to your primary focus: <span className="font-bold uppercase text-emerald-400">{user?.industry || 'General'}</span>.
+              Your dashboard is tailored to your primary focus:&nbsp;
+              <Link 
+                href="/dashboard/settings/business" 
+                className="font-bold text-emerald-600 dark:text-emerald-400 hover:text-emerald-500 underline decoration-emerald-500/30 underline-offset-4 transition-all"
+              >
+                {user?.industry === 'both' ? 'ENTERPRISE CONVERGENCE' : (user?.industry?.toUpperCase() || "PIPELINE")}
+              </Link>.
             </p>
           </div>
         </div>
 
-        {/* --- INSERT THIS NEW AI BRIEFING ROW --- */}
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-8">
-          {/* AI Copilot Intelligence Brief */}
-          <div className="lg:col-span-2 bg-gradient-to-br from-slate-900 to-slate-800 border border-slate-700 rounded-3xl p-6 shadow-xl relative overflow-hidden">
-            <div className="absolute top-0 right-0 p-4 opacity-10">
-              <Activity className="w-32 h-32 text-blue-500" />
-            </div>
-            <div className="relative z-10">
-              <Badge className="mb-3 bg-blue-500/20 text-blue-400 border border-blue-500/30 uppercase tracking-widest text-[10px]">
-                AI Copilot Briefing
-              </Badge>
-              <h2 className="text-2xl font-bold text-white mb-2">System Nominal. Monitoring Active.</h2>
-              <p className="text-slate-400 text-sm leading-relaxed max-w-xl mb-4">
-                Kraftgene AI Agent is actively ingesting telemetry for <span className="text-white font-semibold">{user?.company || 'your organization'}</span>. Network topology optimized for {user?.industry || 'enterprise'} infrastructure.
-              </p>
-              <div className="flex space-x-4 text-xs font-mono text-slate-500">
-                <span className="flex items-center"><ShieldCheck className="w-3 h-3 mr-1 text-emerald-400" /> Auto-Mitigation Enabled</span>
-                <span className="flex items-center"><Activity className="w-3 h-3 mr-1 text-blue-400" /> Live Threat Intel</span>
-              </div>
-            </div>
-          </div>
+        <div className="mb-12">
+  <h2 className="text-lg font-bold text-slate-900 dark:text-white mb-4">Available Enterprise Services</h2>
+  
+  <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+    
+    {/* Digital Twins Services */}
+    <div className="bg-white dark:bg-[#111113] border border-slate-200 dark:border-white/10 rounded-2xl p-6 flex flex-col relative overflow-hidden group hover:border-blue-500/50 transition-colors">
+      <div className="absolute top-4 right-4 bg-slate-100 dark:bg-white/5 p-2 rounded-full">
+        <Lock className="w-4 h-4 text-slate-400" />
+      </div>
+      <div className="w-12 h-12 bg-blue-500/10 rounded-xl flex items-center justify-center mb-4">
+        <Cpu className="w-6 h-6 text-blue-500" />
+      </div>
+      <h3 className="text-lg font-bold text-slate-900 dark:text-white mb-2">Digital Twins Services</h3>
+      <p className="text-sm text-slate-500 dark:text-slate-400 mb-6 flex-grow">
+        Advanced physical asset modeling and custom environmental integration for your specific infrastructure.
+      </p>
+      <Link href="/dashboard/settings/plans" className="text-sm font-bold text-blue-600 dark:text-blue-400 flex items-center group-hover:text-blue-500 transition-colors">
+        Upgrade to Pro <ArrowRight className="w-4 h-4 ml-1" />
+      </Link>
+    </div>
 
-          {/* Infrastructure Health Vitals */}
-          <div className="bg-white dark:bg-slate-900/80 border border-slate-200 dark:border-white/10 rounded-3xl p-6 shadow-lg flex flex-col justify-between">
-            <div>
-              <h3 className="text-sm font-bold text-slate-500 uppercase tracking-widest mb-4">Network Health</h3>
-              <div className="space-y-4">
-                <div className="flex justify-between items-center">
-                  <span className="text-sm text-slate-600 dark:text-slate-400 flex items-center"><AlertTriangle className="w-4 h-4 mr-2 text-amber-500" /> Active Warnings</span>
-                  <span className="font-bold text-white bg-amber-500/20 px-2 py-0.5 rounded text-xs border border-amber-500/30">2</span>
-                </div>
-                <div className="flex justify-between items-center">
-                  <span className="text-sm text-slate-600 dark:text-slate-400 flex items-center"><ServerCrash className="w-4 h-4 mr-2 text-emerald-500" /> System Uptime</span>
-                  <span className="font-bold text-slate-900 dark:text-white">99.99%</span>
-                </div>
-                <div className="flex justify-between items-center">
-                  <span className="text-sm text-slate-600 dark:text-slate-400 flex items-center"><Zap className="w-4 h-4 mr-2 text-blue-500" /> Ingestion Latency</span>
-                  <span className="font-bold text-slate-900 dark:text-white">12ms</span>
-                </div>
-              </div>
-            </div>
-          </div>
+    {/* Professional Services */}
+    <div className="bg-white dark:bg-[#111113] border border-slate-200 dark:border-white/10 rounded-2xl p-6 flex flex-col relative overflow-hidden group hover:border-purple-500/50 transition-colors">
+      <div className="absolute top-4 right-4 bg-slate-100 dark:bg-white/5 p-2 rounded-full">
+        <Lock className="w-4 h-4 text-slate-400" />
+      </div>
+      <div className="w-12 h-12 bg-purple-500/10 rounded-xl flex items-center justify-center mb-4">
+        <Briefcase className="w-6 h-6 text-purple-500" />
+      </div>
+      <h3 className="text-lg font-bold text-slate-900 dark:text-white mb-2">Professional Services</h3>
+      <p className="text-sm text-slate-500 dark:text-slate-400 mb-6 flex-grow">
+        Dedicated client training, seamless system API integration, and full digital transformation consulting.
+      </p>
+      <Link href="/dashboard/settings/plans" className="text-sm font-bold text-purple-600 dark:text-purple-400 flex items-center group-hover:text-purple-500 transition-colors">
+        View Enterprise Plans <ArrowRight className="w-4 h-4 ml-1" />
+      </Link>
+    </div>
+
+    {/* Data Services */}
+    <div className="bg-white dark:bg-[#111113] border border-slate-200 dark:border-white/10 rounded-2xl p-6 flex flex-col relative overflow-hidden group hover:border-amber-500/50 transition-colors">
+      <div className="absolute top-4 right-4 bg-slate-100 dark:bg-white/5 p-2 rounded-full">
+        <Lock className="w-4 h-4 text-slate-400" />
+      </div>
+      <div className="w-12 h-12 bg-amber-500/10 rounded-xl flex items-center justify-center mb-4">
+        <Database className="w-6 h-6 text-amber-500" />
+      </div>
+      <h3 className="text-lg font-bold text-slate-900 dark:text-white mb-2">Data Services</h3>
+      <p className="text-sm text-slate-500 dark:text-slate-400 mb-6 flex-grow">
+        Real-time robotic data acquisition, live UAV drone feeds, and continuous asset health telemetry.
+      </p>
+      <button onClick={() => alert("Contact Sales Triggered")} className="text-sm font-bold text-amber-600 dark:text-amber-400 flex items-center group-hover:text-amber-500 transition-colors text-left">
+        Contact Sales <ArrowRight className="w-4 h-4 ml-1" />
+      </button>
+    </div>
+
+  </div>
         </div>
-        {/* --------------------------------------- */}
 
         {/* Dynamic Platform Launchers based on User Industry Preference */}
         <div className={`grid grid-cols-1 ${user?.industry === 'both' ? 'md:grid-cols-2' : 'max-w-xl mx-auto'} gap-8 mb-12`}>
@@ -207,8 +257,12 @@ export default function DashboardPage() {
                   <div className="w-12 h-12 bg-emerald-100 dark:bg-emerald-500/10 rounded-2xl flex items-center justify-center border border-emerald-200 dark:border-emerald-500/20">
                     <Zap className="w-6 h-6 text-emerald-600 dark:text-emerald-400" />
                   </div>
-                  <Badge className="bg-emerald-100 dark:bg-emerald-500/20 text-emerald-700 dark:text-emerald-400 border-emerald-200 dark:border-emerald-500/30 text-[10px] uppercase font-bold">
-                    Active | Enterprise
+                  <Badge className={`text-[10px] uppercase font-bold border ${
+                    isSubscribed 
+                      ? "bg-emerald-100 text-emerald-900 dark:bg-emerald-900/50 dark:text-emerald-300 border-emerald-300 dark:border-emerald-700/50" 
+                      : "bg-slate-200 dark:bg-slate-800 text-slate-800 dark:text-slate-300 border-slate-300 dark:border-slate-600 shadow-sm"
+                  }`}>
+                    {isSubscribed ? "Active | Enterprise" : "Locked"}
                   </Badge>
                 </div>
 
@@ -220,12 +274,20 @@ export default function DashboardPage() {
                 </p>
               </div>
 
-              <Button 
-                onClick={handleLaunchGrid}
-                className="w-full bg-emerald-600 hover:bg-emerald-500 text-white font-bold h-12 rounded-xl transition-all flex items-center justify-center shadow-md dark:shadow-lg dark:shadow-emerald-900/30"
-              >
-                Launch Grid Platform <ArrowUpRight className="ml-2 w-4 h-4" />
-              </Button>
+              {isSubscribed ? (
+                <Button 
+                  onClick={handleLaunchGrid}
+                  className="w-full bg-emerald-600 hover:bg-emerald-500 text-white font-bold h-12 rounded-xl transition-all flex items-center justify-center shadow-md dark:shadow-lg dark:shadow-emerald-900/30"
+                >
+                  Launch Grid Platform <ArrowUpRight className="ml-2 w-4 h-4" />
+                </Button>
+              ) : (
+                <Link href="/dashboard/settings/plans" className="w-full block">
+                  <Button className="w-full bg-slate-800 hover:bg-slate-700 text-white font-bold h-12 rounded-xl transition-all flex justify-center items-center">
+                    <Lock className="w-4 h-4 mr-2" /> Upgrade to Launch
+                  </Button>
+                </Link>
+              )}
             </div>
           )}
 
@@ -237,8 +299,12 @@ export default function DashboardPage() {
                   <div className="w-12 h-12 bg-blue-100 dark:bg-blue-500/10 rounded-2xl flex items-center justify-center border border-blue-200 dark:border-blue-500/20">
                     <Droplet className="w-6 h-6 text-blue-600 dark:text-blue-400" />
                   </div>
-                  <Badge className="bg-blue-100 dark:bg-blue-500/20 text-blue-700 dark:text-blue-400 border-blue-200 dark:border-blue-500/30 text-[10px] uppercase font-bold">
-                    Active | Enterprise
+                  <Badge className={`text-[10px] uppercase font-bold border ${
+                    isSubscribed 
+                      ? "bg-blue-100 text-blue-900 dark:bg-blue-900/50 dark:text-blue-300 border-blue-300 dark:border-blue-700/50" 
+                      : "bg-slate-200 dark:bg-slate-800 text-slate-800 dark:text-slate-300 border-slate-300 dark:border-slate-600 shadow-sm"
+                  }`}>
+                    {isSubscribed ? "Active | Enterprise" : "Locked"}
                   </Badge>
                 </div>
 
@@ -250,12 +316,20 @@ export default function DashboardPage() {
                 </p>
               </div>
 
-              <Button 
-                onClick={handleLaunchPipeline}
-                className="w-full bg-blue-600 hover:bg-blue-500 text-white font-bold h-12 rounded-xl transition-all flex items-center justify-center shadow-md dark:shadow-lg dark:shadow-blue-900/30"
-              >
-                Launch Pipeline Platform <ArrowUpRight className="ml-2 w-4 h-4" />
-              </Button>
+              {isSubscribed ? (
+                <Button 
+                  onClick={handleLaunchPipeline}
+                  className="w-full bg-blue-600 hover:bg-blue-500 text-white font-bold h-12 rounded-xl transition-all flex items-center justify-center shadow-md dark:shadow-lg dark:shadow-blue-900/30"
+                >
+                  Launch Pipeline Platform <ArrowUpRight className="ml-2 w-4 h-4" />
+                </Button>
+              ) : (
+                <Link href="/dashboard/settings/plans" className="w-full block">
+                  <Button className="w-full bg-slate-800 hover:bg-slate-700 text-white font-bold h-12 rounded-xl transition-all flex justify-center items-center">
+                    <Lock className="w-4 h-4 mr-2" /> Upgrade to Launch
+                  </Button>
+                </Link>
+              )}
             </div>
           )}
 
@@ -271,12 +345,6 @@ export default function DashboardPage() {
             Need technical assistance? Contact <a href="mailto:customer@kraftgeneai.ca" className="text-emerald-600 dark:text-emerald-400 hover:underline">customer@kraftgeneai.ca</a>
           </div>
         </div>
-        {/* Only show the upgrade UI if their plan is 'none' or 'inactive' */}
-        {/* {(!user?.planTier || user?.planTier === 'none' || user?.subscriptionStatus !== 'active') && (
-            <div className="mt-16 pt-12 border-t border-slate-200 dark:border-white/10">
-              <SubscriptionPlans userEmail={user?.email} />
-            </div>
-          )} */}
       </main>
 
     </div>
