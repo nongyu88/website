@@ -5,9 +5,7 @@ import Stripe from 'stripe';
 import { prisma } from '@/lib/prisma';
 import { headers } from 'next/headers';
 
-const stripe = new Stripe(process.env.STRIPE_SECRET_KEY || '', { 
-  apiVersion: '2023-10-16' as any 
-});
+const stripe = new Stripe(process.env.STRIPE_SECRET_KEY || 'sk_test_placeholder');
 const endpointSecret = process.env.STRIPE_WEBHOOK_SECRET; 
 
 export async function POST(req: Request) {
