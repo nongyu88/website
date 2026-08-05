@@ -79,23 +79,32 @@ export default function DashboardPage() {
     fetchFreshData()
   }, [])
 
-// Check both the root user object and the organization object for active status
-const isSubscribed = 
-user?.subscriptionStatus === 'active' || 
-user?.organization?.subscriptionStatus === 'active' || 
-(user?.organization?.planName && user?.organization?.planName !== 'Free');
-
-// Parse active plans to check for specific additional services
+// Parse active plans array first
 const activePlansRaw = user?.organization?.activePlans || user?.activePlans || "[]";
 let activePlansArr: any[] = [];
 try {
-activePlansArr = typeof activePlansRaw === 'string' ? JSON.parse(activePlansRaw) : activePlansRaw;
+  activePlansArr = typeof activePlansRaw === 'string' ? JSON.parse(activePlansRaw) : activePlansRaw;
 } catch (e) {}
 
-// Safely check if the user owns the service (works with strings or objects)
+// Check Add-on Services
 const hasDigitalTwins = activePlansArr.some((p: any) => p.name === "Digital Twins Services" || p === "Digital Twins Services");
 const hasProfessional = activePlansArr.some((p: any) => p.name === "Professional Services" || p === "Professional Services");
 const hasData = activePlansArr.some((p: any) => p.name === "Data Services" || p === "Data Services");
+
+// Check Core Platform Subscriptions directly inside activePlans array
+const hasGridPlan = activePlansArr.some((p: any) => p.name === "Utility Grid Twin" || p === "Utility Grid Twin");
+const hasPipelinePlan = activePlansArr.some((p: any) => p.name === "Pipeline Twin" || p === "Pipeline Twin");
+const hasEnterprisePlan = activePlansArr.some((p: any) => p.name === "Enterprise Convergence" || p === "Enterprise Convergence");
+
+// General active status check fallback
+const isGeneralActive = 
+  user?.subscriptionStatus === 'active' || 
+  user?.organization?.subscriptionStatus === 'active' || 
+  (user?.organization?.planName && user?.organization?.planName !== 'Free');
+
+// Specific unlock permissions for Grid and Pipeline platforms
+const isGridSubscribed = hasGridPlan || hasEnterprisePlan || isGeneralActive;
+const isPipelineSubscribed = hasPipelinePlan || hasEnterprisePlan || isGeneralActive;
 
 const handleLogout = () => {
     localStorage.removeItem("user")
@@ -305,11 +314,11 @@ const handleLogout = () => {
                     <Zap className="w-6 h-6 text-emerald-600 dark:text-emerald-400" />
                   </div>
                   <Badge className={`text-[10px] uppercase font-bold border transition-colors ${
-                    isSubscribed 
+                    isGridSubscribed 
                       ? "bg-emerald-100 text-emerald-900 hover:bg-emerald-200 dark:bg-emerald-900/50 dark:text-emerald-300 dark:hover:bg-emerald-900/70 border-emerald-300 dark:border-emerald-700/50" 
                       : "bg-slate-200 dark:bg-slate-800 text-slate-800 dark:text-slate-300 hover:bg-slate-300 dark:hover:bg-slate-700 border-slate-300 dark:border-slate-600 shadow-sm"
                   }`}>
-                    {isSubscribed ? "Active | Enterprise" : "Locked"}
+                    {isGridSubscribed ? "Active | Enterprise" : "Locked"}
                   </Badge>
                 </div>
 
@@ -321,7 +330,7 @@ const handleLogout = () => {
                 </p>
               </div>
 
-              {isSubscribed ? (
+              {isGridSubscribed ? (
                 <Button 
                   onClick={handleLaunchGrid}
                   className="w-full bg-emerald-600 hover:bg-emerald-500 text-white font-bold h-12 rounded-xl transition-all flex items-center justify-center shadow-md dark:shadow-lg dark:shadow-emerald-900/30"
@@ -347,11 +356,11 @@ const handleLogout = () => {
                     <Droplet className="w-6 h-6 text-blue-600 dark:text-blue-400" />
                   </div>
                   <Badge className={`text-[10px] uppercase font-bold border transition-colors ${
-                    isSubscribed 
+                    isPipelineSubscribed 
                       ? "bg-blue-100 text-blue-900 hover:bg-blue-100 dark:bg-blue-900/50 dark:text-blue-300 dark:hover:bg-blue-900/70 border-blue-300 dark:border-blue-700/50" 
                       : "bg-slate-200 dark:bg-slate-800 text-slate-800 dark:text-slate-300 hover:bg-slate-300 dark:hover:bg-slate-700 border-slate-300 dark:border-slate-600 shadow-sm"
                   }`}>
-                    {isSubscribed ? "Active | Enterprise" : "Locked"}
+                    {isPipelineSubscribed ? "Active | Enterprise" : "Locked"}
                   </Badge>
                 </div>
 
@@ -363,7 +372,7 @@ const handleLogout = () => {
                 </p>
               </div>
 
-              {isSubscribed ? (
+              {isPipelineSubscribed ? (
                 <Button 
                   onClick={handleLaunchPipeline}
                   className="w-full bg-blue-600 hover:bg-blue-500 text-white font-bold h-12 rounded-xl transition-all flex items-center justify-center shadow-md dark:shadow-lg dark:shadow-blue-900/30"

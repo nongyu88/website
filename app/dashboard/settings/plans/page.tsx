@@ -115,7 +115,7 @@ function PlansContent() {
       const data = await res.json();
       
       if (data.url && checkoutWindow) {
-        checkoutWindow.location.href = data.url; 
+        window.location.href = data.url;
       } else {
         checkoutWindow?.close();
         alert(data.error || "Failed to load checkout.");
