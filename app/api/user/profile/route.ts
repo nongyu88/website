@@ -4,9 +4,7 @@ import { NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
 import Stripe from 'stripe';
 
-const stripe = new Stripe(process.env.STRIPE_SECRET_KEY || 'sk_test_placeholder', { 
-  apiVersion: '2024-04-10' as any 
-});
+const stripe = new Stripe(process.env.STRIPE_SECRET_KEY || 'sk_test_placeholder');
 
 export async function GET(request: Request) {
   try {
@@ -32,7 +30,7 @@ export async function GET(request: Request) {
         notifySecurityAlerts: true,
         notifyProductUpdates: true,
         role: true,
-        organization: true,
+        domain: true,
         // 🚨 CRITICAL FIX: Include subscription & plan fields for solo users!
         activePlans: true,
         subscriptionStatus: true,
@@ -45,9 +43,49 @@ export async function GET(request: Request) {
       return NextResponse.json({ error: "User not found" }, { status: 404 });
     }
 
-    // Fetch active Stripe Price ID (Checks Org first, then falls back to solo User)
+    const emailDomain = email.split('@')[1]?.toLowerCase();
+
+    // 1. AUTO-LINK TEAMMATES (Connects c@a.com to a.com's domain so Tax ID/Logo isn't blank)
+    if (!user.domain && emailDomain) {
+      const existingDomain = await prisma.domain.findFirst({ where: { name: emailDomain } });
+      if (existingDomain) {
+        await prisma.user.update({
+          where: { id: user.id },
+          data: { domainId: existingDomain.id }
+        });
+        user.domain = existingDomain;
+      }
+    }
+
+    // 2. MERGE TEAM PLANS (Uses priceId so Monthly and Yearly plans remain separate!)
+    if (emailDomain) {
+      // Find all users in the same company
+      const teammates = await prisma.user.findMany({
+        where: { email: { endsWith: `@${emailDomain}` } },
+        select: { activePlans: true }
+      });
+
+      // Combine all their activePlans into one array
+      let allTeamPlans: any[] = [];
+      teammates.forEach(teammate => {
+        try {
+          const plans = JSON.parse(teammate.activePlans || "[]");
+          allTeamPlans = [...allTeamPlans, ...plans];
+        } catch (e) {}
+      });
+
+      // Remove duplicates using priceId (keeps Monthly & Yearly versions distinct)
+      const uniquePlans = allTeamPlans.filter((plan, index, self) =>
+        index === self.findIndex((t) => t.priceId === plan.priceId)
+      );
+
+      // Overwrite user's plans with merged team plans before sending to frontend
+      user.activePlans = JSON.stringify(uniquePlans);
+    }
+
+    // Fetch active Stripe Price ID 
     let activePriceId = null;
-    const subId = user.organization?.stripeSubscriptionId || user.stripeSubscriptionId;
+    const subId = user.stripeSubscriptionId;
 
     if (subId) {
       try {

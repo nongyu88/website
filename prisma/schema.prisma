@@ -6,17 +6,10 @@ datasource db {
   provider = "sqlserver"
 }
 
-model Organization {
+model domain {
   id                   String   @id @default(uuid())
   name                 String
   users                User[]
-  invites              Invite[]
-
-  // --- NEW STRIPE BILLING FIELDS ---
-  stripeCustomerId     String?  @unique
-  stripeSubscriptionId String?  @unique
-  activePlans          String   @default("[]") @db.NVarChar(Max)
-  subscriptionStatus   String   @default("incomplete")
 
   companySize   String?
   taxId         String?
@@ -55,10 +48,11 @@ model User {
 
 
   role           String        @default("Viewer") // 'Owner', 'Admin', 'Viewer'
-  organizationId String?
-  organization   Organization? @relation(fields: [organizationId], references: [id])
 
   activePlans          String   @default("[]") @db.NVarChar(Max)
+
+  domainId       String?
+  domain         domain?  @relation(fields: [domainId], references: [id])
 }
 
 
@@ -69,7 +63,5 @@ model Invite {
   role           String
   token          String       @unique // A secure random string
   status         String       @default("pending") // 'pending', 'accepted'
-  organizationId String
-  organization   Organization @relation(fields: [organizationId], references: [id])
   createdAt      DateTime     @default(now())
 }

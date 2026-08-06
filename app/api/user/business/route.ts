@@ -12,10 +12,10 @@ export async function PUT(request: Request) {
       return NextResponse.json({ error: "Email is required" }, { status: 400 });
     }
 
-    // 1. Find the user to get their associated organizationId
+    // 1. Find the user to get their associated domainId
     const user = await prisma.user.findUnique({
       where: { email },
-      select: { id: true, organizationId: true }
+      select: { id: true, domainId: true }
     });
 
     if (!user) {
@@ -33,12 +33,31 @@ export async function PUT(request: Request) {
       }
     });
 
-    // 3. Update Organization-level fields
-    if (user.organizationId) {
-      await prisma.organization.update({
-        where: { id: user.organizationId },
+    // 3. Link or Create Domain, then Update Domain-level fields
+    const emailDomain = email.split('@')[1]?.toLowerCase();
+    let targetDomainId = user.domainId;
+
+    if (!targetDomainId && emailDomain) {
+      // Find existing domain for this company, or create one (Using findFirst avoids the ID requirement)
+      let domainRecord = await prisma.domain.findFirst({ where: { name: emailDomain } });
+      
+      if (!domainRecord) {
+        domainRecord = await prisma.domain.create({ data: { name: emailDomain } });
+      }
+      
+      targetDomainId = domainRecord.id;
+
+      // Link the user to this domain
+      await prisma.user.update({
+        where: { id: user.id },
+        data: { domainId: targetDomainId }
+      });
+    }
+
+    if (targetDomainId) {
+      await prisma.domain.update({
+        where: { id: targetDomainId },
         data: {
-          name: companyName || "My Organization",
           companySize,
           taxId,
           businessLogo,

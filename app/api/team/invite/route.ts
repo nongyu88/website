@@ -19,52 +19,15 @@ export async function POST(request: Request) {
     const inviter = await prisma.user.findUnique({ where: { email: inviterEmail } });
     if (!inviter) return NextResponse.json({ error: "Inviter not found." }, { status: 404 });
 
-    // 2. SAFEGUARD: If this is an older test user without an organization, auto-link or create!
-    let orgId = inviter.organizationId;
+    // 2. STRICT DOMAIN MATCHING CHECK
+    const inviterDomain = inviterEmail.split('@')[1]?.toLowerCase();
+    const inviteeDomain = inviteeEmail.split('@')[1]?.toLowerCase();
 
-    if (!orgId) {
-      // A. Check if an organization already exists for their company name
-      let org = await prisma.organization.findFirst({
-        where: inviter.company && inviter.company !== "Unknown" 
-          ? { name: inviter.company } 
-          : undefined
-      });
-
-      // B. If not found, attach to the default/first organization in the database
-      if (!org) {
-        org = await prisma.organization.findFirst();
-      }
-
-      // C. If the database has 0 organizations, create the initial one with unique dummy keys
-      if (!org) {
-        try {
-          const uniqueSuffix = `${Date.now()}-${Math.random().toString(36).substring(2, 7)}`;
-          org = await prisma.organization.create({
-            data: {
-              name: inviter.company || `Enterprise Workspace (${uniqueSuffix})`,
-              activePlans: inviter.activePlans || "[]",
-              subscriptionStatus: inviter.subscriptionStatus || "inactive",
-              stripeCustomerId: `cus_init_${uniqueSuffix}`,
-              stripeSubscriptionId: `sub_init_${uniqueSuffix}`
-            }
-          });
-        } catch (createErr) {
-          // Final safety net: grab any existing org
-          org = await prisma.organization.findFirst();
-        }
-      }
-
-      if (!org) {
-        return NextResponse.json({ error: "Failed to locate or create an organization." }, { status: 500 });
-      }
-
-      // D. Attach the inviter to this organization
-      await prisma.user.update({
-        where: { id: inviter.id },
-        data: { organizationId: org.id, role: "Owner" }
-      });
-
-      orgId = org.id;
+    if (!inviterDomain || !inviteeDomain || inviterDomain !== inviteeDomain) {
+      return NextResponse.json(
+        { error: `Invitations are restricted. You can only invite users with a @${inviterDomain} email address.` }, 
+        { status: 403 }
+      );
     }
 
     // 3. Ensure the inviter has permission
@@ -80,8 +43,7 @@ export async function POST(request: Request) {
       data: {
         email: inviteeEmail,
         role: role,
-        token: token,
-        organizationId: orgId
+        token: token
       }
     });
 

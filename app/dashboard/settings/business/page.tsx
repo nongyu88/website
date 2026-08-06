@@ -39,11 +39,11 @@ export default function BusinessSettingsPage() {
             setRegion(data.user.region || "")
           }
 
-          // Read organization fields directly from the nested organization object!
-          if (data.user?.organization) {
-            setCompanySize(data.user.organization.companySize || "1-50")
-            setTaxId(data.user.organization.taxId || "")
-            setBusinessLogo(data.user.organization.businessLogo || "")
+          // Read domain fields directly from the nested domain object!
+          if (data.user?.domain) {
+            setCompanySize(data.user.domain.companySize || "1-50")
+            setTaxId(data.user.domain.taxId || "")
+            setBusinessLogo(data.user.domain.businessLogo || "")
           }
         } catch (error) {
           console.error("Failed to load business data", error)

@@ -17,7 +17,6 @@ export async function POST(request: Request) {
     // Fetch user and organization safely without referencing old columns
     const user = await prisma.user.findUnique({
       where: { email },
-      include: { organization: true },
     });
 
     if (!user) {
@@ -25,7 +24,7 @@ export async function POST(request: Request) {
     }
 
     // Get customer ID from Organization or User fallback
-    const stripeCustomerId = user.organization?.stripeCustomerId || user.stripeCustomerId;
+    const stripeCustomerId = user.stripeCustomerId;
 
     if (!stripeCustomerId) {
       return NextResponse.json(

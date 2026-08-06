@@ -11,15 +11,16 @@ export async function GET(request: Request) {
 
     if (!email) return NextResponse.json({ error: "Email required" }, { status: 400 });
 
-    const user = await prisma.user.findUnique({ where: { email } });
-    if (!user || !user.organizationId) {
-      return NextResponse.json({ members: [] }); // Return empty array if no org exists yet
+    const domain = email.split('@')[1]?.toLowerCase();
+    
+    if (!domain) {
+      return NextResponse.json({ members: [] }); 
     }
 
-    // Find everyone in the same organization
+    // Find everyone who shares the exact same email domain
     const members = await prisma.user.findMany({
-      where: { organizationId: user.organizationId },
-      select: { id: true, email: true, firstName: true, lastName: true, role: true }
+      where: { email: { endsWith: `@${domain}` } },
+      select: { id: true, email: true, firstName: true, lastName: true, role: true, activePlans: true }
     });
 
     return NextResponse.json({ members }, { status: 200 });
@@ -39,10 +40,10 @@ export async function DELETE(req: Request) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 403 });
     }
 
-    // Remove the user from the organization (sets organizationId to null)
+    // Downgrade their role and wipe their synced enterprise plans
     await prisma.user.update({
       where: { email: targetEmail },
-      data: { organizationId: null, role: "Viewer" } // Downgrade their role when kicked out
+      data: { role: "Viewer", activePlans: "[]" } 
     });
 
     return NextResponse.json({ success: true }, { status: 200 });
@@ -62,10 +63,13 @@ export async function PUT(request: Request) {
       return NextResponse.json({ error: "You do not have permission to modify roles." }, { status: 403 });
     }
 
-    // 2. Ensure the target user actually belongs to their organization
+    // 2. Ensure the target user shares the exact same email domain
     const target = await prisma.user.findUnique({ where: { id: targetUserId } });
-    if (!target || target.organizationId !== requester.organizationId) {
-      return NextResponse.json({ error: "User not found in your organization." }, { status: 404 });
+    const requesterDomain = requesterEmail.split('@')[1]?.toLowerCase();
+    const targetDomain = target?.email.split('@')[1]?.toLowerCase();
+
+    if (!target || requesterDomain !== targetDomain) {
+      return NextResponse.json({ error: "User not found in your domain." }, { status: 404 });
     }
 
     // 3. Update the role

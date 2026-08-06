@@ -77,7 +77,7 @@ export async function POST(req: Request) {
             { email: userEmail }
           ]
         },
-        include: { organization: true }
+        include: { domain: true }
       });
 
       if (!user) return NextResponse.json({ received: true }, { status: 200 });
@@ -93,17 +93,11 @@ export async function POST(req: Request) {
         return JSON.stringify(currentPlans);
       };
 
-      if (user.organization) {
-        await prisma.organization.update({
-          where: { id: user.organization.id },
-          data: { activePlans: updatePlansArray(user.organization.activePlans) }
-        });
-      } else {
-        await prisma.user.update({
-          where: { id: user.id },
-          data: { activePlans: updatePlansArray(user.activePlans) }
-        });
-      }
+      // Update the plans directly on the User record
+    await prisma.user.update({
+      where: { id: user.id },
+      data: { activePlans: updatePlansArray(user.activePlans) }
+    });
     } catch (err) {
       console.error("❌ Error processing checkout database update:", err);
     }
@@ -124,7 +118,7 @@ export async function POST(req: Request) {
 
       const user = await prisma.user.findFirst({
         where: { stripeCustomerId: stripeCustomerId },
-        include: { organization: true }
+        include: { domain: true }
       });
 
       if (!user) return NextResponse.json({ received: true }, { status: 200 });
@@ -138,19 +132,11 @@ export async function POST(req: Request) {
         return JSON.stringify(currentPlans);
       };
 
-      if (user.organization) {
-        await prisma.organization.update({
-          where: { id: user.organization.id },
-          data: { activePlans: removePlanFromArray(user.organization.activePlans) }
-        });
-        console.log(`🗑️ Removed canceled plan from Organization: ${user.organization.id}`);
-      } else {
-        await prisma.user.update({
-          where: { id: user.id },
-          data: { activePlans: removePlanFromArray(user.activePlans) }
-        });
-        console.log(`🗑️ Removed canceled plan from Solo User: ${user.email}`);
-      }
+// Update the plans directly on the User record
+await prisma.user.update({
+  where: { id: user.id },
+  data: { activePlans: removePlanFromArray(user.activePlans) }
+});
     } catch (err) {
       console.error("❌ Error processing subscription deletion:", err);
     }

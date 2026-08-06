@@ -16,7 +16,7 @@ export async function POST(request: Request) {
     // 1. Find the existing user
     const user = await prisma.user.findUnique({
       where: { email },
-      include: { organization: true }
+      include: { domain: true }
     });
 
     if (!user) {
@@ -46,7 +46,6 @@ export async function POST(request: Request) {
         await prisma.user.update({
           where: { id: user.id },
           data: {
-            organizationId: invite.organizationId,
             role: invite.role,
             isApproved: true // Auto-approve users who were invited by an existing team member
           }
@@ -62,7 +61,7 @@ export async function POST(request: Request) {
     // 4. Fetch updated user state after processing any invite
     const updatedUser = await prisma.user.findUnique({
       where: { id: user.id },
-      include: { organization: true }
+      include: { domain: true }
     });
 
     // 5. STRICT APPROVAL CHECK (Evaluated against updatedUser)

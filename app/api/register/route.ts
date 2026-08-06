@@ -28,8 +28,7 @@ export async function POST(req: Request) {
       const invite = await prisma.invite.findUnique({ where: { token: inviteToken } });
       if (invite && invite.status === "pending" && invite.email.toLowerCase() === email.toLowerCase()) {
         assignedRole = invite.role;
-        orgId = invite.organizationId;
-        isApprovedStatus = false; // Auto-approve invited teammates
+        isApprovedStatus = true; // Auto-approve invited teammates
         
         await prisma.invite.update({ where: { id: invite.id }, data: { status: "accepted" } });
       }
@@ -42,7 +41,7 @@ export async function POST(req: Request) {
         password: hashedPassword,
         company: company || "Unknown",
         role: assignedRole,
-        organizationId: orgId,
+        domainId: orgId,
         isApproved: isApprovedStatus,
       },
     });

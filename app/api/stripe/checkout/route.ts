@@ -20,7 +20,6 @@ export async function POST(request: Request) {
     // Fetch the user and include their organization if they have one
     const user = await prisma.user.findUnique({
       where: { email: email },
-      include: { organization: true }
     });
 
     if (!user) {
@@ -28,15 +27,37 @@ export async function POST(request: Request) {
     }
 
     // 2. Determine and reuse the single Stripe Customer ID
-    let customerId = user.organization?.stripeCustomerId || user.stripeCustomerId;
+    let customerId = user.stripeCustomerId;
 
-    // If no Stripe Customer ID exists yet, create ONE customer and attach to both
+    // --- AUTO-LINK TEAMMATE STRIPE CUSTOMER ID ---
+    const emailDomain = email.split('@')[1]?.toLowerCase();
+    if (!customerId && emailDomain) {
+      // Look for any teammate in the same company who already has a Stripe account
+      const teammateWithStripe = await prisma.user.findFirst({
+        where: { 
+          email: { endsWith: `@${emailDomain}` },
+          stripeCustomerId: { not: null }
+        }
+      });
+      
+      if (teammateWithStripe?.stripeCustomerId) {
+        customerId = teammateWithStripe.stripeCustomerId;
+        // Save it to the current user so they are permanently linked to the company billing
+        await prisma.user.update({
+          where: { id: user.id },
+          data: { stripeCustomerId: customerId }
+        });
+      }
+    }
+    // ---------------------------------------------
+
+    // If no Stripe Customer ID exists yet across the entire team, create ONE customer
     if (!customerId) {
       const customer = await stripe.customers.create({
         email: user.email,
         name: user.company || "Enterprise Account",
         metadata: {
-          organizationId: user.organizationId || "",
+          userId: user.id,
         }
       });
       
@@ -47,14 +68,6 @@ export async function POST(request: Request) {
         where: { id: user.id },
         data: { stripeCustomerId: customerId }
       });
-
-      // Also persist to Organization if user belongs to one
-      if (user.organization?.id) {
-        await prisma.organization.update({
-          where: { id: user.organization.id },
-          data: { stripeCustomerId: customerId }
-        });
-      }
     }
 
     // Safely format base URL without trailing slash
@@ -75,7 +88,7 @@ export async function POST(request: Request) {
       success_url: `${baseUrl}/dashboard/settings/plans?success=true`,
       cancel_url: `${baseUrl}/dashboard/settings/plans?canceled=true`,
       metadata: {
-        organizationId: user.organizationId, // Pass this so the Webhook knows who paid!
+        userId: user.id,// Pass this so the Webhook knows who paid!
       }
     });
 
