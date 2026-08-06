@@ -3,6 +3,7 @@ import type { Metadata } from "next"
 import { Inter } from "next/font/google"
 import "./globals.css"
 import { ThemeProvider } from "@/components/theme-provider"
+import { SessionGuard } from "@/components/SessionGuard" // <-- 1. IMPORT THE GUARD
 
 const inter = Inter({ subsets: ["latin"] })
 
@@ -41,6 +42,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
           enableSystem
           disableTransitionOnChange
         >
+          <SessionGuard /> {/* <-- 2. ADD THE GUARD HERE */}
           {children}
         </ThemeProvider>
       </body>

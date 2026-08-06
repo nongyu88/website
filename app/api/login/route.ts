@@ -23,7 +23,7 @@ export async function POST(request: Request) {
       return NextResponse.json({ error: "Invalid email or password." }, { status: 401 });
     }
 
-    // 2. Verify password (using bcrypt or direct match)
+    // 2. Verify password
     let isValid = false;
     try {
       isValid = await bcrypt.compare(password, user.password);
@@ -35,19 +35,20 @@ export async function POST(request: Request) {
       return NextResponse.json({ error: "Invalid email or password." }, { status: 401 });
     }
 
-    // 3. 🚨 PROCESS INVITE TOKEN FOR EXISTING USERS
+    // 3. PROCESS INVITE TOKEN FIRST (If user accepted an invite link)
     if (inviteToken) {
       const invite = await prisma.invite.findUnique({
         where: { token: inviteToken }
       });
 
       if (invite) {
-        // Link User B to User A's organization!
+        // Link User to Inviter's Organization and auto-approve invited teammates
         await prisma.user.update({
           where: { id: user.id },
           data: {
             organizationId: invite.organizationId,
             role: invite.role,
+            isApproved: true // Auto-approve users who were invited by an existing team member
           }
         });
 
@@ -58,15 +59,23 @@ export async function POST(request: Request) {
       }
     }
 
-    // 4. Fetch updated user details including the new Organization
+    // 4. Fetch updated user state after processing any invite
     const updatedUser = await prisma.user.findUnique({
       where: { id: user.id },
       include: { organization: true }
     });
 
-    // 5. Generate session JWT token matching Python backend secret
+    // 5. STRICT APPROVAL CHECK (Evaluated against updatedUser)
+    if (!updatedUser || updatedUser.isApproved === false) {
+      return NextResponse.json(
+        { error: "Your account is pending staff review. You will be able to log in once approved." },
+        { status: 403 }
+      );
+    }
+
+    // 6. Generate session JWT token
     const token = jwt.sign(
-      { userId: user.id, email: user.email },
+      { userId: updatedUser.id, email: updatedUser.email },
       process.env.JWT_SECRET || 'kraftgene_super_secret_key_2026_x89z!',
       { expiresIn: '1d' }
     );

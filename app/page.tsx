@@ -53,8 +53,23 @@ export default function HomePage() {
     }
   }, []);
 
+    const handleAdminLogin = () => {
+      const username = window.prompt("Admin Username:");
+      if (username === "kraftgeneai") {
+        const pwd = window.prompt("Admin Password:");
+        if (pwd === "19571854675") {
+          router.push("/admin");
+        } else {
+          alert("Access Denied: Incorrect password.");
+        }
+      } else if (username) {
+        alert("Access Denied: Unknown user.");
+      }
+    };
+
+
   // This function decides where the buttons should take the user
-  const handleProtectedNavigation = (e: React.MouseEvent) => {
+  const handleProtectedNavigation = (e: React.MouseEvent, targetPath: string = "/dashboard") => {
     e.preventDefault();
     
     const token = localStorage.getItem("kraftgene_token");
@@ -65,8 +80,8 @@ export default function HomePage() {
       const fifteenMinutes = 15 * 60 * 1000;
 
       if (timeElapsed < fifteenMinutes) {
-        // User is logged in AND within 15 minutes -> Send to Dashboard
-        router.push("/dashboard");
+        // User is logged in AND within 15 minutes -> Send to the requested MVP
+        router.push(targetPath);
         return;
       }
     }
@@ -442,6 +457,14 @@ export default function HomePage() {
                <div className="h-5 w-px bg-slate-200 dark:bg-white/10 mx-2"></div>
                
                <div className="flex items-center gap-3">
+                <Button 
+                    onClick={handleAdminLogin}
+                    variant="ghost" 
+                    className="text-blue-600 dark:text-blue-400 hover:text-blue-700 dark:hover:text-blue-300 h-9 px-4 text-sm font-bold transition-all duration-300"
+                  >
+                    Admin
+                  </Button>
+
                 {/* Dynamic Client Login / Greeting Button */}
                 <Button 
                   onClick={handleProtectedNavigation}
@@ -502,6 +525,18 @@ export default function HomePage() {
                 <Link href="#demo" onClick={() => setIsMobileMenuOpen(false)} className="w-full">
                     <Button variant="ghost" className="w-full justify-start text-base h-10 text-emerald-600 dark:text-emerald-400"><PlayCircle className="w-4 h-4 mr-2"/> Platform</Button>
                 </Link>
+
+                {/* --- NEW MOBILE ADMIN BUTTON --- */}
+                <Button 
+                  onClick={(e) => {
+                    setIsMobileMenuOpen(false);
+                    handleAdminLogin();
+                  }}
+                  variant="ghost" 
+                  className="w-full justify-start text-base h-10 text-purple-600 dark:text-purple-400 font-bold"
+                >
+                  Admin Login
+                </Button>
                 {/* Mobile Grid MVP Button (Dynamic) */}
                 <Button 
                   onClick={(e) => {
