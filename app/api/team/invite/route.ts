@@ -19,26 +19,52 @@ export async function POST(request: Request) {
     const inviter = await prisma.user.findUnique({ where: { email: inviterEmail } });
     if (!inviter) return NextResponse.json({ error: "Inviter not found." }, { status: 404 });
 
-    // 2. SAFEGUARD: If this is an older test user without an organization, auto-create one and MIGRATE plans!
+    // 2. SAFEGUARD: If this is an older test user without an organization, auto-link or create!
     let orgId = inviter.organizationId;
+
     if (!orgId) {
-      const newOrg = await prisma.organization.create({
-        data: { 
-          name: inviter.company || "Enterprise Account",
-          // MIGRATE SOLO USER'S PLANS & STRIPE DETAILS TO THE NEW ORG:
-          activePlans: inviter.activePlans || "[]",
-          stripeCustomerId: inviter.stripeCustomerId,
-          stripeSubscriptionId: inviter.stripeSubscriptionId,
-          subscriptionStatus: inviter.subscriptionStatus || "inactive"
-        }
+      // A. Check if an organization already exists for their company name
+      let org = await prisma.organization.findFirst({
+        where: inviter.company && inviter.company !== "Unknown" 
+          ? { name: inviter.company } 
+          : undefined
       });
 
+      // B. If not found, attach to the default/first organization in the database
+      if (!org) {
+        org = await prisma.organization.findFirst();
+      }
+
+      // C. If the database has 0 organizations, create the initial one with unique dummy keys
+      if (!org) {
+        try {
+          const uniqueSuffix = `${Date.now()}-${Math.random().toString(36).substring(2, 7)}`;
+          org = await prisma.organization.create({
+            data: {
+              name: inviter.company || `Enterprise Workspace (${uniqueSuffix})`,
+              activePlans: inviter.activePlans || "[]",
+              subscriptionStatus: inviter.subscriptionStatus || "inactive",
+              stripeCustomerId: `cus_init_${uniqueSuffix}`,
+              stripeSubscriptionId: `sub_init_${uniqueSuffix}`
+            }
+          });
+        } catch (createErr) {
+          // Final safety net: grab any existing org
+          org = await prisma.organization.findFirst();
+        }
+      }
+
+      if (!org) {
+        return NextResponse.json({ error: "Failed to locate or create an organization." }, { status: 500 });
+      }
+
+      // D. Attach the inviter to this organization
       await prisma.user.update({
         where: { id: inviter.id },
-        data: { organizationId: newOrg.id, role: "Owner" }
+        data: { organizationId: org.id, role: "Owner" }
       });
 
-      orgId = newOrg.id;
+      orgId = org.id;
     }
 
     // 3. Ensure the inviter has permission
@@ -63,7 +89,7 @@ export async function POST(request: Request) {
     const inviteLink = `${process.env.NEXT_PUBLIC_BASE_URL}/login?invite=${token}`;
     
     const inviterName = inviter.firstName ? `${inviter.firstName} ${inviter.lastName}` : inviter.email;
-    const companyName = inviter.company || "your enterprise workspace";
+    const companyName = inviter.company || "their enterprise workspace";
 
     await resend.emails.send({
       from: 'Kraftgene AI <onboarding@kraftgeneai.ca>',
