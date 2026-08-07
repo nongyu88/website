@@ -11,7 +11,6 @@ import { Suspense } from "react"
 
 function AuthForm() {
   const [isRegistering, setIsRegistering] = useState(false)
-  const [isDarkMode, setIsDarkMode] = useState(true)
   
   // Form Fields
   const [email, setEmail] = useState("")
@@ -22,6 +21,10 @@ function AuthForm() {
   const [error, setError] = useState("")
   const [success, setSuccess] = useState("")
   const [loading, setLoading] = useState(false)
+
+  // --- NEW: OTP STATE ---
+  const [isVerifyingOtp, setIsVerifyingOtp] = useState(false)
+  const [otp, setOtp] = useState("")
 
   const router = useRouter();
 
@@ -124,9 +127,9 @@ function AuthForm() {
         throw new Error(data?.error || `Server error: received status ${res.status}. Ensure the API route exists.`)
       }
 
-      setSuccess("Registration received! Your account is pending staff review. You will be able to log in once approved.")
-      setIsRegistering(false) // Switch back to login form
-      setPassword("")
+      // --- NEW: SHOW OTP FORM ---
+      setSuccess("Registration initiated! Please check your email for the 6-digit verification code.")
+      setIsVerifyingOtp(true)
     } catch (err: any) {
       setError(err.message)
     } finally {
@@ -134,27 +137,53 @@ function AuthForm() {
     }
   }
 
-  return (
-    <div className={isDarkMode ? "dark" : ""}>
-      <div className="min-h-screen flex items-center justify-center bg-slate-50 dark:bg-slate-950 px-4 transition-colors duration-300">
-        <div className="relative bg-white dark:bg-slate-900 border border-slate-200 dark:border-emerald-900/50 p-8 md:p-10 rounded-3xl shadow-2xl shadow-slate-200/50 dark:shadow-none w-full max-w-md text-slate-900 dark:text-white transition-colors duration-300">
-          
-          {/* ── TOP RIGHT CONTROLS ── */}
-          <div className="absolute top-4 right-4 flex items-center gap-1">
-            <button
-              onClick={() => setIsDarkMode(!isDarkMode)}
-              type="button"
-              className="p-2 rounded-full text-slate-400 hover:text-slate-600 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-slate-800 transition-all duration-200"
-            >
-              {isDarkMode ? <Sun className="w-5 h-5" /> : <Moon className="w-5 h-5" />}
-            </button>
-            <Link
-              href="https://www.kraftgeneai.ca/"
-              className="p-2 rounded-full text-slate-400 hover:text-slate-600 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-slate-800 transition-all duration-200"
-            >
-              <X className="w-5 h-5" />
-            </Link>
-          </div>
+// --- NEW: HANDLE OTP SUBMISSION ---
+const handleVerifyOtp = async (e: React.FormEvent) => {
+  e.preventDefault()
+  setError("")
+  setSuccess("")
+  setLoading(true)
+
+  try {
+    const res = await fetch("/api/verify-otp", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ email, otp }),
+    })
+
+    const isJson = res.headers.get("content-type")?.includes("application/json")
+    const data = isJson ? await res.json() : null
+
+    if (!res.ok) {
+      throw new Error(data?.error || "Invalid or expired code.")
+    }
+
+    setSuccess("Email verified! Your account is now pending staff review. You will be able to log in once approved.")
+    setIsVerifyingOtp(false)
+    setIsRegistering(false) // Switch back to login form
+    setPassword("")
+    setOtp("")
+  } catch (err: any) {
+    setError(err.message)
+  } finally {
+    setLoading(false)
+  }
+}
+
+return (
+  <div>
+    <div className="min-h-screen flex items-center justify-center bg-slate-50 dark:bg-slate-950 px-4 transition-colors duration-300">
+      <div className="relative bg-white dark:bg-slate-900 border border-slate-200 dark:border-emerald-900/50 p-8 md:p-10 rounded-3xl shadow-2xl shadow-slate-200/50 dark:shadow-none w-full max-w-md text-slate-900 dark:text-white transition-colors duration-300">
+        
+        {/* ── TOP RIGHT CONTROLS ── */}
+        <div className="absolute top-4 right-4 flex items-center gap-1">
+          <Link
+            href="https://www.kraftgeneai.ca/"
+            className="p-2 rounded-full text-slate-400 hover:text-slate-600 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-slate-800 transition-all duration-200"
+          >
+            <X className="w-5 h-5" />
+          </Link>
+        </div>
           
           {/* Header Icon */}
         <div className="flex justify-center mb-6">
@@ -185,59 +214,74 @@ function AuthForm() {
         )}
 
         {/* Form */}
-        <form onSubmit={isRegistering ? handleRegister : handleLogin} className="space-y-4">
+        <form onSubmit={isVerifyingOtp ? handleVerifyOtp : (isRegistering ? handleRegister : handleLogin)} className="space-y-4">
           
-          {isRegistering && (
+          {isVerifyingOtp ? (
             <div>
-              <label className="block text-xs font-medium text-slate-400 mb-1.5">Company Name</label>
-              <div className="relative">
-                <input
-                    type="text"
-                    value={company}
-                    onChange={(e) => setCompany(e.target.value)}
-                    disabled={loading} // <-- ADD THIS
-                    placeholder="e.g. Pacific Gas & Electric"
-                    // v-- Add 'disabled:opacity-50 disabled:cursor-not-allowed' to the end of className
-                    className="w-full bg-slate-50 dark:bg-slate-950 border border-slate-300 dark:border-slate-800 rounded-xl px-4 py-3 text-sm text-slate-900 dark:text-white focus:outline-none focus:border-emerald-500 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
-                  />
-              </div>
+              <label className="block text-xs font-medium text-slate-400 mb-1.5">6-Digit Verification Code</label>
+              <input
+                type="text"
+                maxLength={6}
+                value={otp}
+                onChange={(e) => setOtp(e.target.value.replace(/\D/g, ''))}
+                disabled={loading}
+                placeholder="123456"
+                className="w-full bg-slate-50 dark:bg-slate-950 border border-slate-300 dark:border-slate-800 rounded-xl px-4 py-3 text-sm text-slate-900 dark:text-white focus:outline-none focus:border-emerald-500 transition-colors disabled:opacity-50 disabled:cursor-not-allowed text-center tracking-[0.5em] font-mono text-lg"
+                required
+              />
             </div>
+          ) : (
+            <>
+              {isRegistering && (
+                <div>
+                  <label className="block text-xs font-medium text-slate-400 mb-1.5">Company Name</label>
+                  <div className="relative">
+                    <input
+                        type="text"
+                        value={company}
+                        onChange={(e) => setCompany(e.target.value)}
+                        disabled={loading}
+                        placeholder="e.g. Pacific Gas & Electric"
+                        className="w-full bg-slate-50 dark:bg-slate-950 border border-slate-300 dark:border-slate-800 rounded-xl px-4 py-3 text-sm text-slate-900 dark:text-white focus:outline-none focus:border-emerald-500 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                      />
+                  </div>
+                </div>
+              )}
+
+              <div>
+                <label className="block text-xs font-medium text-slate-400 mb-1.5">Email</label>
+                <input
+                  type="email"
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                  disabled={loading}
+                  placeholder="name@company.com"
+                  className="w-full bg-slate-50 dark:bg-slate-950 border border-slate-300 dark:border-slate-800 rounded-xl px-4 py-3 text-sm text-slate-900 dark:text-white focus:outline-none focus:border-emerald-500 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                  required
+                />
+              </div>
+
+              <div>
+                <label className="block text-xs font-medium text-slate-400 mb-1.5">Password</label>
+                <input
+                  type="password"
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
+                  disabled={loading}
+                  placeholder="••••••••••••"
+                  className="w-full bg-slate-50 dark:bg-slate-950 border border-slate-300 dark:border-slate-800 rounded-xl px-4 py-3 text-sm text-slate-900 dark:text-white focus:outline-none focus:border-emerald-500 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                  required
+                />
+              </div>
+            </>
           )}
-
-          <div>
-            <label className="block text-xs font-medium text-slate-400 mb-1.5">Email</label>
-            <input
-              type="email"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-              disabled={loading} // <-- ADD THIS
-              placeholder="name@company.com"
-              // v-- Add 'disabled:opacity-50 disabled:cursor-not-allowed' to the end of className
-              className="w-full bg-slate-50 dark:bg-slate-950 border border-slate-300 dark:border-slate-800 rounded-xl px-4 py-3 text-sm text-slate-900 dark:text-white focus:outline-none focus:border-emerald-500 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
-              required
-            />
-          </div>
-
-          <div>
-            <label className="block text-xs font-medium text-slate-400 mb-1.5">Password</label>
-            <input
-              type="password"
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-              disabled={loading} // <-- ADD THIS
-              placeholder="••••••••••••"
-              // v-- Add 'disabled:opacity-50 disabled:cursor-not-allowed' to the end of className
-              className="w-full bg-slate-50 dark:bg-slate-950 border border-slate-300 dark:border-slate-800 rounded-xl px-4 py-3 text-sm text-slate-900 dark:text-white focus:outline-none focus:border-emerald-500 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
-              required
-            />
-          </div>
 
           <Button
             type="submit"
             disabled={loading}
             className="w-full bg-emerald-600 hover:bg-emerald-500 text-white h-12 rounded-xl font-bold transition-all shadow-lg shadow-emerald-900/30 mt-2"
           >
-            {loading ? "Processing..." : isRegistering ? "Register Account" : "Secure Login"}
+            {loading ? "Processing..." : isVerifyingOtp ? "Verify Email" : isRegistering ? "Register Account" : "Secure Login"}
           </Button>
         </form>
 

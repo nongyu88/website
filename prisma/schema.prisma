@@ -53,6 +53,11 @@ model User {
 
   domainId       String?
   domain         domain?  @relation(fields: [domainId], references: [id])
+
+  // OTP Verification Fields
+  emailVerified   DateTime?
+  verificationOtp String?
+  otpExpiresAt    DateTime?
 }
 
 

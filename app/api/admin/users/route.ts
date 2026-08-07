@@ -45,14 +45,16 @@ export async function PUT(request: Request) {
           to: updatedUser.email,
           subject: "Your Account is Ready! - Kraftgene AI",
           html: `
-            <div style="font-family: sans-serif; padding: 20px; color: #333;">
-              <h2>Great news, ${displayName}!</h2>
-              <p>Your enterprise account has been fully approved by our administration team.</p>
-              <p>You can now log in and access our services.</p>
-              <div style="margin-top: 24px;">
-                <a href="${process.env.NEXT_PUBLIC_BASE_URL}/login" style="padding: 12px 24px; background-color: #9333ea; color: white; text-decoration: none; border-radius: 8px; font-weight: bold; display: inline-block;">Log In to Dashboard</a>
-              </div>
+            <div style="font-family: sans-serif; padding: 20px; color: #333; line-height: 1.6; max-width: 600px;">
+            <h2 style="color: #047857;">Enterprise Access Granted</h2>
+            <p>Hello ${displayName},</p>
+            <p>Your enterprise account has been successfully verified and approved by the Kraftgene AI administration team.</p>
+            <p>You may now log in to the client portal and access your digital twin environment.</p>
+            <div style="margin: 28px 0;">
+              <a href="https://www.kraftgeneai.ca/login" style="background-color: #059669; color: #ffffff; padding: 12px 24px; text-decoration: none; border-radius: 8px; font-weight: bold; display: inline-block;">Log In to Client Portal</a>
             </div>
+            <p style="font-size: 0.9em; color: #666;">If you have any questions or require technical support during onboarding, please reply directly to this email.</p>
+          </div>
           `
         });
       } else if (sendApprovalEmail === false && !updatedUser.isApproved) {
@@ -66,8 +68,7 @@ export async function PUT(request: Request) {
               <p>Hello ${displayName},</p>
               <p>Your access to the Kraftgene AI digital twin platform has been temporarily suspended and returned to "Pending" status by an administrator.</p>
               <p>If you believe this is an error, please contact support.</p>
-            </div>
-          `
+            </div>`
         });
       }
     } catch (emailErr) {

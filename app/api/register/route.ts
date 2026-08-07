@@ -34,6 +34,9 @@ export async function POST(req: Request) {
       }
     }
 
+    const otpCode = Math.floor(100000 + Math.random() * 900000).toString();
+    const otpExpiresAt = new Date(Date.now() + 15 * 60 * 1000); // 15 minutes valid
+
     // 3. Create the user in the database
     const newUser = await prisma.user.create({
       data: {
@@ -41,43 +44,28 @@ export async function POST(req: Request) {
         password: hashedPassword,
         company: company || "Unknown",
         role: assignedRole,
-        domainId: orgId,
         isApproved: isApprovedStatus,
+        verificationOtp: otpCode,
+        otpExpiresAt: otpExpiresAt,
       },
     });
 
-    //  Send email alerts (Admin + Client Confirmation)
     try {
-      await resend.emails.send({
-        from: 'Kraftgene AI <onboarding@kraftgeneai.ca>',
-        to: ["yu.nong@kraftgeneai.com", "m.m@kraftgeneai.com"],
-        subject: `Registration Received - Kraftgene AI`,
-        html: `
-          <div style="font-family: sans-serif; padding: 20px; color: #333;">
-            <h2>Welcome to Kraftgene AI, ${company}!</h2>
-            <p>Your registration was successful. Our team is currently reviewing your account details to ensure secure access to the digital twin environment.</p>
-            <p>We will notify you via email as soon as your account is approved and ready for use.</p>
-            <p>Thank you for your patience!</p>
-          </div>
-        `
-      });
-
-      // B. Send Pending Approval email to the CLIENT via Resend
+      // A. Send OTP code to verify account.
       await resend.emails.send({
         from: 'Kraftgene AI <onboarding@kraftgeneai.ca>',
         to: email,
-        subject: `Registration Received - Kraftgene AI`,
+        subject: 'Verify Your Enterprise Account - Kraftgene AI',
         html: `
-          <div style="font-family: sans-serif; padding: 20px; color: #333;">
-            <h2>Welcome to Kraftgene AI, ${company}!</h2>
-            <p>Your registration was successful. Our team is currently reviewing your account details to ensure secure access to the digital twin environment.</p>
-            <p>We will notify you via email as soon as your account is approved and ready for use.</p>
-            <p>Thank you for your patience!</p>
+          <div style="font-family: sans-serif; padding: 20px; color: #333; line-height: 1.6; max-width: 600px;">
+            <h2 style="color: #047857;">Welcome to Kraftgene AI, ${company}.</h2>
+            <p>To proceed with your enterprise account registration, please verify your email address.</p>
+            <p>Your secure verification code is: <strong style="font-size: 1.4em; letter-spacing: 4px; display: inline-block; margin: 10px 0;">${otpCode}</strong></p>
+            <p style="font-size: 0.9em; color: #666;">This code is valid for 15 minutes.</p>
           </div>
         `
       });
       
-      console.log("Admin and Client emails sent successfully.");
     } catch (emailError) {
       console.error("Failed to send emails:", emailError);
     }
