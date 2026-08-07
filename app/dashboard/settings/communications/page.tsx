@@ -25,35 +25,16 @@ export default function CommunicationsPage() {
     {
       title: "Account risk and compliance",
       items: [
-        "Account status information requests",
-        "Balance collection notice",
-        "Fraud investigations on your account",
-        "Payout capability issues",
-        "Reserve-related information needed",
-        "Security related alerts",
-        "Unusual activity on your account",
       ]
     },
     {
       title: "Account updates",
       items: [
-        "Account activity summary",
-        "App installs or uninstalls",
-        "Connect integration optimizations and suggestions",
-        "Data migrations between accounts",
-        "Email domain verifications",
-        "Extension version deprecations",
-        "Service provider list changes",
-        "Updates to your business information",
       ]
     },
     {
       title: "Team management",
       items: [
-        "Note mentions by teammates",
-        "Single sign-on settings and domain changes",
-        "Team member changes on your account",
-        "Team settings",
       ]
     }
   ]
@@ -71,9 +52,6 @@ export default function CommunicationsPage() {
         </header>
 
         <main className="max-w-4xl mx-auto px-6 py-8">
-          <p className="text-sm text-slate-500 dark:text-slate-400 mb-6">
-            Your communication preferences will only apply to Kraftgene AI Inc. sandbox.
-          </p>
 
           {/* Dynamic Clickable Tabs */}
           <div className="flex space-x-6 border-b border-slate-200 dark:border-white/10 mb-8 text-sm font-bold overflow-x-auto">

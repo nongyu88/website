@@ -66,7 +66,7 @@ export default function CompliancePage() {
                 <h3 className="text-slate-900 dark:text-white font-bold mb-1 text-base">QuickBooks export</h3>
                 <p className="text-sm text-slate-500 dark:text-slate-400">Download an .iif file of your test transaction data that can be easily imported into QuickBooks.</p>
               </div>
-              <button onClick={() => alert("Downloading...")} className="shrink-0 px-4 py-1.5 bg-slate-100 dark:bg-[#2A2A2D] hover:bg-slate-200 dark:hover:bg-[#333336] text-slate-900 dark:text-white text-xs font-semibold rounded-lg border border-slate-200 dark:border-white/10 transition-colors">
+              <button onClick={() => alert("Coming soon...")} className="shrink-0 px-4 py-1.5 bg-slate-100 dark:bg-[#2A2A2D] hover:bg-slate-200 dark:hover:bg-[#333336] text-slate-900 dark:text-white text-xs font-semibold rounded-lg border border-slate-200 dark:border-white/10 transition-colors">
                 Export to QuickBooks...
               </button>
             </div>
