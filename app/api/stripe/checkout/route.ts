@@ -26,30 +26,26 @@ export async function POST(request: Request) {
       return NextResponse.json({ error: "User not found." }, { status: 404 });
     }
 
-    // 2. Determine and reuse the single Stripe Customer ID
+    // 2. Reuse the user's individual Stripe Customer ID or create a new one for them
     let customerId = user.stripeCustomerId;
 
-    // --- AUTO-LINK TEAMMATE STRIPE CUSTOMER ID ---
-    const emailDomain = email.split('@')[1]?.toLowerCase();
-    if (!customerId && emailDomain) {
-      // Look for any teammate in the same company who already has a Stripe account
-      const teammateWithStripe = await prisma.user.findFirst({
-        where: { 
-          email: { endsWith: `@${emailDomain}` },
-          stripeCustomerId: { not: null }
+    if (!customerId) {
+      const customer = await stripe.customers.create({
+        email: user.email, // Always use THIS specific user's email
+        name: user.company || user.email,
+        metadata: {
+          userId: user.id,
         }
       });
       
-      if (teammateWithStripe?.stripeCustomerId) {
-        customerId = teammateWithStripe.stripeCustomerId;
-        // Save it to the current user so they are permanently linked to the company billing
-        await prisma.user.update({
-          where: { id: user.id },
-          data: { stripeCustomerId: customerId }
-        });
-      }
+      customerId = customer.id;
+
+      // Save THIS user's unique Stripe Customer ID to their account
+      await prisma.user.update({
+        where: { id: user.id },
+        data: { stripeCustomerId: customerId }
+      });
     }
-    // ---------------------------------------------
 
     // If no Stripe Customer ID exists yet across the entire team, create ONE customer
     if (!customerId) {
