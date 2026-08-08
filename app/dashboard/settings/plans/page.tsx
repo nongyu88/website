@@ -11,6 +11,7 @@ interface ActivePlanData {
   name: string;
   priceId: string;
   cycle: string;
+  cancelAtPeriodEnd?: boolean;
 }
 
 function PlansContent() {
@@ -39,6 +40,30 @@ function PlansContent() {
     const role = String(userObj.role || "viewer").toLowerCase();
     
     setIsAdmin(role === "admin" || role === "owner");
+  }, []);
+
+  // Re-sync plan state whenever the user switches back to this browser tab (from Stripe Portal)
+  useEffect(() => {
+    const handleFocus = () => {
+      setTimeout(() => {
+        const storedUser = localStorage.getItem("user");
+        if (storedUser) {
+          const parsedUser = JSON.parse(storedUser);
+          fetch(`/api/user/profile?email=${parsedUser.email}&t=${Date.now()}`, { cache: 'no-store' })
+            .then(res => res.json())
+            .then(data => {
+              if (data.user?.activePlans) {
+                const parsed = typeof data.user.activePlans === 'string' ? JSON.parse(data.user.activePlans) : data.user.activePlans;
+                setActivePlans(parsed);
+              }
+            })
+            .catch(err => console.error(err));
+        }
+      }, 1200);
+    };
+
+    window.addEventListener("focus", handleFocus);
+    return () => window.removeEventListener("focus", handleFocus);
   }, []);
 
   useEffect(() => {
@@ -127,14 +152,19 @@ function PlansContent() {
     }
   }
 
-  const handleManageBilling = async () => {
+  const handleManageBilling = async (actionType?: 'update' | 'cancel' | 'reactivate' | 'upgrade', activePriceId?: string, targetPriceId?: string) => {
     setPortalLoading(true);
     try {
       const userObj = JSON.parse(localStorage.getItem("user") || "{}");
       const res = await fetch('/api/stripe/portal', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ email: userObj.email })
+        body: JSON.stringify({ 
+          email: userObj.email, 
+          action: actionType, 
+          priceId: activePriceId,
+          targetPriceId: targetPriceId
+        })
       });
       const data = await res.json();
       
@@ -149,7 +179,6 @@ function PlansContent() {
       setPortalLoading(false);
     }
   }
-
   useEffect(() => {
     const savedTheme = localStorage.getItem("theme")
     if (savedTheme === "light") setIsDarkMode(false)
@@ -360,23 +389,66 @@ function PlansContent() {
           {filteredPlans.map((plan) => {
               const targetPriceId = billingCycle === "monthly" ? plan.stripePriceMonthly : plan.stripePriceAnnually;
               
-              // Only disable if the user's activePlans array has an object with THIS EXACT price ID
+              const yearlyPlanObj = activePlans.find(p => p.name === plan.name && p.priceId === plan.stripePriceAnnually);
+              const monthlyPlanObj = activePlans.find(p => p.name === plan.name && p.priceId === plan.stripePriceMonthly);
+
+              const isYearlyActive = !!yearlyPlanObj;
+              const isMonthlyActive = !!monthlyPlanObj;
               const isExactCurrentPlan = activePlans.some(p => p.priceId === targetPriceId);
-              
-              // Check if they own any cycle of this plan so we can prompt an upgrade if they view yearly
-              const ownsPlanAnyCycle = activePlans.some(p => p.name === plan.name);
+
+              const isYearlyCanceling = yearlyPlanObj?.cancelAtPeriodEnd === true;
+              const isMonthlyCanceling = monthlyPlanObj?.cancelAtPeriodEnd === true;
 
               const isSelected = selectedPlan === plan.name;
 
-            return (
-              <div 
-                key={plan.id}
-                onClick={() => setSelectedPlan(plan.name)}
-                className={`rounded-2xl p-6 border flex flex-col justify-between transition-all duration-300 cursor-pointer ${isSelected ? 'bg-white dark:bg-[#111113] border-slate-900 dark:border-white shadow-md relative' : 'bg-white dark:bg-[#111113] border-slate-200 dark:border-white/10 hover:border-slate-300 dark:hover:border-white/20'}`}
-              >
+              let buttonText = plan.buttonText;
+              let isDisabled = isPageLoading || checkoutLoading === plan.name || !isAdmin;
+              let buttonClasses = `w-full text-xs font-semibold h-10 ${
+                !isAdmin ? 'opacity-50 cursor-not-allowed bg-slate-700 text-slate-400' : ''
+              }`;
+
+              if (isYearlyActive) {
+                if (billingCycle === "annually") {
+                  if (isYearlyCanceling) {
+                    buttonText = "Reactivate Yearly Plan";
+                    buttonClasses = `w-full text-xs font-semibold h-10 bg-emerald-500 hover:bg-emerald-600 text-white ${!isAdmin ? 'opacity-50 cursor-not-allowed' : ''}`;
+                  } else {
+                    buttonText = "Cancel Yearly Plan";
+                    buttonClasses = `w-full text-xs font-semibold h-10 bg-red-500 hover:bg-red-600 text-white ${!isAdmin ? 'opacity-50 cursor-not-allowed' : ''}`;
+                  }
+                } else {
+                  isDisabled = true;
+                  buttonText = "Yearly Active (Disable Monthly)";
+                }
+              } else if (isMonthlyActive) {
+                if (billingCycle === "annually") {
+                  if (isMonthlyCanceling) {
+                    isDisabled = true;
+                    buttonText = "Monthly Canceling (Locked)";
+                  } else {
+                    buttonText = "Upgrade to Pro";
+                    buttonClasses = `w-full text-xs font-semibold h-10 bg-emerald-500 hover:bg-emerald-600 text-white ${!isAdmin ? 'opacity-50 cursor-not-allowed' : ''}`;
+                  }
+                } else {
+                  if (isMonthlyCanceling) {
+                    buttonText = "Reactivate Monthly Plan";
+                    buttonClasses = `w-full text-xs font-semibold h-10 bg-emerald-500 hover:bg-emerald-600 text-white ${!isAdmin ? 'opacity-50 cursor-not-allowed' : ''}`;
+                  } else {
+                    buttonText = "Cancel Monthly Plan";
+                    buttonClasses = `w-full text-xs font-semibold h-10 bg-red-500 hover:bg-red-600 text-white ${!isAdmin ? 'opacity-50 cursor-not-allowed' : ''}`;
+                  }
+                }
+              }
+
+              return (
+                <div 
+                  key={plan.id}
+                  onClick={() => setSelectedPlan(plan.name)}
+                  className={`rounded-2xl p-6 border flex flex-col justify-between transition-all duration-300 cursor-pointer ${isSelected ? 'bg-white dark:bg-[#111113] border-slate-900 dark:border-white shadow-md relative' : 'bg-white dark:bg-[#111113] border-slate-200 dark:border-white/10 hover:border-slate-300 dark:hover:border-white/20'}`}
+                >
                 {isExactCurrentPlan && (
                   <span className="absolute -top-3 left-1/2 -translate-x-1/2 bg-slate-900 dark:bg-white text-white dark:text-slate-900 text-[10px] font-bold px-3 py-1 rounded-full uppercase tracking-wider shadow-sm">
-                    Current Plan
+                    {isYearlyCanceling || isMonthlyCanceling ? "Canceling Soon" : "Current Plan"}
                   </span>
                 )}
                 <div>
@@ -401,35 +473,40 @@ function PlansContent() {
                 </div>
 
                 <Button 
-                  disabled={isPageLoading || isExactCurrentPlan || checkoutLoading === plan.name || !isAdmin}
+                  disabled={isDisabled}
                   onClick={(e) => {
                     e.stopPropagation();
                     if (!isAdmin) {
                       alert("Only Organization Admins can manage billing tiers.");
                       return;
                     }
-                    if (!isExactCurrentPlan) {
+                    
+                    if (isYearlyActive && billingCycle === "annually") {
+                      if (isYearlyCanceling) {
+                        handleManageBilling('reactivate', plan.stripePriceAnnually);
+                      } else {
+                        handleManageBilling('cancel', plan.stripePriceAnnually);
+                      }
+                    } else if (isMonthlyActive && billingCycle === "monthly") {
+                      if (isMonthlyCanceling) {
+                        handleManageBilling('reactivate', plan.stripePriceMonthly);
+                      } else {
+                        handleManageBilling('cancel', plan.stripePriceMonthly);
+                      }
+                    } else if (isMonthlyActive && billingCycle === "annually" && !isMonthlyCanceling) {
+                      handleManageBilling('upgrade', plan.stripePriceMonthly, plan.stripePriceAnnually);
+                    } else if (!isYearlyActive && !isMonthlyActive) {
                       handleSubscribe(targetPriceId, plan.name);
                     }
                   }}
-                  className={`w-full text-xs font-semibold h-10 ${
-                    !isAdmin ? 'opacity-50 cursor-not-allowed bg-slate-700 text-slate-400' : ''
-                  }`}
+                  className={buttonClasses}
                 >
-                  {isPageLoading 
-                    ? "Loading..." 
-                    : !isAdmin 
-                      ? "Admin Permission Required" 
-                      : isExactCurrentPlan 
-                        ? "Current Active Plan" 
-                        : (ownsPlanAnyCycle && billingCycle === "annually")
-                          ? "Upgrade to Annual"
-                          : plan.buttonText}
+                  {isPageLoading ? "Loading..." : !isAdmin ? "Admin Permission Required" : buttonText}
                 </Button>
               </div>
             )
           })}
-</section>
+    </section>
 
           {/* SECTION 3: ADDITIONAL ENTERPRISE SERVICES */}
           <div id="additional-services" className="pt-12 mt-12 border-t border-slate-200 dark:border-white/10 space-y-8">
@@ -508,9 +585,57 @@ function PlansContent() {
             <section className="flex flex-col space-y-8 max-w-md mx-auto">
             {additionalServices.map((plan) => {
                 const targetPriceId = addonBillingCycle === "monthly" ? plan.stripePriceMonthly : plan.stripePriceAnnually;
+                
+                const yearlyPlanObj = activePlans.find(p => p.name === plan.name && p.priceId === plan.stripePriceAnnually);
+                const monthlyPlanObj = activePlans.find(p => p.name === plan.name && p.priceId === plan.stripePriceMonthly);
+
+                const isYearlyActive = !!yearlyPlanObj;
+                const isMonthlyActive = !!monthlyPlanObj;
                 const isExactCurrentPlan = activePlans.some(p => p.priceId === targetPriceId);
-                const ownsPlanAnyCycle = activePlans.some(p => p.name === plan.name);
+
+                const isYearlyCanceling = yearlyPlanObj?.cancelAtPeriodEnd === true;
+                const isMonthlyCanceling = monthlyPlanObj?.cancelAtPeriodEnd === true;
+
                 const isSelected = selectedPlan === plan.name;
+
+                let buttonText = plan.buttonText;
+                let isDisabled = isPageLoading || checkoutLoading === plan.name || !isAdmin;
+                let buttonClasses = `w-full text-xs font-semibold h-10 ${
+                  !isAdmin ? 'opacity-50 cursor-not-allowed bg-slate-700 text-slate-400' : ''
+                }`;
+
+                if (isYearlyActive) {
+                  if (addonBillingCycle === "annually") {
+                    if (isYearlyCanceling) {
+                      buttonText = "Reactivate Yearly Plan";
+                      buttonClasses = `w-full text-xs font-semibold h-10 bg-emerald-500 hover:bg-emerald-600 text-white ${!isAdmin ? 'opacity-50 cursor-not-allowed' : ''}`;
+                    } else {
+                      buttonText = "Cancel Yearly Plan";
+                      buttonClasses = `w-full text-xs font-semibold h-10 bg-red-500 hover:bg-red-600 text-white ${!isAdmin ? 'opacity-50 cursor-not-allowed' : ''}`;
+                    }
+                  } else {
+                    isDisabled = true;
+                    buttonText = "Yearly Active (Disable Monthly)";
+                  }
+                } else if (isMonthlyActive) {
+                  if (addonBillingCycle === "annually") {
+                    if (isMonthlyCanceling) {
+                      isDisabled = true;
+                      buttonText = "Monthly Canceling (Locked)";
+                    } else {
+                      buttonText = "Upgrade to Pro";
+                      buttonClasses = `w-full text-xs font-semibold h-10 bg-emerald-500 hover:bg-emerald-600 text-white ${!isAdmin ? 'opacity-50 cursor-not-allowed' : ''}`;
+                    }
+                  } else {
+                    if (isMonthlyCanceling) {
+                      buttonText = "Reactivate Monthly Plan";
+                      buttonClasses = `w-full text-xs font-semibold h-10 bg-emerald-500 hover:bg-emerald-600 text-white ${!isAdmin ? 'opacity-50 cursor-not-allowed' : ''}`;
+                    } else {
+                      buttonText = "Cancel Monthly Plan";
+                      buttonClasses = `w-full text-xs font-semibold h-10 bg-red-500 hover:bg-red-600 text-white ${!isAdmin ? 'opacity-50 cursor-not-allowed' : ''}`;
+                    }
+                  }
+                }
 
               return (
                 <div 
@@ -521,7 +646,7 @@ function PlansContent() {
                 >
                   {isExactCurrentPlan && (
                     <span className="absolute -top-3 left-1/2 -translate-x-1/2 bg-slate-900 dark:bg-white text-white dark:text-slate-900 text-[10px] font-bold px-3 py-1 rounded-full uppercase tracking-wider shadow-sm">
-                      Current Plan
+                      {isYearlyCanceling || isMonthlyCanceling ? "Canceling Soon" : "Current Plan"}
                     </span>
                   )}
                   <div>
@@ -546,30 +671,35 @@ function PlansContent() {
                   </div>
 
                   <Button 
-                    disabled={isPageLoading || isExactCurrentPlan || checkoutLoading === plan.name || !isAdmin}
+                    disabled={isDisabled}
                     onClick={(e) => {
                       e.stopPropagation();
                       if (!isAdmin) {
                         alert("Only Organization Admins can manage billing tiers.");
                         return;
                       }
-                      if (!isExactCurrentPlan) {
+
+                      if (isYearlyActive && addonBillingCycle === "annually") {
+                        if (isYearlyCanceling) {
+                          handleManageBilling('reactivate', plan.stripePriceAnnually);
+                        } else {
+                          handleManageBilling('cancel', plan.stripePriceAnnually);
+                        }
+                      } else if (isMonthlyActive && addonBillingCycle === "monthly") {
+                        if (isMonthlyCanceling) {
+                          handleManageBilling('reactivate', plan.stripePriceMonthly);
+                        } else {
+                          handleManageBilling('cancel', plan.stripePriceMonthly);
+                        }
+                      } else if (isMonthlyActive && addonBillingCycle === "annually" && !isMonthlyCanceling) {
+                        handleManageBilling('upgrade', plan.stripePriceMonthly, plan.stripePriceAnnually);
+                      } else if (!isYearlyActive && !isMonthlyActive) {
                         handleSubscribe(targetPriceId, plan.name);
                       }
                     }}
-                    className={`w-full text-xs font-semibold h-10 ${
-                      !isAdmin ? 'opacity-50 cursor-not-allowed bg-slate-700 text-slate-400' : ''
-                    }`}
+                    className={buttonClasses}
                   >
-                    {isPageLoading 
-                      ? "Loading..." 
-                      : !isAdmin 
-                        ? "Admin Permission Required" 
-                        : isExactCurrentPlan 
-                          ? "Current Active Plan" 
-                          : (ownsPlanAnyCycle && addonBillingCycle === "annually")
-                            ? "Upgrade to Annual"
-                            : plan.buttonText}
+                    {isPageLoading ? "Loading..." : !isAdmin ? "Admin Permission Required" : buttonText}
                   </Button>
                 </div>
               )

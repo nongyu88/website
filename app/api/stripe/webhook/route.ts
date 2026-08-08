@@ -142,5 +142,72 @@ await prisma.user.update({
     }
   }
 
+// ====================================================================
+  // 3. HANDLE SUBSCRIPTION UPDATES & CANCELLATIONS (e.g. Pending Cancellation)
+  // ====================================================================
+  if (event.type === 'customer.subscription.updated') {
+    console.log("🔄 Subscription Updated Event Received!");
+    const subscription = event.data.object as Stripe.Subscription;
+
+    try {
+      const priceId = subscription.items.data[0]?.price?.id;
+      const stripeCustomerId = subscription.customer as string;
+
+      if (!priceId || !stripeCustomerId) return NextResponse.json({ received: true }, { status: 200 });
+
+      const priceDetails: Record<string, { name: string, cycle: string }> = {
+        "price_1U0drsCnK1WH2hz2ETrB7CUj": { name: "Utility Grid Twin", cycle: "Monthly" },
+        "price_1U0dwrCnK1WH2hz2vRXdFtze": { name: "Utility Grid Twin", cycle: "Annually" },
+        "price_1U0dumCnK1WH2hz29ta30zW3": { name: "Pipeline Twin", cycle: "Monthly" },
+        "price_1U0dxfCnK1WH2hz2B6V9AMUl": { name: "Pipeline Twin", cycle: "Annually" },
+        "price_1U0dvJCnK1WH2hz2XZ6Zlfnm": { name: "Enterprise Convergence", cycle: "Monthly" },
+        "price_1U0dyKCnK1WH2hz2aIY9w2Om": { name: "Enterprise Convergence", cycle: "Annually" },
+        "price_1U13FiCnK1WH2hz2EwrOlA7u": { name: "Digital Twins Services", cycle: "Monthly" },
+        "price_1U13G8CnK1WH2hz2d1Khdn3z": { name: "Digital Twins Services", cycle: "Annually" },
+        "price_1U13HSCnK1WH2hz2zqnZI8xB": { name: "Professional Services", cycle: "Monthly" },
+        "price_1U13HqCnK1WH2hz2QKrXe9En": { name: "Professional Services", cycle: "Annually" },
+        "price_1U13ICCnK1WH2hz2IeK3uYsE": { name: "Data Services", cycle: "Monthly" },
+        "price_1U13IOCnK1WH2hz22xIIcIpH": { name: "Data Services", cycle: "Annually" }
+      };
+
+      const details = priceDetails[priceId];
+      if (!details) return NextResponse.json({ received: true }, { status: 200 });
+
+      const user = await prisma.user.findFirst({
+        where: { stripeCustomerId: stripeCustomerId }
+      });
+
+      if (!user) return NextResponse.json({ received: true }, { status: 200 });
+
+      let currentPlans: any[] = [];
+      try { 
+        currentPlans = JSON.parse(user.activePlans || "[]"); 
+      } catch(e) {}
+
+      // Clear existing records for this plan name
+      currentPlans = currentPlans.filter(p => (typeof p === 'object' ? p.name : p) !== details.name);
+
+      const isFullyCanceled = subscription.status === 'canceled' || subscription.status === 'unpaid';
+
+      // Keep in DB if active, but mark cancelAtPeriodEnd flag
+      if (!isFullyCanceled && (subscription.status === 'active' || subscription.status === 'trialing')) {
+        currentPlans.push({
+          name: details.name,
+          priceId: priceId,
+          cycle: details.cycle,
+          cancelAtPeriodEnd: subscription.cancel_at_period_end ?? false,
+          subscribedAt: new Date().toISOString()
+        });
+      }
+
+      await prisma.user.update({
+        where: { id: user.id },
+        data: { activePlans: JSON.stringify(currentPlans) }
+      });
+
+    } catch (err) {
+      console.error("❌ Error processing subscription update:", err);
+    }
+  }
   return NextResponse.json({ received: true }, { status: 200 });
 }
