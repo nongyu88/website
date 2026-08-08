@@ -27,6 +27,13 @@ export async function GET(request: Request) {
         industry: true,
         region: true,
         avatarUrl: true,
+        position: true,
+        department: true,
+        bio: true,
+        linkedinUrl: true,
+        timezone: true,
+        skills: true,
+        workingHours: true,
         notifySecurityAlerts: true,
         notifyProductUpdates: true,
         role: true,
@@ -108,7 +115,8 @@ export async function PUT(request: Request) {
     const body = await request.json();
     const { 
       email, firstName, lastName, company, website, 
-      industry, region, avatarUrl, notifySecurityAlerts, notifyProductUpdates 
+      industry, region, avatarUrl, notifySecurityAlerts, notifyProductUpdates,
+      position, department, bio, linkedinUrl, timezone, skills, workingHours
     } = body;
 
     if (!email) {
@@ -126,6 +134,13 @@ export async function PUT(request: Request) {
         industry,
         region,
         avatarUrl,
+        position,
+        department,
+        bio,
+        linkedinUrl,
+        timezone,
+        skills,
+        workingHours,
         notifySecurityAlerts,
         notifyProductUpdates
       },

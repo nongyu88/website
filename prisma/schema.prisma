@@ -29,6 +29,15 @@ model User {
   region                 String?  
   alertFocus             String?  
 
+// --- PROFESSIONAL PROFILE FIELDS ---
+  position               String?
+  department             String?
+  bio                    String?   @db.NVarChar(Max)
+  linkedinUrl            String?
+  timezone               String?
+  skills                 String?   @db.NVarChar(Max) // Stored as comma-separated values or text
+  workingHours           String?
+
   // --- NEW: EXTENDED PROFILE FIELDS ---
   firstName              String?
   lastName               String?

@@ -24,22 +24,30 @@ export default function SecuritySettingsPage() {
   const [inviteLoading, setInviteLoading] = useState(false) // <-- NEW
   const [inviteMsg, setInviteMsg] = useState({ type: "", text: "" }) // <-- NEW
 
-    // 1. Add the state at the top of your component
-    const [isDarkMode, setIsDarkMode] = useState(true)
+  const [position, setPosition] = useState("")
+  const [department, setDepartment] = useState("")
+  const [bio, setBio] = useState("")
+  const [linkedinUrl, setLinkedinUrl] = useState("")
+  const [timezone, setTimezone] = useState("")
+  const [skills, setSkills] = useState("")
+  const [workingHours, setWorkingHours] = useState("")
 
-    useEffect(() => {
-    // Sync with your main dashboard's theme preference
-    const savedTheme = localStorage.getItem("theme")
-    if (savedTheme === "light") setIsDarkMode(false)
-    // ... rest of your existing useEffect code
-    }, [])
+  // 1. Add the state at the top of your component
+  const [isDarkMode, setIsDarkMode] = useState(true)
 
   useEffect(() => {
-    const storedUser = localStorage.getItem("user")
-    if (storedUser) {
-      setUserEmail(JSON.parse(storedUser).email || "")
-    }
+  // Sync with your main dashboard's theme preference
+  const savedTheme = localStorage.getItem("theme")
+  if (savedTheme === "light") setIsDarkMode(false)
+  // ... rest of your existing useEffect code
   }, [])
+
+useEffect(() => {
+  const storedUser = localStorage.getItem("user")
+  if (storedUser) {
+    setUserEmail(JSON.parse(storedUser).email || "")
+  }
+}, [])
 
 // Real Team Data State
 const [teamMembers, setTeamMembers] = useState<any[]>([])

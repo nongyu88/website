@@ -13,15 +13,24 @@ export default function ProfileSettingsPage() {
   // File Upload Ref
   const fileInputRef = useRef<HTMLInputElement>(null)
 
-  // Form State
-  const [email, setEmail] = useState("")
-  const [firstName, setFirstName] = useState("")
-  const [lastName, setLastName] = useState("")
-  const [company, setCompany] = useState("")
-  const [website, setWebsite] = useState("")
-  const [industry, setIndustry] = useState("")
-  const [region, setRegion] = useState("")
-  const [avatarUrl, setAvatarUrl] = useState("")
+// Form State
+const [email, setEmail] = useState("")
+const [firstName, setFirstName] = useState("")
+const [lastName, setLastName] = useState("")
+const [company, setCompany] = useState("")
+const [website, setWebsite] = useState("")
+const [industry, setIndustry] = useState("")
+const [region, setRegion] = useState("")
+const [avatarUrl, setAvatarUrl] = useState("")
+
+// Professional Fields State
+const [position, setPosition] = useState("")
+const [department, setDepartment] = useState("")
+const [bio, setBio] = useState("")
+const [linkedinUrl, setLinkedinUrl] = useState("")
+const [timezone, setTimezone] = useState("")
+const [skills, setSkills] = useState("")
+const [workingHours, setWorkingHours] = useState("")
   
   // Communication State
   const [notifySecurityAlerts, setNotifySecurityAlerts] = useState(true)
@@ -47,6 +56,16 @@ useEffect(() => {
             setIndustry(u.industry || "")
             setRegion(u.region || "")
             setAvatarUrl(u.avatarUrl || "")
+            
+            // Populate Professional Fields
+            setPosition(u.position || "")
+            setDepartment(u.department || "")
+            setBio(u.bio || "")
+            setLinkedinUrl(u.linkedinUrl || "")
+            setTimezone(u.timezone || "")
+            setSkills(u.skills || "")
+            setWorkingHours(u.workingHours || "")
+
             setNotifySecurityAlerts(u.notifySecurityAlerts ?? true)
             setNotifyProductUpdates(u.notifyProductUpdates ?? false)
 
@@ -103,7 +122,9 @@ const handleImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ 
-          email, firstName, lastName, company, website, industry, region, avatarUrl, notifySecurityAlerts, notifyProductUpdates
+          email, firstName, lastName, company, website, industry, region, avatarUrl, 
+          notifySecurityAlerts, notifyProductUpdates,
+          position, department, bio, linkedinUrl, timezone, skills, workingHours
         }),
       })
 
@@ -216,6 +237,89 @@ const handleImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
                     className="w-full bg-slate-50 dark:bg-[#0A0A0B] border border-slate-200 dark:border-white/10 rounded-lg px-4 py-2.5 text-slate-900 dark:text-white focus:border-purple-500 focus:outline-none transition-colors cursor-not-allowed"
                   />
                 </div>
+                <div>
+                <label className="block text-sm font-medium text-slate-700 dark:text-slate-400 mb-2">Position / Title</label>
+                <input
+                  type="text"
+                  value={position}
+                  onChange={(e) => setPosition(e.target.value)}
+                  className="w-full bg-slate-50 dark:bg-[#0A0A0B] border border-slate-200 dark:border-white/10 rounded-lg px-4 py-2.5 text-slate-900 dark:text-white focus:border-purple-500 focus:outline-none transition-colors"
+                  placeholder="e.g. Senior Grid Engineer"
+                />
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium text-slate-700 dark:text-slate-400 mb-2">Department</label>
+                <input
+                  type="text"
+                  value={department}
+                  onChange={(e) => setDepartment(e.target.value)}
+                  className="w-full bg-slate-50 dark:bg-[#0A0A0B] border border-slate-200 dark:border-white/10 rounded-lg px-4 py-2.5 text-slate-900 dark:text-white focus:border-purple-500 focus:outline-none transition-colors"
+                  placeholder="e.g. Infrastructure & Operations"
+                />
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium text-slate-700 dark:text-slate-400 mb-2">LinkedIn Profile</label>
+                <input
+                  type="url"
+                  value={linkedinUrl}
+                  onChange={(e) => setLinkedinUrl(e.target.value)}
+                  className="w-full bg-slate-50 dark:bg-[#0A0A0B] border border-slate-200 dark:border-white/10 rounded-lg px-4 py-2.5 text-slate-900 dark:text-white focus:border-purple-500 focus:outline-none transition-colors"
+                  placeholder="https://linkedin.com/in/username"
+                />
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium text-slate-700 dark:text-slate-400 mb-2">Timezone</label>
+                <select
+                  value={timezone}
+                  onChange={(e) => setTimezone(e.target.value)}
+                  className="w-full bg-slate-50 dark:bg-[#0A0A0B] border border-slate-200 dark:border-white/10 rounded-lg px-4 py-2.5 text-slate-900 dark:text-white focus:border-purple-500 focus:outline-none appearance-none transition-colors"
+                >
+                  <option value="" disabled>Select primary timezone...</option>
+                  <option value="America/New_York">Eastern Time (EST / UTC-5)</option>
+                  <option value="America/Chicago">Central Time (CST / UTC-6)</option>
+                  <option value="America/Denver">Mountain Time (MST / UTC-7)</option>
+                  <option value="America/Los_Angeles">Pacific Time (PST / UTC-8)</option>
+                  <option value="Europe/London">Greenwich Mean Time (GMT / UTC+0)</option>
+                  <option value="Europe/Berlin">Central European Time (CET / UTC+1)</option>
+                  <option value="Asia/Hong_Kong">Hong Kong Time (HKT / UTC+8)</option>
+                </select>
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium text-slate-700 dark:text-slate-400 mb-2">Working Hours</label>
+                <input
+                  type="text"
+                  value={workingHours}
+                  onChange={(e) => setWorkingHours(e.target.value)}
+                  className="w-full bg-slate-50 dark:bg-[#0A0A0B] border border-slate-200 dark:border-white/10 rounded-lg px-4 py-2.5 text-slate-900 dark:text-white focus:border-purple-500 focus:outline-none transition-colors"
+                  placeholder="e.g. 9:00 AM - 5:00 PM EST"
+                />
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium text-slate-700 dark:text-slate-400 mb-2">Skills & Specialties</label>
+                <input
+                  type="text"
+                  value={skills}
+                  onChange={(e) => setSkills(e.target.value)}
+                  className="w-full bg-slate-50 dark:bg-[#0A0A0B] border border-slate-200 dark:border-white/10 rounded-lg px-4 py-2.5 text-slate-900 dark:text-white focus:border-purple-500 focus:outline-none transition-colors"
+                  placeholder="e.g. SCADA Systems, Python, Azure"
+                />
+              </div>
+
+              <div className="md:col-span-2">
+                <label className="block text-sm font-medium text-slate-700 dark:text-slate-400 mb-2">Professional Bio</label>
+                <textarea
+                  value={bio}
+                  onChange={(e) => setBio(e.target.value)}
+                  rows={4}
+                  className="w-full bg-slate-50 dark:bg-[#0A0A0B] border border-slate-200 dark:border-white/10 rounded-lg px-4 py-2.5 text-slate-900 dark:text-white focus:border-purple-500 focus:outline-none transition-colors"
+                  placeholder="Brief overview of your background and technical experience..."
+                />
+              </div>
               </div>
             </div>
           </section>
