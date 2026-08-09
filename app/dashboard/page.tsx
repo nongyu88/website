@@ -246,13 +246,8 @@ export default function DashboardPage() {
   
   <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
     
-{/* Digital Twins Services */}
-<div className={`bg-white dark:bg-[#111113] border rounded-2xl p-6 flex flex-col relative overflow-hidden group transition-colors ${hasDigitalTwins ? 'border-blue-500/50 dark:border-blue-500/30' : 'border-slate-200 dark:border-white/10 hover:border-blue-500/50'}`}>
-      {!hasDigitalTwins && (
-        <div className="absolute top-4 right-4 bg-slate-100 dark:bg-white/5 p-2 rounded-full">
-          <Lock className="w-4 h-4 text-slate-400" />
-        </div>
-      )}
+    {/* Digital Twins Services */}
+    <div className={`bg-white dark:bg-[#111113] border rounded-2xl p-6 flex flex-col relative overflow-hidden group transition-colors ${hasDigitalTwins ? 'border-blue-500/50 dark:border-blue-500/30' : 'border-slate-200 dark:border-white/10 hover:border-blue-500/50'}`}>
       <div className="w-12 h-12 bg-blue-500/10 rounded-xl flex items-center justify-center mb-4">
         <Cpu className="w-6 h-6 text-blue-500" />
       </div>
@@ -263,24 +258,13 @@ export default function DashboardPage() {
       <p className="text-sm text-slate-500 dark:text-slate-400 mb-6 flex-grow">
         Advanced physical asset modeling and custom environmental integration for your specific infrastructure.
       </p>
-      {hasDigitalTwins ? (
-        <Link href="/dashboard/digital-twins" className="text-sm font-bold text-blue-600 dark:text-blue-400 flex items-center group-hover:text-blue-500 transition-colors">
-          Launch Digital Twins <ArrowUpRight className="w-4 h-4 ml-1" />
-        </Link>
-      ) : (
-        <Link href="/dashboard/settings/plans#digital-twins" className="text-sm font-bold text-slate-500 hover:text-blue-500 transition-colors flex items-center">
-          Upgrade to Pro <ArrowRight className="w-4 h-4 ml-1" />
-        </Link>
-      )}
+      <Link href="/dashboard/digital-twins" className="text-sm font-bold text-blue-600 dark:text-blue-400 flex items-center group-hover:text-blue-500 transition-colors">
+        {hasDigitalTwins ? "Launch Digital Twins" : "Explore Digital Twins"} <ArrowUpRight className="w-4 h-4 ml-1" />
+      </Link>
     </div>
 
     {/* Professional Services */}
     <div className={`bg-white dark:bg-[#111113] border rounded-2xl p-6 flex flex-col relative overflow-hidden group transition-colors ${hasProfessional ? 'border-purple-500/50 dark:border-purple-500/30' : 'border-slate-200 dark:border-white/10 hover:border-purple-500/50'}`}>
-      {!hasProfessional && (
-        <div className="absolute top-4 right-4 bg-slate-100 dark:bg-white/5 p-2 rounded-full">
-          <Lock className="w-4 h-4 text-slate-400" />
-        </div>
-      )}
       <div className="w-12 h-12 bg-purple-500/10 rounded-xl flex items-center justify-center mb-4">
         <Briefcase className="w-6 h-6 text-purple-500" />
       </div>
@@ -291,24 +275,13 @@ export default function DashboardPage() {
       <p className="text-sm text-slate-500 dark:text-slate-400 mb-6 flex-grow">
         Dedicated client training, seamless system API integration, and full digital transformation consulting.
       </p>
-      {hasProfessional ? (
-        <Link href="/dashboard/professional-services" className="text-sm font-bold text-purple-600 dark:text-purple-400 flex items-center group-hover:text-purple-500 transition-colors">
-          Access Pro Services <ArrowUpRight className="w-4 h-4 ml-1" />
-        </Link>
-      ) : (
-        <Link href="/dashboard/settings/plans#professional-services" className="text-sm font-bold text-slate-500 hover:text-purple-500 transition-colors flex items-center">
-          View Enterprise Plans <ArrowRight className="w-4 h-4 ml-1" />
-        </Link>
-      )}
+      <Link href="/dashboard/professional-services" className="text-sm font-bold text-purple-600 dark:text-purple-400 flex items-center group-hover:text-purple-500 transition-colors">
+        {hasProfessional ? "Access Pro Services" : "Explore Pro Services"} <ArrowUpRight className="w-4 h-4 ml-1" />
+      </Link>
     </div>
 
     {/* Data Services */}
     <div className={`bg-white dark:bg-[#111113] border rounded-2xl p-6 flex flex-col relative overflow-hidden group transition-colors ${hasData ? 'border-amber-500/50 dark:border-amber-500/30' : 'border-slate-200 dark:border-white/10 hover:border-amber-500/50'}`}>
-      {!hasData && (
-        <div className="absolute top-4 right-4 bg-slate-100 dark:bg-white/5 p-2 rounded-full">
-          <Lock className="w-4 h-4 text-slate-400" />
-        </div>
-      )}
       <div className="w-12 h-12 bg-amber-500/10 rounded-xl flex items-center justify-center mb-4">
         <Database className="w-6 h-6 text-amber-500" />
       </div>
@@ -319,15 +292,9 @@ export default function DashboardPage() {
       <p className="text-sm text-slate-500 dark:text-slate-400 mb-6 flex-grow">
         Real-time robotic data acquisition, live UAV drone feeds, and continuous asset health telemetry.
       </p>
-      {hasData ? (
-        <Link href="/dashboard/data-services" className="text-sm font-bold text-amber-600 dark:text-amber-400 flex items-center group-hover:text-amber-500 transition-colors">
-          Open Data Console <ArrowUpRight className="w-4 h-4 ml-1" />
-        </Link>
-      ) : (
-        <Link href="/dashboard/settings/plans#data-services" className="text-sm font-bold text-slate-500 hover:text-amber-500 transition-colors flex items-center">
-          Explore Data Services <ArrowRight className="w-4 h-4 ml-1" />
-        </Link>
-      )}
+      <Link href="/dashboard/data-services" className="text-sm font-bold text-amber-600 dark:text-amber-400 flex items-center group-hover:text-amber-500 transition-colors">
+        {hasData ? "Open Data Console" : "Explore Data Services"} <ArrowUpRight className="w-4 h-4 ml-1" />
+      </Link>
     </div>
 
   </div>
@@ -347,9 +314,9 @@ export default function DashboardPage() {
                   <Badge className={`text-[10px] uppercase font-bold border transition-colors ${
                     isGridSubscribed 
                       ? "bg-emerald-100 text-emerald-900 hover:bg-emerald-200 dark:bg-emerald-900/50 dark:text-emerald-300 dark:hover:bg-emerald-900/70 border-emerald-300 dark:border-emerald-700/50" 
-                      : "bg-slate-200 dark:bg-slate-800 text-slate-800 dark:text-slate-300 hover:bg-slate-300 dark:hover:bg-slate-700 border-slate-300 dark:border-slate-600 shadow-sm"
+                      : "bg-slate-100 dark:bg-white/5 text-slate-600 dark:text-slate-400 border-slate-200 dark:border-white/10"
                   }`}>
-                    {isGridSubscribed ? "Active | Enterprise" : "Locked"}
+                    {isGridSubscribed ? "Active | Enterprise" : "Preview Mode"}
                   </Badge>
                 </div>
 
@@ -369,9 +336,9 @@ export default function DashboardPage() {
                   Launch Grid Platform <ArrowUpRight className="ml-2 w-4 h-4" />
                 </Button>
               ) : (
-                <Link href="/dashboard/settings/plans" className="w-full block">
+                <Link href="/dashboard/grid-platform" className="w-full block">
                   <Button className="w-full bg-slate-800 hover:bg-slate-700 text-white font-bold h-12 rounded-xl transition-all flex justify-center items-center">
-                    <Lock className="w-4 h-4 mr-2" /> Upgrade to Launch
+                    Explore Grid Platform <ArrowRight className="w-4 h-4 ml-2" />
                   </Button>
                 </Link>
               )}
@@ -389,9 +356,9 @@ export default function DashboardPage() {
                   <Badge className={`text-[10px] uppercase font-bold border transition-colors ${
                     isPipelineSubscribed 
                       ? "bg-blue-100 text-blue-900 hover:bg-blue-100 dark:bg-blue-900/50 dark:text-blue-300 dark:hover:bg-blue-900/70 border-blue-300 dark:border-blue-700/50" 
-                      : "bg-slate-200 dark:bg-slate-800 text-slate-800 dark:text-slate-300 hover:bg-slate-300 dark:hover:bg-slate-700 border-slate-300 dark:border-slate-600 shadow-sm"
+                      : "bg-slate-100 dark:bg-white/5 text-slate-600 dark:text-slate-400 border-slate-200 dark:border-white/10"
                   }`}>
-                    {isPipelineSubscribed ? "Active | Enterprise" : "Locked"}
+                    {isPipelineSubscribed ? "Active | Enterprise" : "Preview Mode"}
                   </Badge>
                 </div>
 
@@ -411,9 +378,9 @@ export default function DashboardPage() {
                   Launch Pipeline Platform <ArrowUpRight className="ml-2 w-4 h-4" />
                 </Button>
               ) : (
-                <Link href="/dashboard/settings/plans" className="w-full block">
+                <Link href="/dashboard/pipeline-platform" className="w-full block">
                   <Button className="w-full bg-slate-800 hover:bg-slate-700 text-white font-bold h-12 rounded-xl transition-all flex justify-center items-center">
-                    <Lock className="w-4 h-4 mr-2" /> Upgrade to Launch
+                    Explore Pipeline Platform <ArrowRight className="w-4 h-4 ml-2" />
                   </Button>
                 </Link>
               )}

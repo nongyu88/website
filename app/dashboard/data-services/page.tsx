@@ -5,7 +5,8 @@ import Link from "next/link"
 import { 
   ArrowLeft, Database, Flame, Activity, 
   FileText, Download, Rocket, ShieldAlert, 
-  ArrowRight, X, CheckCircle2, Radar, Target
+  ArrowRight, X, CheckCircle2, Radar, Target,
+  Lock, Unlock
 } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
@@ -30,6 +31,15 @@ export default function DataServicesPage() {
     if (storedUser) setUser(JSON.parse(storedUser))
   }, [])
 
+  // Parse subscription state
+  const activePlansRaw = user?.organization?.activePlans || user?.activePlans || "[]";
+  let activePlansArr: any[] = [];
+  try {
+    activePlansArr = typeof activePlansRaw === 'string' ? JSON.parse(activePlansRaw) : activePlansRaw;
+  } catch (e) {}
+
+  const hasDataServices = activePlansArr.some((p: any) => p.name === "Data Services" || p === "Data Services");
+
   // Mock Automated Reports
   const recentReports = [
     { id: "REP-091", title: "Wildfire Risk Proximity Assessment", date: "Today, 08:30 AM", type: "Automated API", status: "Ready" },
@@ -47,13 +57,31 @@ export default function DataServicesPage() {
     }, 2000)
   }
 
-  const handleHardwareSubmit = (e: React.FormEvent) => {
+  const handleHardwareSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
-    setHardwareSubmitted(true)
-    setTimeout(() => {
-      setIsHardwareModalOpen(false)
-      setHardwareSubmitted(false)
-    }, 2500)
+    try {
+      await fetch('/api/services/request', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          serviceType: 'Robotics Hardware Deployment',
+          userEmail: user?.email,
+          details: { 
+            "Hardware Type": hardwareType, 
+            "Mission Type": missionType, 
+            "Training": trainingRequired 
+          }
+        })
+      });
+
+      setHardwareSubmitted(true)
+      setTimeout(() => {
+        setIsHardwareModalOpen(false)
+        setHardwareSubmitted(false)
+      }, 2500)
+    } catch (error) {
+      console.error("Hardware request submission error:", error)
+    }
   }
 
   return (
@@ -138,7 +166,7 @@ export default function DataServicesPage() {
           </div>
         </section>
 
-        {/* SECTION 2: HARDWARE ACQUISITION (Lead Gen / Consultative) */}
+        {/* SECTION 2: HARDWARE ACQUISITION */}
         <section className="space-y-6 pt-6">
           <div className="flex flex-col md:flex-row md:items-center justify-between gap-2 border-b border-slate-200 dark:border-white/10 pb-4">
             <div>
@@ -194,6 +222,46 @@ export default function DataServicesPage() {
 
           </div>
         </section>
+
+        {/* Subscription Status & Progress Section */}
+        {hasDataServices ? (
+          <section className="bg-gradient-to-r from-emerald-900/20 to-slate-900 border border-emerald-500/30 rounded-2xl p-8 mt-12 relative overflow-hidden shadow-lg">
+            <div className="absolute top-4 right-4 bg-emerald-500/10 p-2 rounded-full border border-emerald-500/20">
+              <Unlock className="w-5 h-5 text-emerald-400" />
+            </div>
+            <h2 className="text-xl font-bold text-white mb-2 flex items-center">
+              <CheckCircle2 className="w-6 h-6 text-emerald-500 mr-2" /> Data Services Module Active
+            </h2>
+            <p className="text-sm text-slate-300 mb-6 max-w-2xl">
+              Your subscription is successfully activated. Automated analytics generation is now unlocked, and our field operations team is reviewing your hardware deployment request.
+            </p>
+            
+            {/* Deployment Progress Bar */}
+            <div className="max-w-2xl bg-slate-900/50 p-5 rounded-xl border border-white/5">
+              <div className="flex justify-between text-xs font-bold text-slate-400 mb-3 uppercase tracking-wider">
+                <span>Provisioning Status</span>
+                <span className="text-emerald-400">20%</span>
+              </div>
+              <div className="w-full bg-slate-800 rounded-full h-2 mb-2 overflow-hidden border border-slate-700">
+                <div className="bg-emerald-500 h-2 rounded-full relative overflow-hidden" style={{ width: '20%' }}>
+                   <div className="absolute inset-0 bg-white/20 w-full animate-[shimmer_2s_infinite] -translate-x-full"></div>
+                </div>
+              </div>
+              <p className="text-xs text-slate-500 text-right font-mono mt-2">Current Phase: API Provisioning & Hardware Allocation</p>
+            </div>
+          </section>
+        ) : (
+          <section className="bg-gradient-to-r from-slate-900 to-slate-800 border border-slate-700 rounded-2xl p-8 text-center mt-12 relative overflow-hidden">
+            <div className="absolute top-4 right-4 bg-amber-500/20 p-2 rounded-full">
+              <Lock className="w-5 h-5 text-amber-400" />
+            </div>
+            <h2 className="text-xl font-bold text-white mb-2">Ready to Access Automated Analytics & Robotics?</h2>
+            <p className="text-sm text-slate-300 mb-6 max-w-xl mx-auto">Purchase the Data Services add-on to officially unlock unlimited report generation and authorize hardware fleet deployment.</p>
+            <Link href="/dashboard/settings/plans#data-services">
+              <Button className="bg-amber-600 hover:bg-amber-500 text-white font-bold px-8">View Plans & Pricing</Button>
+            </Link>
+          </section>
+        )}
 
       </main>
 

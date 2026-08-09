@@ -5,7 +5,8 @@ import Link from "next/link"
 import { 
   ArrowLeft, Briefcase, FileText, Settings, 
   GraduationCap, Headset, ArrowRight, X, 
-  CheckCircle2, Workflow, Database, Users
+  CheckCircle2, Workflow, Database, Users,
+  Lock, Unlock
 } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
@@ -24,14 +25,40 @@ export default function ProfessionalServicesPage() {
     if (storedUser) setUser(JSON.parse(storedUser))
   }, [])
 
-  const handleSowSubmit = (e: React.FormEvent) => {
+  // Parse subscription state
+  const activePlansRaw = user?.organization?.activePlans || user?.activePlans || "[]";
+  let activePlansArr: any[] = [];
+  try {
+    activePlansArr = typeof activePlansRaw === 'string' ? JSON.parse(activePlansRaw) : activePlansRaw;
+  } catch (e) {}
+
+  const hasProfessional = activePlansArr.some((p: any) => p.name === "Professional Services" || p === "Professional Services");
+
+  const handleSowSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
-    setSowSubmitted(true)
-    setTimeout(() => {
-      setIsSowModalOpen(false)
-      setSowSubmitted(false)
-      setScopeDetails("")
-    }, 2500)
+    try {
+      await fetch('/api/services/request', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          serviceType: 'Professional Services SOW',
+          userEmail: user?.email,
+          details: { 
+            "Project Type": projectType, 
+            "Scope Details": scopeDetails 
+          }
+        })
+      });
+
+      setSowSubmitted(true)
+      setTimeout(() => {
+        setIsSowModalOpen(false)
+        setSowSubmitted(false)
+        setScopeDetails("")
+      }, 2500)
+    } catch (error) {
+      console.error("SOW submission error:", error)
+    }
   }
 
   return (
@@ -61,7 +88,7 @@ export default function ProfessionalServicesPage() {
 
       <main className="max-w-6xl mx-auto px-6 py-8 space-y-10">
 
-        {/* Value Proposition Banner (Contrast Fixed for Both Modes) */}
+        {/* Value Proposition Banner */}
         <div className="bg-gradient-to-r from-purple-50 via-fuchsia-50 to-white dark:from-purple-900/30 dark:via-fuchsia-900/20 dark:to-slate-900/40 border border-purple-200 dark:border-purple-500/30 rounded-3xl p-8 relative overflow-hidden shadow-xl transition-colors">
           <div className="relative z-10 max-w-2xl">
             <Badge className="mb-3 bg-purple-100 dark:bg-purple-500/10 text-purple-700 dark:text-purple-400 border-purple-300 dark:border-purple-500/30 px-3 py-1 text-[10px] uppercase tracking-widest font-bold">
@@ -180,8 +207,47 @@ export default function ProfessionalServicesPage() {
               <p className="text-xs text-slate-500">Rigorous UAT testing, user training sessions, and transition to ongoing TAM support.</p>
             </div>
           </div>
-
         </section>
+
+        {/* Subscription Status & Progress Section */}
+        {hasProfessional ? (
+          <section className="bg-gradient-to-r from-emerald-900/20 to-slate-900 border border-emerald-500/30 rounded-2xl p-8 mt-12 relative overflow-hidden shadow-lg">
+            <div className="absolute top-4 right-4 bg-emerald-500/10 p-2 rounded-full border border-emerald-500/20">
+              <Unlock className="w-5 h-5 text-emerald-400" />
+            </div>
+            <h2 className="text-xl font-bold text-white mb-2 flex items-center">
+              <CheckCircle2 className="w-6 h-6 text-emerald-500 mr-2" /> Professional Services Active
+            </h2>
+            <p className="text-sm text-slate-300 mb-6 max-w-2xl">
+              Your service agreement is successfully activated. A Technical Account Manager (TAM) has been assigned to your workspace and is preparing your architecture audit.
+            </p>
+            
+            {/* Deployment Progress Bar */}
+            <div className="max-w-2xl bg-slate-900/50 p-5 rounded-xl border border-white/5">
+              <div className="flex justify-between text-xs font-bold text-slate-400 mb-3 uppercase tracking-wider">
+                <span>Engagement Status</span>
+                <span className="text-emerald-400">10%</span>
+              </div>
+              <div className="w-full bg-slate-800 rounded-full h-2 mb-2 overflow-hidden border border-slate-700">
+                <div className="bg-emerald-500 h-2 rounded-full relative overflow-hidden" style={{ width: '10%' }}>
+                   <div className="absolute inset-0 bg-white/20 w-full animate-[shimmer_2s_infinite] -translate-x-full"></div>
+                </div>
+              </div>
+              <p className="text-xs text-slate-500 text-right font-mono mt-2">Current Phase: 01 - Architecture Audit & SOW</p>
+            </div>
+          </section>
+        ) : (
+          <section className="bg-gradient-to-r from-slate-900 to-slate-800 border border-slate-700 rounded-2xl p-8 text-center mt-12 relative overflow-hidden">
+            <div className="absolute top-4 right-4 bg-purple-500/20 p-2 rounded-full">
+              <Lock className="w-5 h-5 text-purple-400" />
+            </div>
+            <h2 className="text-xl font-bold text-white mb-2">Ready to Engage Our Engineering Team?</h2>
+            <p className="text-sm text-slate-300 mb-6 max-w-xl mx-auto">Subscribe to our Professional Services tier to activate dedicated support, customized operator training, and system integration.</p>
+            <Link href="/dashboard/settings/plans#professional-services">
+              <Button className="bg-purple-600 hover:bg-purple-500 text-white font-bold px-8">View Plans & Pricing</Button>
+            </Link>
+          </section>
+        )}
 
       </main>
 

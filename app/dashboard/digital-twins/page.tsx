@@ -5,7 +5,8 @@ import Link from "next/link"
 import { 
   ArrowLeft, Cpu, Layers, Box, Calendar, 
   ExternalLink, Sparkles, PhoneCall, 
-  CheckCircle2, CloudRain, Radio, ArrowRight, X, Building
+  CheckCircle2, CloudRain, Radio, ArrowRight, X, Building,
+  Lock, Unlock
 } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
@@ -25,6 +26,15 @@ export default function DigitalTwinsHubPage() {
     const storedUser = localStorage.getItem("user")
     if (storedUser) setUser(JSON.parse(storedUser))
   }, [])
+
+  // Parse subscription state
+  const activePlansRaw = user?.organization?.activePlans || user?.activePlans || "[]";
+  let activePlansArr: any[] = [];
+  try {
+    activePlansArr = typeof activePlansRaw === 'string' ? JSON.parse(activePlansRaw) : activePlansRaw;
+  } catch (e) {}
+
+  const hasDigitalTwins = activePlansArr.some((p: any) => p.name === "Digital Twins Services" || p === "Digital Twins Services");
 
   // Showcase Demos (Proof of Capability)
   const capabilityDemos = [
@@ -54,14 +64,33 @@ export default function DigitalTwinsHubPage() {
     }
   ]
 
-  const handleConsultSubmit = (e: React.FormEvent) => {
+  const handleConsultSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
-    setConsultSubmitted(true)
-    setTimeout(() => {
-      setIsConsultModalOpen(false)
-      setConsultSubmitted(false)
-      setFacilityName("")
-    }, 2500)
+    try {
+      await fetch('/api/services/request', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          serviceType: 'Digital Twins Scoping',
+          userEmail: user?.email,
+          details: { 
+            "Facility": facilityName, 
+            "Industry": industrySector, 
+            "CAD Status": hasCadData, 
+            "Timeline": projectTimeline 
+          }
+        })
+      });
+
+      setConsultSubmitted(true)
+      setTimeout(() => {
+        setIsConsultModalOpen(false)
+        setConsultSubmitted(false)
+        setFacilityName("")
+      }, 2500)
+    } catch (error) {
+      console.error("Consult submission error:", error)
+    }
   }
 
   return (
@@ -207,6 +236,46 @@ export default function DigitalTwinsHubPage() {
             </Button>
           </div>
         </section>
+
+        {/* Subscription Status & Progress Section */}
+        {hasDigitalTwins ? (
+          <section className="bg-gradient-to-r from-emerald-900/20 to-slate-900 border border-emerald-500/30 rounded-2xl p-8 mt-12 relative overflow-hidden shadow-lg">
+            <div className="absolute top-4 right-4 bg-emerald-500/10 p-2 rounded-full border border-emerald-500/20">
+              <Unlock className="w-5 h-5 text-emerald-400" />
+            </div>
+            <h2 className="text-xl font-bold text-white mb-2 flex items-center">
+              <CheckCircle2 className="w-6 h-6 text-emerald-500 mr-2" /> Digital Twins Module Active
+            </h2>
+            <p className="text-sm text-slate-300 mb-6 max-w-2xl">
+              Your enterprise subscription is successfully activated. Our spatial engineering team has been notified and is currently initiating the discovery phase for your infrastructure.
+            </p>
+            
+            {/* Deployment Progress Bar */}
+            <div className="max-w-2xl bg-slate-900/50 p-5 rounded-xl border border-white/5">
+              <div className="flex justify-between text-xs font-bold text-slate-400 mb-3 uppercase tracking-wider">
+                <span>Project Deployment Status</span>
+                <span className="text-emerald-400">15%</span>
+              </div>
+              <div className="w-full bg-slate-800 rounded-full h-2 mb-2 overflow-hidden border border-slate-700">
+                <div className="bg-emerald-500 h-2 rounded-full relative overflow-hidden" style={{ width: '15%' }}>
+                   <div className="absolute inset-0 bg-white/20 w-full animate-[shimmer_2s_infinite] -translate-x-full"></div>
+                </div>
+              </div>
+              <p className="text-xs text-slate-500 text-right font-mono mt-2">Current Phase: 01 - Scoping & Discovery</p>
+            </div>
+          </section>
+        ) : (
+          <section className="bg-gradient-to-r from-slate-900 to-slate-800 border border-slate-700 rounded-2xl p-8 text-center mt-12 relative overflow-hidden">
+            <div className="absolute top-4 right-4 bg-blue-500/20 p-2 rounded-full">
+              <Lock className="w-5 h-5 text-blue-400" />
+            </div>
+            <h2 className="text-xl font-bold text-white mb-2">Ready to Initiate Your Digital Twin?</h2>
+            <p className="text-sm text-slate-300 mb-6 max-w-xl mx-auto">Purchase the Enterprise module add-on to officially start your digital transformation project and assign an engineering team.</p>
+            <Link href="/dashboard/settings/plans#digital-twins">
+              <Button className="bg-blue-600 hover:bg-blue-500 text-white font-bold px-8">View Plans & Pricing</Button>
+            </Link>
+          </section>
+        )}
 
       </main>
 
