@@ -5,7 +5,8 @@ import Link from "next/link"
 import { 
   ArrowLeft, Droplet, Flame, Waves, 
   Activity, ArrowUpRight, Lock, Unlock, 
-  CheckCircle2, ArrowRight, X, PhoneCall, Thermometer
+  CheckCircle2, ArrowRight, X, PhoneCall,
+  ShieldCheck
 } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
@@ -25,7 +26,7 @@ export default function PipelinePlatformPage() {
     if (storedUser) setUser(JSON.parse(storedUser))
   }, [])
 
-  // 1. Subscription Checking Logic
+  // 1. Check Active Plans
   const activePlansRaw = user?.organization?.activePlans || user?.activePlans || "[]";
   let activePlansArr: any[] = [];
   try {
@@ -38,7 +39,7 @@ export default function PipelinePlatformPage() {
   
   const isPipelineSubscribed = hasPipelinePlan || hasEnterprisePlan || isGeneralActive;
 
-  // 2. Auth Token Retrieval for Live Engine
+  // 2. JWT Token Logic for Copilot Engine Launch
   const getRobustToken = () => {
     let token = localStorage.getItem("kraftgene_token");
     if (token) return token;
@@ -66,7 +67,7 @@ export default function PipelinePlatformPage() {
         body: JSON.stringify({
           serviceType: 'Pipeline Platform Evaluation',
           userEmail: user?.email,
-          details: { "Pipeline Length": pipelineLength, "Fluid Type": fluidType, "Sensor Status": sensorStatus }
+          details: { "Pipeline Length": pipelineLength, "Fluid Type": fluidType, "Sensor Readiness": sensorStatus }
         })
       });
 
@@ -74,9 +75,9 @@ export default function PipelinePlatformPage() {
       setTimeout(() => {
         setIsConsultModalOpen(false)
         setConsultSubmitted(false)
-      }, 3000)
+      }, 2500)
     } catch (error) {
-      console.error(error)
+      console.error("Consultation Submission Error:", error)
     }
   }
 
@@ -96,95 +97,156 @@ export default function PipelinePlatformPage() {
             <p className="text-xs text-slate-500 dark:text-slate-400">Oil & Gas Pipeline Twin & Multi-Phase Fluid Simulation</p>
           </div>
         </div>
-        
-        {!isPipelineSubscribed && (
-          <Button onClick={() => setIsConsultModalOpen(true)} className="bg-blue-600 hover:bg-blue-500 text-white font-semibold text-xs h-9 px-4 rounded-xl shadow-md shadow-blue-900/20">
-            <PhoneCall className="w-4 h-4 mr-2" /> Talk to an Engineer
-          </Button>
-        )}
+
+        <Button 
+          onClick={() => setIsConsultModalOpen(true)}
+          className="bg-blue-600 hover:bg-blue-500 text-white font-semibold text-xs h-10 px-4 rounded-xl shadow-md shadow-blue-900/20"
+        >
+          <PhoneCall className="w-4 h-4 mr-2" /> Discuss Pipeline Requirements
+        </Button>
       </header>
 
       <main className="max-w-6xl mx-auto px-6 py-8 space-y-10">
 
-        {/* Adaptive Contrast Banner */}
-        <div className="bg-gradient-to-r from-blue-50 via-cyan-50 to-white dark:from-blue-900/30 dark:via-cyan-900/20 dark:to-slate-900/40 border border-blue-200 dark:border-blue-500/30 rounded-3xl p-8 md:p-12 relative overflow-hidden shadow-xl transition-colors">
+        {/* Hero Banner */}
+        <div className="bg-gradient-to-r from-blue-50 via-cyan-50 to-white dark:from-blue-900/30 dark:via-cyan-900/20 dark:to-slate-900/40 border border-blue-200 dark:border-blue-500/30 rounded-3xl p-8 relative overflow-hidden shadow-xl transition-colors">
           <div className="relative z-10 max-w-2xl">
             <Badge className="mb-3 bg-blue-100 dark:bg-blue-500/10 text-blue-700 dark:text-blue-400 border-blue-300 dark:border-blue-500/30 px-3 py-1 text-[10px] uppercase tracking-widest font-bold">
               Core Platform
             </Badge>
-            <h2 className="text-3xl md:text-4xl font-bold text-slate-900 dark:text-white mb-4 tracking-tight">
+            <h2 className="text-2xl md:text-3xl font-bold text-slate-900 dark:text-white mb-3">
               Monitor, Simulate, and Secure Critical Pipeline Assets
             </h2>
-            <p className="text-slate-600 dark:text-slate-300 text-sm md:text-base leading-relaxed mb-8">
-              Gain unparalleled visibility into your midstream infrastructure. Run interactive fluid dynamics, monitor real-time pressure telemetry, and isolate thermal anomalies using integrated UAV data feeds.
+            <p className="text-slate-600 dark:text-slate-300 text-sm leading-relaxed mb-6">
+              Gain real-time visibility across midstream infrastructure. Run multi-phase fluid simulations, monitor SCADA pressure drops, and ingest UAV thermal streams for automated leak detection.
             </p>
-            
-            {isPipelineSubscribed ? (
-              <Button onClick={handleLaunchPipeline} className="bg-blue-600 hover:bg-blue-500 text-white font-bold h-12 px-8 rounded-xl shadow-lg shadow-blue-900/40">
-                Launch Live Engine <ArrowUpRight className="w-5 h-5 ml-2" />
-              </Button>
-            ) : (
-              <div className="flex flex-col sm:flex-row gap-4">
-                <Link href="/dashboard/settings/plans#pipeline">
-                  <Button className="w-full sm:w-auto bg-slate-900 dark:bg-white text-white dark:text-slate-900 font-bold h-12 px-8 rounded-xl shadow-lg hover:bg-slate-800 dark:hover:bg-slate-200">
-                    <Lock className="w-4 h-4 mr-2" /> Unlock Platform
-                  </Button>
-                </Link>
-                <Button onClick={() => setIsConsultModalOpen(true)} variant="outline" className="w-full sm:w-auto h-12 px-8 rounded-xl border-slate-300 dark:border-white/20 dark:text-white">
-                  Request Trial / Demo
-                </Button>
-              </div>
-            )}
+            <Button 
+              onClick={() => setIsConsultModalOpen(true)}
+              className="bg-blue-600 hover:bg-blue-500 text-white font-bold text-xs h-11 px-6 rounded-xl transition-all shadow-lg shadow-blue-900/40"
+            >
+              Discuss Your Pipeline Requirements <ArrowRight className="w-4 h-4 ml-2" />
+            </Button>
           </div>
         </div>
 
-        {/* Feature Highlights */}
-        <section className="grid grid-cols-1 md:grid-cols-3 gap-6">
-          <div className="bg-white dark:bg-[#111113] border border-slate-200 dark:border-white/10 rounded-2xl p-6 shadow-sm">
-            <div className="w-12 h-12 bg-blue-100 dark:bg-blue-500/10 rounded-xl flex items-center justify-center mb-4">
-              <Waves className="w-6 h-6 text-blue-600 dark:text-blue-400" />
+        {/* Platform Pillars */}
+        <section className="space-y-6">
+          <div className="flex flex-col md:flex-row md:items-center justify-between gap-2 border-b border-slate-200 dark:border-white/10 pb-4">
+            <div>
+              <h2 className="text-xl font-bold text-slate-900 dark:text-white flex items-center gap-2">
+                <Droplet className="w-5 h-5 text-blue-500" /> Platform Pillars
+              </h2>
+              <p className="text-xs text-slate-500">Real-time simulation modules tailored for oil & gas midstream operators</p>
             </div>
-            <h3 className="font-bold text-slate-900 dark:text-white mb-2">Fluid Dynamics Sim</h3>
-            <p className="text-xs text-slate-500 dark:text-slate-400 leading-relaxed">
-              Visualize multi-phase flow characteristics and anticipate friction-induced pressure drops across complex topographies.
-            </p>
           </div>
 
-          <div className="bg-white dark:bg-[#111113] border border-slate-200 dark:border-white/10 rounded-2xl p-6 shadow-sm">
-            <div className="w-12 h-12 bg-blue-100 dark:bg-blue-500/10 rounded-xl flex items-center justify-center mb-4">
-              <Activity className="w-6 h-6 text-blue-600 dark:text-blue-400" />
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            
+            {/* Pillar 1 */}
+            <div className="bg-white dark:bg-[#111113] border border-slate-200 dark:border-white/10 rounded-2xl p-6 flex items-start space-x-4 shadow-sm">
+              <div className="w-12 h-12 bg-blue-100 dark:bg-blue-500/10 rounded-xl flex items-center justify-center shrink-0 border border-blue-200 dark:border-blue-500/20">
+                <Waves className="w-6 h-6 text-blue-600 dark:text-blue-400" />
+              </div>
+              <div>
+                <h3 className="font-bold text-slate-900 dark:text-white mb-2">Multi-Phase Fluid Dynamics</h3>
+                <p className="text-xs text-slate-500 dark:text-slate-400 leading-relaxed">
+                  Simulate complex liquid/gas hydraulic flow rates, pressure drops, and friction dynamics across terrain elevation profiles.
+                </p>
+              </div>
             </div>
-            <h3 className="font-bold text-slate-900 dark:text-white mb-2">Pressure Telemetry</h3>
-            <p className="text-xs text-slate-500 dark:text-slate-400 leading-relaxed">
-              Bind live SCADA sensor feeds directly to 3D pipeline nodes to instantly flag leaks or compressor station failures.
-            </p>
-          </div>
 
-          <div className="bg-white dark:bg-[#111113] border border-slate-200 dark:border-white/10 rounded-2xl p-6 shadow-sm">
-            <div className="w-12 h-12 bg-blue-100 dark:bg-blue-500/10 rounded-xl flex items-center justify-center mb-4">
-              <Flame className="w-6 h-6 text-blue-600 dark:text-blue-400" />
+            {/* Pillar 2 */}
+            <div className="bg-white dark:bg-[#111113] border border-slate-200 dark:border-white/10 rounded-2xl p-6 flex items-start space-x-4 shadow-sm">
+              <div className="w-12 h-12 bg-blue-100 dark:bg-blue-500/10 rounded-xl flex items-center justify-center shrink-0 border border-blue-200 dark:border-blue-500/20">
+                <Activity className="w-6 h-6 text-blue-600 dark:text-blue-400" />
+              </div>
+              <div>
+                <h3 className="font-bold text-slate-900 dark:text-white mb-2">SCADA Pressure Telemetry</h3>
+                <p className="text-xs text-slate-500 dark:text-slate-400 leading-relaxed">
+                  Direct SCADA pressure and flow sensor stream binding for immediate micro-leak detection and compressor station auditing.
+                </p>
+              </div>
             </div>
-            <h3 className="font-bold text-slate-900 dark:text-white mb-2">Thermal Fire Isolation</h3>
-            <p className="text-xs text-slate-500 dark:text-slate-400 leading-relaxed">
-              Ingest UAV thermal scans to map flare stack intensity, vegetation encroachment, and automate emergency valve isolation.
-            </p>
+
+            {/* Pillar 3 */}
+            <div className="bg-white dark:bg-[#111113] border border-slate-200 dark:border-white/10 rounded-2xl p-6 flex items-start space-x-4 shadow-sm">
+              <div className="w-12 h-12 bg-blue-100 dark:bg-blue-500/10 rounded-xl flex items-center justify-center shrink-0 border border-blue-200 dark:border-blue-500/20">
+                <Flame className="w-6 h-6 text-blue-600 dark:text-blue-400" />
+              </div>
+              <div>
+                <h3 className="font-bold text-slate-900 dark:text-white mb-2">UAV Thermal Stream Ingestion</h3>
+                <p className="text-xs text-slate-500 dark:text-slate-400 leading-relaxed">
+                  Ingest aerial drone thermal feeds to track flare stack intensity, right-of-way vegetation encroachment, and hot spot anomalies.
+                </p>
+              </div>
+            </div>
+
+            {/* Pillar 4 */}
+            <div className="bg-white dark:bg-[#111113] border border-slate-200 dark:border-white/10 rounded-2xl p-6 flex items-start space-x-4 shadow-sm">
+              <div className="w-12 h-12 bg-blue-100 dark:bg-blue-500/10 rounded-xl flex items-center justify-center shrink-0 border border-blue-200 dark:border-blue-500/20">
+                <ShieldCheck className="w-6 h-6 text-blue-600 dark:text-blue-400" />
+              </div>
+              <div>
+                <h3 className="font-bold text-slate-900 dark:text-white mb-2">Emergency Valve Isolation</h3>
+                <p className="text-xs text-slate-500 dark:text-slate-400 leading-relaxed">
+                  Automated containment protocols suggesting optimal valve shutdown sequences during pressure drops or environmental threats.
+                </p>
+              </div>
+            </div>
+
           </div>
         </section>
 
-        {/* Subscription Status & Progress Section */}
+        {/* Engagement Process */}
+        <section className="bg-white dark:bg-[#111113] border border-slate-200 dark:border-white/10 rounded-2xl p-8">
+          <h2 className="text-xl font-bold text-slate-900 dark:text-white mb-2">The Engagement Process</h2>
+          <p className="text-xs text-slate-500 mb-8">How we onboard your pipeline network into Kraftgene AI</p>
+
+          <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
+            <div className="p-4 bg-slate-50 dark:bg-[#0A0A0B] rounded-xl border border-slate-200 dark:border-white/5 relative">
+              <span className="text-2xl font-black text-blue-500/30 mb-2 block">01</span>
+              <h4 className="font-bold text-sm text-slate-900 dark:text-white mb-1">GIS & CAD Audit</h4>
+              <p className="text-xs text-slate-500">Import pipeline shapefiles, valve station blueprints, and elevation profiles.</p>
+            </div>
+
+            <div className="p-4 bg-slate-50 dark:bg-[#0A0A0B] rounded-xl border border-slate-200 dark:border-white/5 relative">
+              <span className="text-2xl font-black text-blue-500/30 mb-2 block">02</span>
+              <h4 className="font-bold text-sm text-slate-900 dark:text-white mb-1">Hydraulic Tuning</h4>
+              <p className="text-xs text-slate-500">Calibrate multi-phase fluid flow parameters against historical throughput logs.</p>
+            </div>
+
+            <div className="p-4 bg-slate-50 dark:bg-[#0A0A0B] rounded-xl border border-slate-200 dark:border-white/5 relative">
+              <span className="text-2xl font-black text-blue-500/30 mb-2 block">03</span>
+              <h4 className="font-bold text-sm text-slate-900 dark:text-white mb-1">Telemetry Sync</h4>
+              <p className="text-xs text-slate-500">Bind live SCADA pressure sensors and configure UAV stream ingestion endpoints.</p>
+            </div>
+
+            <div className="p-4 bg-slate-50 dark:bg-[#0A0A0B] rounded-xl border border-slate-200 dark:border-white/5 relative">
+              <span className="text-2xl font-black text-blue-500/30 mb-2 block">04</span>
+              <h4 className="font-bold text-sm text-slate-900 dark:text-white mb-1">Copilot Launch</h4>
+              <p className="text-xs text-slate-500">Authorize control room operator access with secure JWT token authentication.</p>
+            </div>
+          </div>
+        </section>
+
+        {/* Subscription / Unlocked Engine Section */}
         {isPipelineSubscribed ? (
           <section className="bg-gradient-to-r from-emerald-900/20 to-slate-900 border border-emerald-500/30 rounded-2xl p-8 mt-12 relative overflow-hidden shadow-lg">
             <div className="absolute top-4 right-4 bg-emerald-500/10 p-2 rounded-full border border-emerald-500/20">
               <Unlock className="w-5 h-5 text-emerald-400" />
             </div>
             <h2 className="text-xl font-bold text-white mb-2 flex items-center">
-              <CheckCircle2 className="w-6 h-6 text-emerald-500 mr-2" /> Platform Access Granted
+              <CheckCircle2 className="w-6 h-6 text-emerald-500 mr-2" /> Pipeline Platform Active
             </h2>
             <p className="text-sm text-slate-300 mb-6 max-w-2xl">
-              Your enterprise subscription is active. Your encrypted session token is verified, and the live simulation engine is ready for operation.
+              Your subscription is active and verified. Click below to launch the live EnergyEminence™ Pipeline Copilot simulation engine.
             </p>
-            <Button onClick={handleLaunchPipeline} className="bg-blue-600 hover:bg-blue-500 text-white font-bold h-11 px-8 rounded-xl shadow-lg shadow-blue-900/40">
-              Open EnergyEminence - P <ArrowUpRight className="w-4 h-4 ml-2" />
+            
+            <Button 
+              onClick={handleLaunchPipeline}
+              className="bg-blue-600 hover:bg-blue-500 text-white font-bold h-12 px-8 rounded-xl shadow-lg shadow-blue-900/40 text-sm"
+            >
+              Launch Pipeline Platform <ArrowUpRight className="w-4 h-4 ml-2" />
             </Button>
           </section>
         ) : (
@@ -195,41 +257,41 @@ export default function PipelinePlatformPage() {
             <h2 className="text-xl font-bold text-white mb-2">Ready to Launch the Pipeline Platform?</h2>
             <p className="text-sm text-slate-300 mb-6 max-w-xl mx-auto">Purchase a core platform subscription to securely authenticate and launch the interactive simulation engine.</p>
             <Link href="/dashboard/settings/plans#pipeline">
-              <Button className="bg-blue-600 hover:bg-blue-500 text-white font-bold h-11 px-8 rounded-xl shadow-lg">
-                View Enterprise Plans <ArrowRight className="w-4 h-4 ml-2" />
-              </Button>
+              <Button className="bg-blue-600 hover:bg-blue-500 text-white font-bold px-8 h-11">View Enterprise Plans</Button>
             </Link>
           </section>
         )}
 
       </main>
 
-      {/* Consult Modal */}
+      {/* Modal: Consultation */}
       {isConsultModalOpen && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/40 dark:bg-black/60 backdrop-blur-sm p-4 animate-in fade-in duration-200">
-          <div className="bg-white dark:bg-[#111113] border border-slate-200 dark:border-white/10 rounded-2xl w-full max-w-md p-6 shadow-2xl relative">
+          <div className="bg-white dark:bg-[#111113] border border-slate-200 dark:border-white/10 rounded-2xl w-full max-w-lg p-6 md:p-8 shadow-2xl relative">
             <button onClick={() => setIsConsultModalOpen(false)} className="absolute top-4 right-4 text-slate-400 hover:text-white p-1 rounded-full hover:bg-white/5">
               <X className="w-5 h-5" />
             </button>
-            <h3 className="text-xl font-bold text-slate-900 dark:text-white mb-2">Request Platform Evaluation</h3>
-            <p className="text-xs text-slate-500 mb-6">Our solutions architects will review your infrastructure parameters and arrange a guided technical demo.</p>
+
+            <h3 className="text-xl font-bold text-slate-900 dark:text-white mb-2">Request Pipeline Platform Evaluation</h3>
+            <p className="text-xs text-slate-500 mb-6">Our pipeline engineering team will contact you within 24 hours to schedule a technical demonstration.</p>
 
             {consultSubmitted ? (
-              <div className="bg-emerald-500/10 border border-emerald-500/30 text-emerald-600 dark:text-emerald-500 p-8 rounded-xl text-center space-y-2">
-                <CheckCircle2 className="w-10 h-10 mx-auto" />
-                <h4 className="font-bold">Request Received</h4>
-                <p className="text-xs">An engineer will contact you shortly.</p>
+              <div className="bg-emerald-500/10 border border-emerald-500/30 text-emerald-600 dark:text-emerald-500 p-8 rounded-xl text-center space-y-3">
+                <CheckCircle2 className="w-12 h-12 mx-auto" />
+                <h4 className="font-bold text-lg text-slate-900 dark:text-white">Evaluation Request Received</h4>
+                <p className="text-xs text-slate-600 dark:text-slate-300">An engineer will contact <span className="font-semibold text-blue-500">{user?.email}</span> to schedule a discovery call.</p>
               </div>
             ) : (
               <form onSubmit={handleConsultSubmit} className="space-y-4">
                 <div>
-                  <label className="block text-xs font-medium text-slate-400 mb-1.5">Network Scale</label>
+                  <label className="block text-xs font-medium text-slate-600 dark:text-slate-400 mb-1.5">Network Scale</label>
                   <select value={pipelineLength} onChange={(e) => setPipelineLength(e.target.value)} className="w-full bg-slate-50 dark:bg-[#0A0A0B] border border-slate-200 dark:border-white/10 rounded-xl px-3 py-2.5 text-sm">
                     <option>Under 100 km</option>
                     <option>100 - 500 km</option>
                     <option>500+ km Interstate</option>
                   </select>
                 </div>
+
                 <div>
                   <label className="block text-xs font-medium text-slate-400 mb-1.5">Transport Fluid Type</label>
                   <select value={fluidType} onChange={(e) => setFluidType(e.target.value)} className="w-full bg-slate-50 dark:bg-[#0A0A0B] border border-slate-200 dark:border-white/10 rounded-xl px-3 py-2.5 text-sm">
@@ -238,8 +300,9 @@ export default function PipelinePlatformPage() {
                     <option>Multi-Phase Mix</option>
                   </select>
                 </div>
-                <div className="flex justify-end pt-4">
-                  <Button type="button" variant="outline" onClick={() => setIsConsultModalOpen(false)} className="mr-3 text-xs border-slate-200 dark:border-white/10">Cancel</Button>
+
+                <div className="flex justify-end space-x-3 pt-4">
+                  <Button type="button" variant="outline" onClick={() => setIsConsultModalOpen(false)} className="border-slate-200 dark:border-white/10 text-xs">Cancel</Button>
                   <Button type="submit" className="bg-blue-600 hover:bg-blue-500 text-white font-bold text-xs px-6">Submit Request</Button>
                 </div>
               </form>
@@ -247,6 +310,7 @@ export default function PipelinePlatformPage() {
           </div>
         </div>
       )}
+
     </div>
   )
 }
