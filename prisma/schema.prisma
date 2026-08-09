@@ -24,6 +24,8 @@ model User {
   isApproved             Boolean  @default(false)
   createdAt              DateTime @default(now())
 
+  lastLoginAt            DateTime? // <-- NEW: Track last login
+
   hasCompletedOnboarding Boolean  @default(false)
   industry               String?  
   region                 String?  

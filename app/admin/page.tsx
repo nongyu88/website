@@ -1,7 +1,7 @@
 "use client"
 
 import { useState, useEffect } from "react"
-import { Shield, Trash2, Edit, CheckCircle, XCircle, X, UserPlus, Info } from "lucide-react"
+import { Shield, Trash2, Edit, CheckCircle, XCircle, X, UserPlus, Info, User as UserIcon } from "lucide-react"
 
 export default function AdminDashboard() {
   const [users, setUsers] = useState<any[]>([])
@@ -18,6 +18,8 @@ export default function AdminDashboard() {
   const [editingUser, setEditingUser] = useState<any | null>(null)
   const [editCompany, setEditCompany] = useState("")
   const [editRole, setEditRole] = useState("")
+  const [editFirstName, setEditFirstName] = useState("")
+  const [editLastName, setEditLastName] = useState("")
 
   useEffect(() => {
     fetchUsers()
@@ -118,12 +120,14 @@ export default function AdminDashboard() {
           userId: editingUser.id, 
           company: editCompany, 
           role: editRole,
+          firstName: editFirstName,
+          lastName: editLastName,
           isApproved: editingUser.isApproved 
         })
       });
       if (!res.ok) throw new Error("Update failed");
       
-      setUsers(prev => prev.map(u => u.id === editingUser.id ? { ...u, company: editCompany, role: editRole } : u));
+      setUsers(prev => prev.map(u => u.id === editingUser.id ? { ...u, company: editCompany, role: editRole, firstName: editFirstName, lastName: editLastName } : u));
       setEditingUser(null);
     } catch (error) {
       alert("Error updating user details.");
@@ -240,8 +244,14 @@ export default function AdminDashboard() {
                       </button>
                     </td>
                     <td className="py-4 px-6 text-right space-x-3">
-                      <button 
-                        onClick={() => { setEditingUser(user); setEditCompany(user.company); setEditRole(user.role || 'Viewer'); }}
+                    <button 
+                        onClick={() => { 
+                          setEditingUser(user); 
+                          setEditCompany(user.company || ''); 
+                          setEditRole(user.role || 'Viewer'); 
+                          setEditFirstName(user.firstName || ''); 
+                          setEditLastName(user.lastName || ''); 
+                        }}
                         className="text-blue-400 hover:text-blue-300 transition-colors p-1"
                         title="Detailed Profile & Edit"
                       >
@@ -313,9 +323,44 @@ export default function AdminDashboard() {
             
             {/* Quick Edit Form */}
             <form onSubmit={handleSaveEdit} className="space-y-4 mb-6">
+              
+              {/* Profile Photo Display */}
+              <div className="flex items-center gap-4 bg-[#0A0A0B] p-3 rounded-xl border border-white/5">
+                <div className="w-14 h-14 rounded-full border border-white/20 bg-[#1A1A1D] flex items-center justify-center overflow-hidden shrink-0">
+                  {editingUser.avatarUrl && editingUser.avatarUrl.startsWith("http") ? (
+                    <img 
+                      src={editingUser.avatarUrl} 
+                      alt="Profile Avatar" 
+                      className="w-full h-full object-cover" 
+                    />
+                  ) : (
+                    <UserIcon className="w-6 h-6 text-slate-500" />
+                  )}
+                </div>
+                <div>
+                  <p className="text-sm font-bold text-white">
+                    {editingUser.firstName || editingUser.lastName ? `${editingUser.firstName || ''} ${editingUser.lastName || ''}`.trim() : "No Display Name Set"}
+                  </p>
+                  <p className="text-xs text-slate-500">{editingUser.email}</p>
+                </div>
+              </div>
+
+              {/* Name Fields */}
+              <div className="grid grid-cols-2 gap-4">
+                <div>
+                  <label className="block text-xs font-medium text-slate-400 mb-1">First Name</label>
+                  <input type="text" value={editFirstName} onChange={(e) => setEditFirstName(e.target.value)} placeholder="e.g. John" className="w-full bg-[#0A0A0B] border border-white/10 rounded-lg px-4 py-2 text-sm text-white focus:border-blue-500 focus:outline-none transition-colors" />
+                </div>
+                <div>
+                  <label className="block text-xs font-medium text-slate-400 mb-1">Last Name</label>
+                  <input type="text" value={editLastName} onChange={(e) => setEditLastName(e.target.value)} placeholder="e.g. Doe" className="w-full bg-[#0A0A0B] border border-white/10 rounded-lg px-4 py-2 text-sm text-white focus:border-blue-500 focus:outline-none transition-colors" />
+                </div>
+              </div>
+
+              {/* Company & Role Fields */}
               <div className="flex gap-4">
                 <div className="flex-1">
-                  <label className="block text-xs font-medium text-slate-400 mb-1">Company / Name</label>
+                  <label className="block text-xs font-medium text-slate-400 mb-1">Company Name</label>
                   <input type="text" required value={editCompany} onChange={(e) => setEditCompany(e.target.value)} className="w-full bg-[#0A0A0B] border border-white/10 rounded-lg px-4 py-2 text-sm text-white focus:border-blue-500 focus:outline-none transition-colors" />
                 </div>
                 <div className="w-1/3">
@@ -327,6 +372,7 @@ export default function AdminDashboard() {
                   </select>
                 </div>
               </div>
+
               <button type="submit" className="w-full bg-blue-600 hover:bg-blue-500 text-white font-bold py-2 rounded-lg transition-all text-sm">
                 Update Primary Info
               </button>
@@ -334,13 +380,31 @@ export default function AdminDashboard() {
 
             <div className="border-t border-white/10 pt-6 space-y-6">
               {/* Detailed Read-Only Data */}
-              <div>
-                <h4 className="text-xs font-bold text-slate-500 uppercase tracking-widest mb-3">Audit Details</h4>
-                <div className="bg-[#0A0A0B] border border-white/5 rounded-lg p-3 space-y-2 text-sm">
-                  <p><span className="text-slate-500 w-24 inline-block">Email:</span> <span className="text-white font-medium">{editingUser.email}</span></p>
-                  <p><span className="text-slate-500 w-24 inline-block">Stripe ID:</span> <span className="text-white font-medium font-mono">{editingUser.stripeCustomerId || "None"}</span></p>
-                  <p><span className="text-slate-500 w-24 inline-block">Onboarded:</span> <span className="text-white font-medium">{editingUser.hasCompletedOnboarding ? "Yes" : "No"}</span></p>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                
+                {/* Audit & Timeline */}
+                <div>
+                  <h4 className="text-xs font-bold text-slate-500 uppercase tracking-widest mb-3">Audit & Timeline</h4>
+                  <div className="bg-[#0A0A0B] border border-white/5 rounded-lg p-3 space-y-2 text-sm h-full">
+                    <p><span className="text-slate-500 w-28 inline-block">Email:</span> <span className="text-white font-medium">{editingUser.email}</span></p>
+                    <p><span className="text-slate-500 w-28 inline-block">Stripe ID:</span> <span className="text-white font-medium font-mono">{editingUser.stripeCustomerId || "None"}</span></p>
+                    <p><span className="text-slate-500 w-28 inline-block">Created At:</span> <span className="text-white font-medium">{editingUser.createdAt ? new Date(editingUser.createdAt).toLocaleString('en-US', { timeZone: 'Asia/Shanghai' }) + ' (CST)' : "N/A"}</span></p>
+                    <p><span className="text-slate-500 w-28 inline-block">Last Active:</span> <span className="text-white font-medium">{editingUser.lastLoginAt ? new Date(editingUser.lastLoginAt).toLocaleString('en-US', { timeZone: 'Asia/Shanghai' }) + ' (CST)' : "Never logged in"}</span></p>
+                    <p><span className="text-slate-500 w-28 inline-block">Onboarded:</span> <span className="text-emerald-400 font-medium">{editingUser.hasCompletedOnboarding ? "Yes" : "No"}</span></p>
+                  </div>
                 </div>
+
+                {/* Professional Demographics */}
+                <div>
+                  <h4 className="text-xs font-bold text-slate-500 uppercase tracking-widest mb-3">Demographics</h4>
+                  <div className="bg-[#0A0A0B] border border-white/5 rounded-lg p-3 space-y-2 text-sm h-full">
+                    <p><span className="text-slate-500 w-24 inline-block">Industry:</span> <span className="text-white font-medium capitalize">{editingUser.industry || "Not Provided"}</span></p>
+                    <p><span className="text-slate-500 w-24 inline-block">Region:</span> <span className="text-white font-medium capitalize">{editingUser.region?.replace('_', ' ') || "Not Provided"}</span></p>
+                    <p><span className="text-slate-500 w-24 inline-block">Department:</span> <span className="text-white font-medium">{editingUser.department || "Not Provided"}</span></p>
+                    <p><span className="text-slate-500 w-24 inline-block">Position:</span> <span className="text-white font-medium">{editingUser.position || "Not Provided"}</span></p>
+                  </div>
+                </div>
+
               </div>
 
 {/* Digital Twins & Plans */}

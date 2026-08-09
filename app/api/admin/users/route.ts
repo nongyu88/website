@@ -7,7 +7,6 @@ import bcrypt from "bcryptjs";
 
 const resend = new Resend(process.env.RESEND_API_KEY || 're_123456789');
 
-// GET: Fetch ALL users with extended details
 export async function GET() {
   try {
     const allUsers = await prisma.user.findMany({
@@ -19,12 +18,52 @@ export async function GET() {
         role: true, 
         isApproved: true, 
         createdAt: true,
+        lastLoginAt: true,
         stripeCustomerId: true,
         activePlans: true,
-        hasCompletedOnboarding: true
+        hasCompletedOnboarding: true,
+        industry: true,
+        region: true,
+        position: true,
+        firstName: true,
+        lastName: true,
+        avatarUrl: true
       }
     });
-    return NextResponse.json({ users: allUsers }, { status: 200 });
+
+    // Merge team plans by domain so admins see full workspace active subscriptions
+    const enrichedUsers = allUsers.map((user) => {
+      const emailDomain = user.email.split('@')[1]?.toLowerCase();
+      
+      if (!emailDomain) return user;
+
+      // Find all teammates matching this email domain
+      const teammates = allUsers.filter(u => u.email.split('@')[1]?.toLowerCase() === emailDomain);
+      
+      let allDomainPlans: any[] = [];
+      teammates.forEach(teammate => {
+        try {
+          const plans = JSON.parse(teammate.activePlans || "[]");
+          allDomainPlans = [...allDomainPlans, ...plans];
+        } catch (e) {}
+      });
+
+      // Remove duplicates by priceId or plan name
+      const uniquePlans = allDomainPlans.filter((plan, index, self) =>
+        index === self.findIndex((p) => {
+          const p1 = typeof p === 'string' ? p : p.priceId || p.name;
+          const p2 = typeof plan === 'string' ? plan : plan.priceId || plan.name;
+          return p1 === p2;
+        })
+      );
+
+      return {
+        ...user,
+        activePlans: JSON.stringify(uniquePlans)
+      };
+    });
+
+    return NextResponse.json({ users: enrichedUsers }, { status: 200 });
   } catch (error: any) {
     console.error("GET /api/admin/users Error:", error);
     return NextResponse.json({ error: error?.message || "Failed to fetch users." }, { status: 500 });
@@ -69,12 +108,14 @@ export async function POST(request: Request) {
 // PUT: Update user (Approve, or Edit details)
 export async function PUT(request: Request) {
   try {
-    const { userId, isApproved, company, role, sendApprovalEmail } = await request.json();
+    const { userId, isApproved, company, role, firstName, lastName, sendApprovalEmail } = await request.json();
 
     const updateData: any = {};
     if (typeof isApproved === "boolean") updateData.isApproved = isApproved;
     if (company !== undefined) updateData.company = company;
     if (role !== undefined) updateData.role = role;
+    if (firstName !== undefined) updateData.firstName = firstName;
+    if (lastName !== undefined) updateData.lastName = lastName;
 
     const updatedUser = await prisma.user.update({
       where: { id: userId },
