@@ -6,7 +6,7 @@ import {
   ArrowLeft, Cpu, Layers, Box, Calendar, 
   ExternalLink, Sparkles, PhoneCall, 
   CheckCircle2, CloudRain, Radio, ArrowRight, X, Building,
-  Lock, Unlock
+  Lock, Unlock, Play
 } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
@@ -16,16 +16,36 @@ export default function DigitalTwinsHubPage() {
   const [isConsultModalOpen, setIsConsultModalOpen] = useState(false)
   const [consultSubmitted, setConsultSubmitted] = useState(false)
 
+  // Video Modal State
+  const [selectedVideoUrl, setSelectedVideoUrl] = useState<string | null>(null)
+  const [selectedVideoTitle, setSelectedVideoTitle] = useState<string>("")
+
+  // Consultation Form State
+
   // Consultation Form State
   const [facilityName, setFacilityName] = useState("")
   const [industrySector, setIndustrySector] = useState("Power & Utilities")
   const [hasCadData, setHasCadData] = useState("Yes - BIM / Revit / CAD")
   const [projectTimeline, setProjectTimeline] = useState("Immediate (1-3 months)")
+  
 
   useEffect(() => {
     const storedUser = localStorage.getItem("user")
     if (storedUser) setUser(JSON.parse(storedUser))
   }, [])
+
+  // Close video modal on ESC key
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') {
+        setSelectedVideoUrl(null)
+      }
+    }
+    window.addEventListener('keydown', handleKeyDown)
+    return () => window.removeEventListener('keydown', handleKeyDown)
+  }, [])
+
+  // Parse subscription state
 
   // Parse subscription state
   const activePlansRaw = user?.organization?.activePlans || user?.activePlans || "[]";
@@ -36,31 +56,57 @@ export default function DigitalTwinsHubPage() {
 
   const hasDigitalTwins = activePlansArr.some((p: any) => p.name === "Digital Twins Services" || p === "Digital Twins Services");
 
-  // Showcase Demos (Proof of Capability)
+// Showcase Demos (Proof of Capability)
   const capabilityDemos = [
+    // --- GRID DEMOS ---
     {
-      id: "demo-01",
-      name: "Substation High-Voltage 3D Mesh",
+      id: "demo-g1",
+      name: "Autonomous Grid Copilot",
       sector: "Power Grid",
-      tech: "LiDAR Point Cloud + Thermal Overlay",
-      description: "Interactive 3D representation of electrical substations with real-time transformer health nodes.",
-      engineUrl: "https://www.energyeminence.online/"
+      tech: "AI Mitigation Matrix",
+      description: "Transition from reactive alerts to autonomous action. The Grid Copilot instantly generates an executable mitigation matrix to isolate burning nodes, shed load, and halt cascading failures.",
+      videoUrl: "/demo5-copilot.webm",
     },
     {
-      id: "demo-02",
-      name: "Pipeline Valve Station & Fluid Dynamics",
-      sector: "Oil & Gas",
-      tech: "CAD / GIS + Pressure Telemetry",
-      description: "Simulated multi-phase fluid flow, pressure drop modeling, and UAV thermal leak detection.",
-      engineUrl: "https://www.energyeminence.xyz/"
+      id: "demo-g2",
+      name: "Multi-Spectrum Thermal Vision",
+      sector: "Power Grid",
+      tech: "FLIR + Thermal Infrared",
+      description: "Go beyond standard optical feeds with real-time FLIR and thermal infrared drone ingestion. The AI vision engine continuously scans for intense heat anomalies—detecting overheating transformers and invisible structural fires to trigger immediate Copilot isolation.",
+      videoUrl: "/demo7-thermal.webm",
     },
     {
-      id: "demo-03",
-      name: "Compressor Station & Environmental Twin",
-      sector: "Facility Infrastructure",
-      tech: "Photogrammetry Mesh + NOAA Radar",
-      description: "Full spatial twin integrating ambient weather telemetry and structural vibration sensors.",
-      engineUrl: "https://www.energyeminence.xyz/"
+      id: "demo-g3",
+      name: "Physics-Informed Prediction Engine",
+      sector: "Power Grid",
+      tech: "Physics-Informed ML + GNN",
+      description: "Stay ahead of catastrophe. Our predictive AI engine utilizes physics-informed machine learning to forecast node failures and map cascading blackouts before physical infrastructure is actually compromised.",
+      videoUrl: "/demo8-prediction.webm",
+    },
+    // --- PIPELINE DEMOS ---
+    {
+      id: "demo-p1",
+      name: "Multi-Modal Topology & Telemetry",
+      sector: "Oil & Gas Pipeline",
+      tech: "3D Topology + Live SCADA",
+      description: "Seamlessly transition between 2D geographic reality and 3D logical topologies. Inspect live SCADA telemetry, pressure, and flow dynamics across individual pipeline segments.",
+      videoUrl: "/cap1.webm",
+    },
+    {
+      id: "demo-p2",
+      name: "Environmental Hazard Fusion",
+      sector: "Oil & Gas Pipeline",
+      tech: "Meteorological API + GIS",
+      description: "Overlay live meteorological data directly onto the pipeline corridor. Monitor severe weather fronts, active flood zones, storm tracks, and tornado risks to defend vulnerable assets.",
+      videoUrl: "/cap3.webm",
+    },
+    {
+      id: "demo-p3",
+      name: "Autonomous AI Copilot Isolation",
+      sector: "Oil & Gas Pipeline",
+      tech: "AI Copilot + Valve Automation",
+      description: "Transition from manual monitoring to AI-assisted defense. The Pipeline Copilot instantly generates and executes an action plan to isolate compromised wildfire nodes and prevent systemic failure.",
+      videoUrl: "/cap6.webm",
     }
   ]
 
@@ -183,14 +229,15 @@ export default function DigitalTwinsHubPage() {
                   </div>
                 </div>
 
-                <a
-                  href={demo.engineUrl}
-                  target="_blank"
-                  rel="noreferrer"
-                  className="w-full inline-flex items-center justify-center bg-slate-100 hover:bg-blue-600 dark:bg-white/5 dark:hover:bg-blue-600 text-slate-900 dark:text-white hover:text-white font-semibold h-10 rounded-xl text-xs transition-all border border-slate-200 dark:border-white/10 hover:border-blue-600"
+                <Button
+                  onClick={() => {
+                    setSelectedVideoUrl(demo.videoUrl)
+                    setSelectedVideoTitle(demo.name)
+                  }}
+                  className="w-full bg-slate-100 hover:bg-blue-600 dark:bg-white/5 dark:hover:bg-blue-600 text-slate-900 dark:text-white hover:text-white font-semibold h-10 rounded-xl text-xs transition-all border border-slate-200 dark:border-white/10 hover:border-blue-600"
                 >
-                  Launch Interactive Demo <ExternalLink className="w-3.5 h-3.5 ml-2" />
-                </a>
+                  Watch Video Demo <Play className="w-3.5 h-3.5 ml-2 fill-current" />
+                </Button>
               </div>
             ))}
           </div>
@@ -386,6 +433,47 @@ export default function DigitalTwinsHubPage() {
                 </div>
               </form>
             )}
+
+</div>
+        </div>
+      )}
+
+      {/* Video Demo Player Modal */}
+      {selectedVideoUrl && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 backdrop-blur-md p-4 animate-in fade-in duration-200">
+          <div className="bg-[#111113] border border-slate-200 dark:border-white/10 rounded-2xl w-full max-w-4xl p-6 shadow-2xl relative overflow-hidden">
+            
+            <div className="flex items-center justify-between mb-4 border-b border-slate-200 dark:border-white/10 pb-3">
+              <h3 className="text-lg font-bold text-slate-900 dark:text-white flex items-center gap-2">
+                <Play className="w-5 h-5 text-blue-500 fill-current" /> {selectedVideoTitle}
+              </h3>
+              <button 
+                onClick={() => setSelectedVideoUrl(null)} 
+                className="text-slate-400 hover:text-slate-900 dark:hover:text-white p-1 rounded-full hover:bg-slate-100 dark:hover:bg-white/10 transition-colors"
+              >
+                <X className="w-5 h-5" />
+              </button>
+            </div>
+
+            {/* Video Element */}
+            <div className="relative aspect-video rounded-xl overflow-hidden bg-black border border-white/5">
+              <video 
+                src={selectedVideoUrl} 
+                controls 
+                autoPlay 
+                className="w-full h-full object-cover"
+              />
+            </div>
+
+            <div className="flex justify-end mt-4">
+              <Button 
+                onClick={() => setSelectedVideoUrl(null)}
+                variant="outline"
+                className="border-slate-200 dark:border-white/10 text-xs text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-white/5"
+              >
+                Close Demo
+              </Button>
+            </div>
 
           </div>
         </div>

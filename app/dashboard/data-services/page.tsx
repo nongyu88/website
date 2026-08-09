@@ -6,7 +6,7 @@ import {
   ArrowLeft, Database, Flame, Activity, 
   FileText, Download, Rocket, ShieldAlert, 
   ArrowRight, X, CheckCircle2, Radar, Target,
-  Lock, Unlock
+  Lock, Unlock, Camera, ClipboardCheck
 } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
@@ -218,6 +218,154 @@ export default function DataServicesPage() {
               >
                 Request Rover Deployment
               </Button>
+            </div>
+
+          </div>
+        </section>
+
+        {/* SECTION 3: PROCEDURE & COSTS */}
+        <section className="space-y-6 pt-10 border-t border-slate-200 dark:border-white/10">
+          <div className="flex flex-col md:flex-row md:items-center justify-between gap-2 border-b border-slate-200 dark:border-white/10 pb-4">
+            <div>
+              <h2 className="text-xl font-bold text-slate-900 dark:text-white flex items-center gap-2">
+                <ClipboardCheck className="w-5 h-5 text-amber-500" /> Deployment Procedure & Pricing
+              </h2>
+              <p className="text-xs text-slate-500">Standardized workflows and transparent industry pricing for hardware rentals and certified pilot missions</p>
+            </div>
+          </div>
+
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+            {/* Left: Procedure */}
+            <div className="bg-white dark:bg-[#111113] border border-slate-200 dark:border-white/10 rounded-2xl p-6 shadow-sm">
+               <h3 className="font-bold text-slate-900 dark:text-white mb-6 text-sm uppercase tracking-wider">Mission Workflow</h3>
+               <div className="space-y-6">
+                 {/* Step 1 */}
+                 <div className="flex gap-4">
+                    <div className="w-8 h-8 rounded-full bg-amber-100 dark:bg-amber-500/20 text-amber-600 dark:text-amber-400 flex items-center justify-center font-bold text-sm shrink-0">1</div>
+                    <div>
+                      <h4 className="font-semibold text-slate-900 dark:text-white text-sm">Scoping & Authorization</h4>
+                      <p className="text-xs text-slate-500 dark:text-slate-400 mt-1">Define mission parameters, secure FAA Part 107 / BVLOS airspace approvals, and conduct strict site safety briefings.</p>
+                    </div>
+                 </div>
+                 {/* Step 2 */}
+                 <div className="flex gap-4">
+                    <div className="w-8 h-8 rounded-full bg-amber-100 dark:bg-amber-500/20 text-amber-600 dark:text-amber-400 flex items-center justify-center font-bold text-sm shrink-0">2</div>
+                    <div>
+                      <h4 className="font-semibold text-slate-900 dark:text-white text-sm">Hardware Dispatch</h4>
+                      <p className="text-xs text-slate-500 dark:text-slate-400 mt-1">Ship leased equipment to your site, or deploy Kraftgene's certified pilot teams directly to the energy facility.</p>
+                    </div>
+                 </div>
+                 {/* Step 3 */}
+                 <div className="flex gap-4">
+                    <div className="w-8 h-8 rounded-full bg-amber-100 dark:bg-amber-500/20 text-amber-600 dark:text-amber-400 flex items-center justify-center font-bold text-sm shrink-0">3</div>
+                    <div>
+                      <h4 className="font-semibold text-slate-900 dark:text-white text-sm">Data Acquisition</h4>
+                      <p className="text-xs text-slate-500 dark:text-slate-400 mt-1">UAVs and Rovers capture high-res RGB, radiometric thermal (FLIR), and LiDAR point cloud data along the designated route.</p>
+                    </div>
+                 </div>
+                 {/* Step 4 */}
+                 <div className="flex gap-4">
+                    <div className="w-8 h-8 rounded-full bg-amber-100 dark:bg-amber-500/20 text-amber-600 dark:text-amber-400 flex items-center justify-center font-bold text-sm shrink-0">4</div>
+                    <div>
+                      <h4 className="font-semibold text-slate-900 dark:text-white text-sm">Telemetry Sync</h4>
+                      <p className="text-xs text-slate-500 dark:text-slate-400 mt-1">Raw spatial data is uploaded directly to your Digital Twin for instant AI defect detection and structural health scoring.</p>
+                    </div>
+                 </div>
+               </div>
+            </div>
+
+            {/* Right: Costs */}
+            <div className="bg-white dark:bg-[#111113] border border-slate-200 dark:border-white/10 rounded-2xl p-6 shadow-sm">
+               <h3 className="font-bold text-slate-900 dark:text-white mb-6 text-sm uppercase tracking-wider">Industry Standard Pricing</h3>
+               
+               <div className="space-y-4">
+                 <div className="p-4 bg-slate-50 dark:bg-white/5 rounded-xl border border-slate-200 dark:border-white/10">
+                   <div className="flex justify-between items-center mb-1">
+                     <h4 className="font-semibold text-slate-900 dark:text-white text-sm">Certified Pilot + Drone Team</h4>
+                     <span className="text-amber-600 dark:text-amber-400 font-bold">$1,500 - $3,000 <span className="text-xs font-normal text-slate-500">/ day</span></span>
+                   </div>
+                   <p className="text-xs text-slate-500 mt-1">
+                     Includes highly trained pilot, enterprise thermal drone, and insurance. Day rates typically range from $1,000 to $3,000 depending on complexity. Ideal for facilities, solar farms, and complex substations.
+                   </p>
+                 </div>
+
+                 <div className="p-4 bg-slate-50 dark:bg-white/5 rounded-xl border border-slate-200 dark:border-white/10">
+                   <div className="flex justify-between items-center mb-1">
+                     <h4 className="font-semibold text-slate-900 dark:text-white text-sm">Linear Infrastructure (Pipelines/Grid)</h4>
+                     <span className="text-amber-600 dark:text-amber-400 font-bold">$15 - $75 <span className="text-xs font-normal text-slate-500">/ mile</span></span>
+                   </div>
+                   <p className="text-xs text-slate-500 mt-1">
+                     Drone inspection costs $15–$75 per mile compared to $150–$500+ per mile for traditional manned helicopters. High-speed corridor mapping using fixed-wing or multi-rotor BVLOS operations.
+                   </p>
+                 </div>
+
+                 <div className="p-4 bg-slate-50 dark:bg-white/5 rounded-xl border border-slate-200 dark:border-white/10">
+                   <div className="flex justify-between items-center mb-1">
+                     <h4 className="font-semibold text-slate-900 dark:text-white text-sm">Self-Operated Hardware Rental</h4>
+                     <span className="text-amber-600 dark:text-amber-400 font-bold">$500 - $2,000 <span className="text-xs font-normal text-slate-500">/ week</span></span>
+                   </div>
+                   <p className="text-xs text-slate-500 mt-1">
+                     Lease our autonomous ground rovers or UAVs. We ship the hardware, you operate it using our pre-programmed flight/drive software modules.
+                   </p>
+                 </div>
+               </div>
+            </div>
+          </div>
+        </section>
+
+        {/* SECTION 4: ROBOTICS IN ACTION (GALLERY) */}
+        <section className="space-y-6 pt-10 border-t border-slate-200 dark:border-white/10">
+          <div className="flex flex-col md:flex-row md:items-center justify-between gap-2 border-b border-slate-200 dark:border-white/10 pb-4">
+            <div>
+              <h2 className="text-xl font-bold text-slate-900 dark:text-white flex items-center gap-2">
+                <Camera className="w-5 h-5 text-amber-500" /> Robotics in Action
+              </h2>
+              <p className="text-xs text-slate-500">Field deployments of our UAVs and autonomous rovers across critical infrastructure</p>
+            </div>
+          </div>
+          
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+            
+            <div className="relative group overflow-hidden rounded-xl border border-slate-200 dark:border-white/10 aspect-[4/3] bg-slate-100 dark:bg-white/5">
+              <img src="/d1.webp" alt="Refinery UAV Inspection" className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110" />
+              <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity flex items-end p-4">
+                 <p className="text-white text-xs font-semibold leading-relaxed">UAV inspecting chemical refinery towers</p>
+              </div>
+            </div>
+
+            <div className="relative group overflow-hidden rounded-xl border border-slate-200 dark:border-white/10 aspect-[4/3] bg-slate-100 dark:bg-white/5">
+              <img src="/d2.webp" alt="Certified Pilots" className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110" />
+              <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity flex items-end p-4">
+                 <p className="text-white text-xs font-semibold leading-relaxed">Certified pilots conducting VLOS operations</p>
+              </div>
+            </div>
+
+            <div className="relative group overflow-hidden rounded-xl border border-slate-200 dark:border-white/10 aspect-[4/3] bg-slate-100 dark:bg-white/5">
+              <img src="/d3.webp" alt="Solar UAV mapping" className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110" />
+              <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity flex items-end p-4">
+                 <p className="text-white text-xs font-semibold leading-relaxed">UAV thermal mapping over utility solar array</p>
+              </div>
+            </div>
+
+            <div className="relative group overflow-hidden rounded-xl border border-slate-200 dark:border-white/10 aspect-[4/3] bg-slate-100 dark:bg-white/5">
+              <img src="/g1.webp" alt="Ground Rover Solar" className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110" />
+              <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity flex items-end p-4">
+                 <p className="text-white text-xs font-semibold leading-relaxed">Autonomous rover patrolling solar arrays</p>
+              </div>
+            </div>
+
+            <div className="relative group overflow-hidden rounded-xl border border-slate-200 dark:border-white/10 aspect-[4/3] bg-slate-100 dark:bg-white/5">
+              <img src="/g2.webp" alt="Ground Rover Transmission" className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110" />
+              <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity flex items-end p-4">
+                 <p className="text-white text-xs font-semibold leading-relaxed">Ground rover inspecting high-voltage transmission towers</p>
+              </div>
+            </div>
+
+            <div className="relative group overflow-hidden rounded-xl border border-slate-200 dark:border-white/10 aspect-[4/3] bg-slate-100 dark:bg-white/5">
+              <img src="/g3.webp" alt="Rover Setup" className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110" />
+              <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity flex items-end p-4">
+                 <p className="text-white text-xs font-semibold leading-relaxed">Field engineers configuring rover for substation audit</p>
+              </div>
             </div>
 
           </div>
