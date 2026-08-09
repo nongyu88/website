@@ -14,6 +14,7 @@ export default function SecuritySettingsPage() {
   const [is2FAModalOpen, setIs2FAModalOpen] = useState(false)
 
   const [isDisable2FAModalOpen, setIsDisable2FAModalOpen] = useState(false)
+  const [isSSOModalOpen, setIsSSOModalOpen] = useState(false)
 
   // 2FA Setup State
   const [qrCodeUrl, setQrCodeUrl] = useState("")
@@ -53,7 +54,8 @@ export default function SecuritySettingsPage() {
         setIs2FAModalOpen(false);
         setIsPasswordModalOpen(false);
         setIsInviteModalOpen(false);
-        setIsDisable2FAModalOpen(false); // <-- Added this line
+        setIsDisable2FAModalOpen(false);
+        setIsSSOModalOpen(false);
       }
     };
     window.addEventListener("keydown", handleKeyDown);
@@ -428,7 +430,10 @@ const confirmRemoveMember = async () => {
             <p className="text-sm text-slate-500 dark:text-slate-400 mb-4">
               Configure Single Sign-On (SAML/OIDC) for your organization. This feature requires an active Enterprise subscription.
             </p>
-            <Button disabled className="bg-slate-100 dark:bg-slate-800 text-slate-400 dark:text-slate-500 cursor-not-allowed border-0">
+            <Button 
+              onClick={() => setIsSSOModalOpen(true)}
+              className="bg-purple-600 hover:bg-purple-500 text-white font-medium transition-all shadow-md shadow-purple-900/20"
+            >
               Configure SSO
             </Button>
           </section>
@@ -638,6 +643,51 @@ const confirmRemoveMember = async () => {
           </div>
         )}
 
+        {/* Enterprise SSO Information Modal */}
+        {isSSOModalOpen && (
+          <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/40 dark:bg-black/60 backdrop-blur-sm p-4 animate-in fade-in duration-200">
+            <div className="bg-white dark:bg-[#111113] border border-slate-200 dark:border-white/10 rounded-2xl w-full max-w-md p-6 md:p-8 shadow-2xl relative text-center">
+              
+              <button 
+                onClick={() => setIsSSOModalOpen(false)} 
+                className="absolute top-4 right-4 p-1.5 rounded-full text-slate-400 hover:text-slate-900 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-white/5 transition-colors"
+              >
+                <X className="w-5 h-5" />
+              </button>
+
+              {/* Glowing Shield Icon Header */}
+              <div className="w-14 h-14 bg-purple-500/10 border border-purple-500/20 rounded-2xl flex items-center justify-center mx-auto mb-5 shadow-lg shadow-purple-500/5">
+                <Shield className="w-7 h-7 text-purple-500 dark:text-purple-400" />
+              </div>
+
+              <h3 className="text-xl font-bold text-slate-900 dark:text-white mb-2">
+                Enterprise SSO Integration
+              </h3>
+              
+              <p className="text-sm text-slate-600 dark:text-slate-300 leading-relaxed mb-6">
+                Enterprise SSO (SAML/OIDC) is available on custom enterprise tiers. Contact our security engineering team at <a href="mailto:security@kraftgeneai.ca?subject=Enterprise%20SSO%20Setup%20Request" className="text-purple-500 dark:text-purple-400 font-semibold hover:underline">security@kraftgeneai.ca</a> to enable Okta, Azure AD, or Google Workspace for your organization.
+              </p>
+
+              <div className="space-y-3">
+                <a
+                  href="mailto:security@kraftgeneai.ca?subject=Enterprise%20SSO%20Setup%20Request"
+                  className="w-full inline-flex items-center justify-center bg-purple-600 hover:bg-purple-500 text-white font-semibold h-11 rounded-xl transition-all shadow-md shadow-purple-900/30 text-sm"
+                >
+                  Contact Security Team
+                </a>
+
+                <Button 
+                  variant="outline" 
+                  onClick={() => setIsSSOModalOpen(false)} 
+                  className="w-full border-slate-200 dark:border-white/10 text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-white/5 h-10 text-xs"
+                >
+                  Close
+                </Button>
+              </div>
+
+            </div>
+          </div>
+        )}
       </div>
     </div>
   )
