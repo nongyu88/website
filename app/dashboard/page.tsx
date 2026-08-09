@@ -264,9 +264,9 @@ export default function DashboardPage() {
         Advanced physical asset modeling and custom environmental integration for your specific infrastructure.
       </p>
       {hasDigitalTwins ? (
-        <button onClick={() => window.open('https://your-digital-twins-url.com', '_blank')} className="text-sm font-bold text-blue-600 dark:text-blue-400 flex items-center group-hover:text-blue-500 transition-colors">
+        <Link href="/dashboard/digital-twins" className="text-sm font-bold text-blue-600 dark:text-blue-400 flex items-center group-hover:text-blue-500 transition-colors">
           Launch Digital Twins <ArrowUpRight className="w-4 h-4 ml-1" />
-        </button>
+        </Link>
       ) : (
         <Link href="/dashboard/settings/plans#digital-twins" className="text-sm font-bold text-slate-500 hover:text-blue-500 transition-colors flex items-center">
           Upgrade to Pro <ArrowRight className="w-4 h-4 ml-1" />
@@ -292,9 +292,9 @@ export default function DashboardPage() {
         Dedicated client training, seamless system API integration, and full digital transformation consulting.
       </p>
       {hasProfessional ? (
-        <button onClick={() => window.open('https://your-professional-services-url.com', '_blank')} className="text-sm font-bold text-purple-600 dark:text-purple-400 flex items-center group-hover:text-purple-500 transition-colors">
+        <Link href="/dashboard/professional-services" className="text-sm font-bold text-purple-600 dark:text-purple-400 flex items-center group-hover:text-purple-500 transition-colors">
           Access Pro Services <ArrowUpRight className="w-4 h-4 ml-1" />
-        </button>
+        </Link>
       ) : (
         <Link href="/dashboard/settings/plans#professional-services" className="text-sm font-bold text-slate-500 hover:text-purple-500 transition-colors flex items-center">
           View Enterprise Plans <ArrowRight className="w-4 h-4 ml-1" />
@@ -320,9 +320,9 @@ export default function DashboardPage() {
         Real-time robotic data acquisition, live UAV drone feeds, and continuous asset health telemetry.
       </p>
       {hasData ? (
-        <button onClick={() => window.open('https://your-data-services-url.com', '_blank')} className="text-sm font-bold text-amber-600 dark:text-amber-400 flex items-center group-hover:text-amber-500 transition-colors">
+        <Link href="/dashboard/data-services" className="text-sm font-bold text-amber-600 dark:text-amber-400 flex items-center group-hover:text-amber-500 transition-colors">
           Open Data Console <ArrowUpRight className="w-4 h-4 ml-1" />
-        </button>
+        </Link>
       ) : (
         <Link href="/dashboard/settings/plans#data-services" className="text-sm font-bold text-slate-500 hover:text-amber-500 transition-colors flex items-center">
           Explore Data Services <ArrowRight className="w-4 h-4 ml-1" />
