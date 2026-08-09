@@ -36,6 +36,7 @@ export async function GET(request: Request) {
         workingHours: true,
         notifySecurityAlerts: true,
         notifyProductUpdates: true,
+        isTwoFactorEnabled: true,
         role: true,
         domain: true,
         // 🚨 CRITICAL FIX: Include subscription & plan fields for solo users!
@@ -114,7 +115,7 @@ export async function PUT(request: Request) {
   try {
     const body = await request.json();
     const { 
-      email, firstName, lastName, company, website, 
+      email, firstName, lastName, company, website, isTwoFactorEnabled,
       industry, region, avatarUrl, notifySecurityAlerts, notifyProductUpdates,
       position, department, bio, linkedinUrl, timezone, skills, workingHours
     } = body;
@@ -123,27 +124,31 @@ export async function PUT(request: Request) {
       return NextResponse.json({ error: "User email is required for updates." }, { status: 400 });
     }
 
-    // Update the user record in the SQL database
+    // 1. FIX THE "NO RECORD FOUND" ERROR
+    // Strip hidden spaces and enforce lowercase so it perfectly matches the database
+    const safeEmail = email.trim().toLowerCase();
+
+    // 2. BUILD THE UPDATE OBJECT
+    const updateData: any = { 
+      firstName, lastName, company, website,
+      industry, region, avatarUrl, notifySecurityAlerts, notifyProductUpdates,
+      position, department, bio, linkedinUrl, timezone, skills, workingHours 
+    };
+
+    // 3. INJECT 2FA SETTINGS
+    if (typeof isTwoFactorEnabled === 'boolean') {
+      updateData.isTwoFactorEnabled = isTwoFactorEnabled;
+      // Clear secret key when 2FA is disabled
+      if (!isTwoFactorEnabled) {
+        updateData.twoFactorSecret = null;
+      }
+    }
+    
+    // 4. FIX THE PRISMA INVOCATION BUG
+    // Pass the actual dynamically-built `updateData` object instead of hardcoded fields
     const updatedUser = await prisma.user.update({
-      where: { email: email },
-      data: {
-        firstName,
-        lastName,
-        company,
-        website,
-        industry,
-        region,
-        avatarUrl,
-        position,
-        department,
-        bio,
-        linkedinUrl,
-        timezone,
-        skills,
-        workingHours,
-        notifySecurityAlerts,
-        notifyProductUpdates
-      },
+      where: { email: safeEmail },
+      data: updateData,
     });
 
     return NextResponse.json({ 
@@ -158,12 +163,19 @@ export async function PUT(request: Request) {
         industry: updatedUser.industry,
         region: updatedUser.region,
         avatarUrl: updatedUser.avatarUrl,
+        position: updatedUser.position,
+        department: updatedUser.department,
+        bio: updatedUser.bio,
+        linkedinUrl: updatedUser.linkedinUrl,
+        timezone: updatedUser.timezone,
+        skills: updatedUser.skills,
+        workingHours: updatedUser.workingHours,
+        isTwoFactorEnabled: updatedUser.isTwoFactorEnabled,
         notifySecurityAlerts: updatedUser.notifySecurityAlerts,
         notifyProductUpdates: updatedUser.notifyProductUpdates,
         hasCompletedOnboarding: updatedUser.hasCompletedOnboarding
       } 
     }, { status: 200 });
-
   } catch (error: any) {
     console.error("Profile Update Error:", error);
     return NextResponse.json({ error: "Failed to update profile." }, { status: 500 });

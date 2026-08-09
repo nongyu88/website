@@ -31,6 +31,9 @@ function AuthForm() {
   const searchParams = useSearchParams();
   const inviteToken = searchParams?.get('invite');
 
+  const [requiresTwoFactor, setRequiresTwoFactor] = useState(false)
+  const [twoFactorCode, setTwoFactorCode] = useState("")
+
   useEffect(() => {
     // 1. Grab the token and the time the user logged in
     const token = localStorage.getItem("kraftgene_token");
@@ -74,7 +77,7 @@ function AuthForm() {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         // 🚨 FIX 2: Pass the invite token to the login route so existing users can accept invites!
-        body: JSON.stringify({ email, password, inviteToken: inviteToken }),
+        body: JSON.stringify({ email, password, inviteToken: inviteToken, twoFactorCode }),
       })
 
       // Safely check if the response is JSON before parsing
@@ -83,6 +86,12 @@ function AuthForm() {
 
       if (!res.ok) {
         throw new Error(data?.error || `Server error: received status ${res.status}.`)
+      }
+
+      if (data.requiresTwoFactor) {
+        setRequiresTwoFactor(true)
+        setLoading(false)
+        return // Stop execution here so it doesn't log them in yet
       }
 
       // Store signed JWT token & user session
@@ -213,10 +222,24 @@ return (
           </div>
         )}
 
-        {/* Form */}
-        <form onSubmit={isVerifyingOtp ? handleVerifyOtp : (isRegistering ? handleRegister : handleLogin)} className="space-y-4">
+{/* Form */}
+<form onSubmit={isVerifyingOtp ? handleVerifyOtp : (isRegistering ? handleRegister : handleLogin)} className="space-y-4">
           
-          {isVerifyingOtp ? (
+          {requiresTwoFactor ? (
+            <div>
+              <label className="block text-xs font-medium text-slate-400 mb-1.5">Google Authenticator Code</label>
+              <input
+                type="text"
+                maxLength={6}
+                value={twoFactorCode}
+                onChange={(e) => setTwoFactorCode(e.target.value.replace(/\D/g, ''))}
+                disabled={loading}
+                placeholder="123456"
+                className="w-full bg-slate-50 dark:bg-slate-950 border border-slate-300 dark:border-slate-800 rounded-xl px-4 py-3 text-sm text-slate-900 dark:text-white focus:outline-none focus:border-emerald-500 transition-colors disabled:opacity-50 disabled:cursor-not-allowed text-center tracking-[0.5em] font-mono text-lg"
+                required
+              />
+            </div>
+          ) : isVerifyingOtp ? (
             <div>
               <label className="block text-xs font-medium text-slate-400 mb-1.5">6-Digit Verification Code</label>
               <input
@@ -281,7 +304,7 @@ return (
             disabled={loading}
             className="w-full bg-emerald-600 hover:bg-emerald-500 text-white h-12 rounded-xl font-bold transition-all shadow-lg shadow-emerald-900/30 mt-2"
           >
-            {loading ? "Processing..." : isVerifyingOtp ? "Verify Email" : isRegistering ? "Register Account" : "Secure Login"}
+            {loading ? "Processing..." : requiresTwoFactor ? "Verify 2FA" : isVerifyingOtp ? "Verify Email" : isRegistering ? "Register Account" : "Secure Login"}
           </Button>
         </form>
 

@@ -69,6 +69,10 @@ model User {
   emailVerified   DateTime?
   verificationOtp String?
   otpExpiresAt    DateTime?
+
+  // 2FA TOTP Fields
+  twoFactorSecret    String?
+  isTwoFactorEnabled Boolean  @default(false)
 }
 
 

@@ -11,6 +11,17 @@ export default function SecuritySettingsPage() {
   // Modal States
   const [isPasswordModalOpen, setIsPasswordModalOpen] = useState(false)
   const [isInviteModalOpen, setIsInviteModalOpen] = useState(false)
+  const [is2FAModalOpen, setIs2FAModalOpen] = useState(false)
+
+  const [isDisable2FAModalOpen, setIsDisable2FAModalOpen] = useState(false)
+
+  // 2FA Setup State
+  const [qrCodeUrl, setQrCodeUrl] = useState("")
+  const [twoFactorCode, setTwoFactorCode] = useState("")
+  const [twoFactorLoading, setTwoFactorLoading] = useState(false)
+  const [twoFactorMsg, setTwoFactorMsg] = useState({ type: "", text: "" })
+  const [is2FAEnabled, setIs2FAEnabled] = useState(false)
+  const [is2FAStatusLoading, setIs2FAStatusLoading] = useState(true)
 
   // Password Form State
   const [currentPassword, setCurrentPassword] = useState("")
@@ -35,6 +46,20 @@ export default function SecuritySettingsPage() {
   // 1. Add the state at the top of your component
   const [isDarkMode, setIsDarkMode] = useState(true)
 
+  // Close modals when ESC key is pressed
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === "Escape") {
+        setIs2FAModalOpen(false);
+        setIsPasswordModalOpen(false);
+        setIsInviteModalOpen(false);
+        setIsDisable2FAModalOpen(false); // <-- Added this line
+      }
+    };
+    window.addEventListener("keydown", handleKeyDown);
+    return () => window.removeEventListener("keydown", handleKeyDown);
+  }, []);
+
   useEffect(() => {
   // Sync with your main dashboard's theme preference
   const savedTheme = localStorage.getItem("theme")
@@ -42,12 +67,26 @@ export default function SecuritySettingsPage() {
   // ... rest of your existing useEffect code
   }, [])
 
-useEffect(() => {
-  const storedUser = localStorage.getItem("user")
-  if (storedUser) {
-    setUserEmail(JSON.parse(storedUser).email || "")
-  }
-}, [])
+  useEffect(() => {
+    const storedUser = localStorage.getItem("user")
+    if (storedUser) {
+      const email = JSON.parse(storedUser).email || ""
+      setUserEmail(email)
+
+      // Fetch fresh 2FA status from database on page load
+      fetch(`/api/user/profile?email=${email}`)
+        .then(res => res.json())
+        .then(data => {
+          if (data.user?.isTwoFactorEnabled) {
+            setIs2FAEnabled(true)
+          }
+        })
+        .catch(err => console.error("Error fetching 2FA status:", err))
+        .finally(() => setIs2FAStatusLoading(false))
+    } else {
+      setIs2FAStatusLoading(false)
+    }
+  }, [])
 
 // Real Team Data State
 const [teamMembers, setTeamMembers] = useState<any[]>([])
@@ -252,12 +291,58 @@ const confirmRemoveMember = async () => {
 
               <div className="flex flex-col md:flex-row md:items-center justify-between p-4 border border-slate-100 dark:border-white/5 rounded-lg bg-slate-50 dark:bg-[#0A0A0B] transition-colors duration-300">
                 <div>
-                  <p className="text-slate-900 dark:text-white font-medium flex items-center"><Lock className="w-4 h-4 mr-2 text-slate-500 dark:text-slate-400" /> Two-step verification</p>
+                  <p className="text-slate-900 dark:text-white font-medium flex items-center">
+                    <Lock className="w-4 h-4 mr-2 text-slate-500 dark:text-slate-400" /> Two-step verification
+                    {is2FAEnabled && (
+                      <span className="ml-3 px-2 py-0.5 text-xs font-bold bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 rounded-full">
+                        Active
+                      </span>
+                    )}
+                  </p>
                   <p className="text-sm text-slate-500 mt-1">Add an extra layer of security to your account using an authenticator app.</p>
                 </div>
-                <Button onClick={() => alert("2FA setup requires TOTP integration (Coming soon!)")} variant="outline" className="mt-4 md:mt-0 border-slate-200 dark:border-white/20 text-slate-700 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-white/10">
-                  Enable 2FA
-                </Button>
+
+                {is2FAStatusLoading ? (
+                  <Button 
+                    disabled 
+                    variant="outline" 
+                    className="mt-4 md:mt-0 border-slate-200/50 dark:border-white/10 text-slate-400 dark:text-slate-600 opacity-50 cursor-not-allowed"
+                  >
+                    Loading 2FA...
+                  </Button>
+                ) : is2FAEnabled ? (
+                  <Button 
+                    onClick={() => setIsDisable2FAModalOpen(true)} 
+                    variant="outline" 
+                    className="mt-4 md:mt-0 border-red-500/30 text-red-400 hover:bg-red-500/10"
+                  >
+                    Disable 2FA
+                  </Button>
+                ) : (
+                  <Button 
+                    onClick={async () => {
+                      setIs2FAModalOpen(true);
+                      setTwoFactorLoading(true);
+                      try {
+                        const res = await fetch('/api/auth/2fa/setup', {
+                          method: 'POST',
+                          headers: { 'Content-Type': 'application/json' },
+                          body: JSON.stringify({ email: userEmail })
+                        });
+                        const data = await res.json();
+                        if (data.qrCodeUrl) setQrCodeUrl(data.qrCodeUrl);
+                      } catch (e) {
+                        setTwoFactorMsg({ type: "error", text: "Failed to load QR code." });
+                      } finally {
+                        setTwoFactorLoading(false);
+                      }
+                    }} 
+                    variant="outline" 
+                    className="mt-4 md:mt-0 border-slate-200 dark:border-white/20 text-slate-700 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-white/10"
+                  >
+                    Enable 2FA
+                  </Button>
+                )}
               </div>
             </div>
           </section>
@@ -399,6 +484,118 @@ const confirmRemoveMember = async () => {
                 </Button>
                 <Button onClick={confirmRemoveMember} className="bg-red-600 hover:bg-red-500 text-white">
                   Remove User
+                </Button>
+              </div>
+            </div>
+          </div>
+        )}
+
+
+        {/* 2FA Setup Modal */}
+        {is2FAModalOpen && (
+          <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/40 dark:bg-black/60 backdrop-blur-sm p-4">
+            <div className="bg-white dark:bg-[#111113] border border-slate-200 dark:border-white/10 rounded-2xl w-full max-w-md p-6 shadow-2xl relative">
+              <button onClick={() => setIs2FAModalOpen(false)} className="absolute top-4 right-4 text-slate-400 dark:text-slate-500 hover:text-slate-900 dark:hover:text-white transition-colors">
+                <X className="w-5 h-5" />
+              </button>
+              <h3 className="text-xl font-bold text-slate-900 dark:text-white mb-2">Setup 2FA Authenticator</h3>
+              <p className="text-xs text-slate-500 mb-4">Scan the QR code with Google Authenticator or Authy, then enter the 6-digit code.</p>
+              
+              {twoFactorMsg.text && (
+                <div className={`p-3 rounded-lg text-sm mb-4 border ${twoFactorMsg.type === 'error' ? 'bg-red-50 dark:bg-red-500/10 border-red-200 dark:border-red-500/50 text-red-600 dark:text-red-400' : 'bg-emerald-50 dark:bg-emerald-500/10 border-emerald-200 dark:border-emerald-500/50 text-emerald-600 dark:text-emerald-400'}`}>
+                  {twoFactorMsg.text}
+                </div>
+              )}
+
+              <div className="flex justify-center mb-4">
+                {twoFactorLoading ? (
+                  <p className="text-xs text-slate-500 py-8">Generating QR Code...</p>
+                ) : (
+                  qrCodeUrl && <img src={qrCodeUrl} alt="2FA QR Code" className="w-44 h-44 rounded-lg border border-white/10" />
+                )}
+              </div>
+
+              <form onSubmit={async (e) => {
+                e.preventDefault();
+                setTwoFactorLoading(true);
+                setTwoFactorMsg({ type: "", text: "" });
+
+                try {
+                  const res = await fetch('/api/auth/2fa/verify', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ email: userEmail, token: twoFactorCode })
+                  });
+                  const data = await res.json();
+                  if (!res.ok) throw new Error(data.error);
+
+                  setIs2FAEnabled(true);
+                  setTwoFactorMsg({ type: "success", text: "2FA successfully enabled!" });
+                  setTimeout(() => {
+                    setIs2FAModalOpen(false);
+                    setTwoFactorCode("");
+                    setTwoFactorMsg({ type: "", text: "" });
+                  }, 2000);
+                } catch (err: any) {
+                  setTwoFactorMsg({ type: "error", text: err.message });
+                } finally {
+                  setTwoFactorLoading(false);
+                }
+              }} className="space-y-4">
+                <div>
+                  <label className="block text-sm font-medium text-slate-700 dark:text-slate-400 mb-2">Authenticator Code</label>
+                  <input 
+                    type="text" 
+                    required 
+                    maxLength={6} 
+                    value={twoFactorCode} 
+                    onChange={(e) => setTwoFactorCode(e.target.value)} 
+                    placeholder="123456" 
+                    className="w-full bg-slate-50 dark:bg-[#0A0A0B] border border-slate-200 dark:border-white/10 rounded-lg px-4 py-2.5 text-center text-lg font-mono tracking-widest text-slate-900 dark:text-white focus:border-purple-500 focus:outline-none" 
+                  />
+                </div>
+                <Button type="submit" disabled={twoFactorLoading || twoFactorCode.length < 6} className="w-full bg-purple-600 hover:bg-purple-500 text-white">
+                  {twoFactorLoading ? "Verifying..." : "Verify & Enable 2FA"}
+                </Button>
+              </form>
+            </div>
+          </div>
+        )}
+
+        {/* Disable 2FA Confirmation Modal */}
+        {isDisable2FAModalOpen && (
+          <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/40 dark:bg-black/60 backdrop-blur-sm p-4">
+            <div className="bg-white dark:bg-[#111113] border border-slate-200 dark:border-white/10 rounded-2xl w-full max-w-md p-6 shadow-2xl relative">
+              <h3 className="text-xl font-bold text-slate-900 dark:text-white mb-2">Disable 2FA</h3>
+              <p className="text-slate-500 dark:text-slate-400 mb-6">
+                Are you sure you want to disable Two-Factor Authentication? This will remove the extra layer of security from your account.
+              </p>
+              
+              <div className="flex justify-end space-x-3">
+                <Button variant="outline" onClick={() => setIsDisable2FAModalOpen(false)} className="border-slate-200 dark:border-white/10 text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-white/5">
+                  Cancel
+                </Button>
+                <Button 
+                  disabled={twoFactorLoading}
+                  onClick={async () => {
+                    setTwoFactorLoading(true);
+                    try {
+                      await fetch('/api/user/profile', {
+                        method: 'PUT',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ email: userEmail, isTwoFactorEnabled: false })
+                      });
+                      setIs2FAEnabled(false);
+                      setIsDisable2FAModalOpen(false);
+                    } catch (error) {
+                      console.error("Failed to disable 2FA", error);
+                    } finally {
+                      setTwoFactorLoading(false);
+                    }
+                  }} 
+                  className="bg-red-600 hover:bg-red-500 text-white"
+                >
+                  {twoFactorLoading ? "Disabling..." : "Disable 2FA"}
                 </Button>
               </div>
             </div>

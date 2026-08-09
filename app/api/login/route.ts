@@ -5,9 +5,40 @@ import { prisma } from '@/lib/prisma';
 import bcrypt from 'bcryptjs';
 import jwt from 'jsonwebtoken';
 
+const otplib = require('otplib');
+const authenticator = otplib.authenticator || otplib.default?.authenticator || otplib;
+
+// Robust 2FA validator that handles Promises, Objects ({valid: true}), and Booleans
+async function verifyTwoFactor(token: string, secret: string): Promise<boolean> {
+  try {
+    let res: any = null;
+    if (typeof authenticator.check === 'function') {
+      res = authenticator.check(token, secret);
+    } else if (typeof authenticator.verify === 'function') {
+      res = authenticator.verify({ token, secret });
+    } else if (typeof otplib.verify === 'function') {
+      res = otplib.verify({ token, secret });
+    }
+
+    if (res instanceof Promise) {
+      res = await res;
+    }
+
+    if (typeof res === 'boolean') {
+      return res === true;
+    }
+    if (res && typeof res === 'object' && 'valid' in res) {
+      return res.valid === true;
+    }
+  } catch (err) {
+    console.error("2FA verification error:", err);
+  }
+  return false;
+}
+
 export async function POST(request: Request) {
   try {
-    const { email, password, inviteToken } = await request.json();
+    const { email, password, inviteToken, twoFactorCode } = await request.json();
 
     if (!email || !password) {
       return NextResponse.json({ error: "Email and password are required." }, { status: 400 });
@@ -78,7 +109,30 @@ export async function POST(request: Request) {
       data: { lastLoginAt: new Date() }
     });
 
-    // 6. Generate session JWT token
+// 6. Check if 2FA is enabled
+if (updatedUser.isTwoFactorEnabled) {
+  if (!twoFactorCode || String(twoFactorCode).trim() === '') {
+    return NextResponse.json({ 
+      requiresTwoFactor: true, 
+      email: updatedUser.email 
+    }, { status: 200 });
+  }
+
+  const cleanToken = String(twoFactorCode).trim();
+  const secret = updatedUser.twoFactorSecret;
+
+  if (!secret) {
+    return NextResponse.json({ error: "2FA secret is missing." }, { status: 400 });
+  }
+
+  const isValid2FA = await verifyTwoFactor(cleanToken, secret);
+
+  if (!isValid2FA) {
+    return NextResponse.json({ error: "Invalid 2FA code. Check your authenticator app." }, { status: 400 });
+  }
+}
+
+    // 7. Generate session JWT token
     const token = jwt.sign(
       { userId: updatedUser.id, email: updatedUser.email },
       process.env.JWT_SECRET || 'kraftgene_super_secret_key_2026_x89z!',
