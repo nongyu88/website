@@ -20,6 +20,7 @@ export default function DataServicesPage() {
   
   const [isHardwareModalOpen, setIsHardwareModalOpen] = useState(false)
   const [hardwareSubmitted, setHardwareSubmitted] = useState(false)
+  const [isSubmittingHardware, setIsSubmittingHardware] = useState(false)
 
   // Hardware Form State
   const [hardwareType, setHardwareType] = useState("UAV Drone Fleet (Thermal/LiDAR)")
@@ -90,6 +91,9 @@ export default function DataServicesPage() {
 
   const handleHardwareSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
+    if (isSubmittingHardware) return
+    setIsSubmittingHardware(true)
+
     try {
       await fetch('/api/services/request', {
         method: 'POST',
@@ -112,6 +116,8 @@ export default function DataServicesPage() {
       }, 2500)
     } catch (error) {
       console.error("Hardware request submission error:", error)
+    } finally {
+      setIsSubmittingHardware(false)
     }
   }
 
@@ -542,63 +548,66 @@ export default function DataServicesPage() {
               </div>
             ) : (
               <form onSubmit={handleHardwareSubmit} className="space-y-4">
-                
-                <div className="grid grid-cols-2 gap-4">
+                <fieldset disabled={isSubmittingHardware} className="space-y-4 disabled:opacity-50 transition-opacity">
+                  <div className="grid grid-cols-2 gap-4">
+                    <div>
+                      <label className="block text-xs font-medium text-slate-400 mb-1.5">Hardware Target</label>
+                      <select 
+                        value={hardwareType}
+                        onChange={(e) => setHardwareType(e.target.value)}
+                        className="w-full bg-slate-50 dark:bg-[#0A0A0B] border border-slate-200 dark:border-white/10 rounded-xl px-3 py-2.5 text-sm text-slate-900 dark:text-white focus:outline-none focus:border-amber-500 disabled:cursor-not-allowed"
+                      >
+                        <option>UAV Drone Fleet (Thermal/LiDAR)</option>
+                        <option>Autonomous Ground Rover</option>
+                        <option>Stationary IoT Sensor Pack</option>
+                      </select>
+                    </div>
+                    <div>
+                      <label className="block text-xs font-medium text-slate-400 mb-1.5">Mission Type</label>
+                      <select 
+                        value={missionType}
+                        onChange={(e) => setMissionType(e.target.value)}
+                        className="w-full bg-slate-50 dark:bg-[#0A0A0B] border border-slate-200 dark:border-white/10 rounded-xl px-3 py-2.5 text-sm text-slate-900 dark:text-white focus:outline-none focus:border-amber-500 disabled:cursor-not-allowed"
+                      >
+                        <option>Hazardous Asset Inspection</option>
+                        <option>Routine Photogrammetry Scan</option>
+                        <option>Emergency Wildfire / Leak Response</option>
+                      </select>
+                    </div>
+                  </div>
+
                   <div>
-                    <label className="block text-xs font-medium text-slate-400 mb-1.5">Hardware Target</label>
+                    <label className="block text-xs font-medium text-slate-400 mb-1.5">Location / Asset Focus</label>
+                    <input
+                      type="text"
+                      required
+                      placeholder="e.g. Northern Pipeline Sector 7"
+                      className="w-full bg-slate-50 dark:bg-[#0A0A0B] border border-slate-200 dark:border-white/10 rounded-xl px-4 py-2.5 text-sm text-slate-900 dark:text-white focus:outline-none focus:border-amber-500 disabled:cursor-not-allowed"
+                    />
+                  </div>
+
+                  <div>
+                    <label className="block text-xs font-medium text-slate-400 mb-1.5">Operator Training Requirements</label>
                     <select 
-                      value={hardwareType}
-                      onChange={(e) => setHardwareType(e.target.value)}
-                      className="w-full bg-slate-50 dark:bg-[#0A0A0B] border border-slate-200 dark:border-white/10 rounded-xl px-3 py-2.5 text-sm text-slate-900 dark:text-white focus:outline-none focus:border-amber-500"
+                      value={trainingRequired}
+                      onChange={(e) => setTrainingRequired(e.target.value)}
+                      className="w-full bg-slate-50 dark:bg-[#0A0A0B] border border-slate-200 dark:border-white/10 rounded-xl px-3 py-2.5 text-sm text-slate-900 dark:text-white focus:outline-none focus:border-amber-500 disabled:cursor-not-allowed"
                     >
-                      <option>UAV Drone Fleet (Thermal/LiDAR)</option>
-                      <option>Autonomous Ground Rover</option>
-                      <option>Stationary IoT Sensor Pack</option>
+                      <option>Yes, include operator training</option>
+                      <option>No, we have certified Kraftgene operators</option>
+                      <option>Full-Service (Kraftgene flies the mission)</option>
                     </select>
                   </div>
-                  <div>
-                    <label className="block text-xs font-medium text-slate-400 mb-1.5">Mission Type</label>
-                    <select 
-                      value={missionType}
-                      onChange={(e) => setMissionType(e.target.value)}
-                      className="w-full bg-slate-50 dark:bg-[#0A0A0B] border border-slate-200 dark:border-white/10 rounded-xl px-3 py-2.5 text-sm text-slate-900 dark:text-white focus:outline-none focus:border-amber-500"
-                    >
-                      <option>Hazardous Asset Inspection</option>
-                      <option>Routine Photogrammetry Scan</option>
-                      <option>Emergency Wildfire / Leak Response</option>
-                    </select>
-                  </div>
-                </div>
-
-                <div>
-                  <label className="block text-xs font-medium text-slate-400 mb-1.5">Location / Asset Focus</label>
-                  <input
-                    type="text"
-                    required
-                    placeholder="e.g. Northern Pipeline Sector 7"
-                    className="w-full bg-slate-50 dark:bg-[#0A0A0B] border border-slate-200 dark:border-white/10 rounded-xl px-4 py-2.5 text-sm text-slate-900 dark:text-white focus:outline-none focus:border-amber-500"
-                  />
-                </div>
-
-                <div>
-                  <label className="block text-xs font-medium text-slate-400 mb-1.5">Operator Training Requirements</label>
-                  <select 
-                    value={trainingRequired}
-                    onChange={(e) => setTrainingRequired(e.target.value)}
-                    className="w-full bg-slate-50 dark:bg-[#0A0A0B] border border-slate-200 dark:border-white/10 rounded-xl px-3 py-2.5 text-sm text-slate-900 dark:text-white focus:outline-none focus:border-amber-500"
-                  >
-                    <option>Yes, include operator training</option>
-                    <option>No, we have certified Kraftgene operators</option>
-                    <option>Full-Service (Kraftgene flies the mission)</option>
-                  </select>
-                </div>
+                </fieldset>
 
                 <div className="flex justify-end space-x-3 pt-4">
-                  <Button type="button" variant="outline" onClick={() => setIsHardwareModalOpen(false)} className="border-slate-200 dark:border-white/10 text-xs">
+                  <Button type="button" variant="outline" disabled={isSubmittingHardware} onClick={() => setIsHardwareModalOpen(false)} className="border-slate-200 dark:border-white/10 text-xs disabled:opacity-50">
                     Cancel
                   </Button>
-                  <Button type="submit" className="bg-amber-600 hover:bg-amber-500 text-white font-bold text-xs px-6 shadow-md shadow-amber-900/30">
-                    Submit Deployment Request
+                  <Button type="submit" disabled={isSubmittingHardware} className="bg-amber-600 hover:bg-amber-500 text-white font-bold text-xs px-6 shadow-md shadow-amber-900/30 disabled:opacity-50 disabled:cursor-not-allowed transition-all">
+                    {isSubmittingHardware ? (
+                      <span className="flex items-center"><span className="animate-spin w-4 h-4 border-2 border-white border-t-transparent rounded-full mr-2"></span> Submitting...</span>
+                    ) : "Submit Deployment Request"}
                   </Button>
                 </div>
               </form>

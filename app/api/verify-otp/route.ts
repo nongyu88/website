@@ -43,7 +43,7 @@ export async function POST(request: Request) {
       // 1. Notify Admin Team to review the new user
       await resend.emails.send({
         from: 'Kraftgene AI <onboarding@kraftgeneai.ca>',
-        to: ["yu.nong@kraftgeneai.com", "m.mai@kraftgeneai.com"],
+        to: ["yu.nong@kraftgeneai.com", "tech@kraftgeneai.com"],
         subject: `[Action Required] New Account Registration - ${companyName}`,
         html: `
           <div style="font-family: sans-serif; padding: 20px; color: #333; line-height: 1.6; max-width: 600px;">

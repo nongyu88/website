@@ -15,11 +15,27 @@ export default function PipelinePlatformPage() {
   const [user, setUser] = useState<any>(null)
   const [isConsultModalOpen, setIsConsultModalOpen] = useState(false)
   const [consultSubmitted, setConsultSubmitted] = useState(false)
+  const [isSubmitting, setIsSubmitting] = useState(false)
 
   // Consult Form State
   const [pipelineLength, setPipelineLength] = useState("Under 100 km")
   const [fluidType, setFluidType] = useState("Crude Oil / Liquid")
   const [sensorStatus, setSensorStatus] = useState("Existing Pressure/Flow Sensors")
+
+  const isEvaluationModalOpen = isConsultModalOpen
+  const setIsEvaluationModalOpen = setIsConsultModalOpen
+
+  // Close evaluation modal on ESC key
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') {
+        // Change this state variable to match whatever you named it in those files!
+        setIsEvaluationModalOpen(false) 
+      }
+    }
+    window.addEventListener('keydown', handleKeyDown)
+    return () => window.removeEventListener('keydown', handleKeyDown)
+  }, [])
 
   useEffect(() => {
     const storedUser = localStorage.getItem("user")
@@ -60,6 +76,9 @@ export default function PipelinePlatformPage() {
 
   const handleConsultSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
+    if (isSubmitting) return
+    setIsSubmitting(true)
+
     try {
       await fetch('/api/services/request', {
         method: 'POST',
@@ -78,6 +97,8 @@ export default function PipelinePlatformPage() {
       }, 2500)
     } catch (error) {
       console.error("Consultation Submission Error:", error)
+    } finally {
+      setIsSubmitting(false)
     }
   }
 
@@ -283,27 +304,33 @@ export default function PipelinePlatformPage() {
               </div>
             ) : (
               <form onSubmit={handleConsultSubmit} className="space-y-4">
-                <div>
-                  <label className="block text-xs font-medium text-slate-600 dark:text-slate-400 mb-1.5">Network Scale</label>
-                  <select value={pipelineLength} onChange={(e) => setPipelineLength(e.target.value)} className="w-full bg-slate-50 dark:bg-[#0A0A0B] border border-slate-200 dark:border-white/10 rounded-xl px-3 py-2.5 text-sm">
-                    <option>Under 100 km</option>
-                    <option>100 - 500 km</option>
-                    <option>500+ km Interstate</option>
-                  </select>
-                </div>
+                <fieldset disabled={isSubmitting} className="space-y-4 disabled:opacity-50 transition-opacity">
+                  <div>
+                    <label className="block text-xs font-medium text-slate-600 dark:text-slate-400 mb-1.5">Network Scale</label>
+                    <select value={pipelineLength} onChange={(e) => setPipelineLength(e.target.value)} className="w-full bg-slate-50 dark:bg-[#0A0A0B] border border-slate-200 dark:border-white/10 rounded-xl px-3 py-2.5 text-sm text-slate-900 dark:text-white focus:outline-none focus:border-blue-500 disabled:cursor-not-allowed">
+                      <option>Under 100 km</option>
+                      <option>100 - 500 km</option>
+                      <option>500+ km Interstate</option>
+                    </select>
+                  </div>
 
-                <div>
-                  <label className="block text-xs font-medium text-slate-400 mb-1.5">Transport Fluid Type</label>
-                  <select value={fluidType} onChange={(e) => setFluidType(e.target.value)} className="w-full bg-slate-50 dark:bg-[#0A0A0B] border border-slate-200 dark:border-white/10 rounded-xl px-3 py-2.5 text-sm">
-                    <option>Crude Oil / Liquid</option>
-                    <option>Natural Gas</option>
-                    <option>Multi-Phase Mix</option>
-                  </select>
-                </div>
+                  <div>
+                    <label className="block text-xs font-medium text-slate-400 mb-1.5">Transport Fluid Type</label>
+                    <select value={fluidType} onChange={(e) => setFluidType(e.target.value)} className="w-full bg-slate-50 dark:bg-[#0A0A0B] border border-slate-200 dark:border-white/10 rounded-xl px-3 py-2.5 text-sm text-slate-900 dark:text-white focus:outline-none focus:border-blue-500 disabled:cursor-not-allowed">
+                      <option>Crude Oil / Liquid</option>
+                      <option>Natural Gas</option>
+                      <option>Multi-Phase Mix</option>
+                    </select>
+                  </div>
+                </fieldset>
 
                 <div className="flex justify-end space-x-3 pt-4">
-                  <Button type="button" variant="outline" onClick={() => setIsConsultModalOpen(false)} className="border-slate-200 dark:border-white/10 text-xs">Cancel</Button>
-                  <Button type="submit" className="bg-blue-600 hover:bg-blue-500 text-white font-bold text-xs px-6">Submit Request</Button>
+                  <Button type="button" variant="outline" disabled={isSubmitting} onClick={() => setIsConsultModalOpen(false)} className="border-slate-200 dark:border-white/10 text-xs disabled:opacity-50">Cancel</Button>
+                  <Button type="submit" disabled={isSubmitting} className="bg-blue-600 hover:bg-blue-500 text-white font-bold text-xs px-6 disabled:opacity-50 disabled:cursor-not-allowed transition-all">
+                    {isSubmitting ? (
+                      <span className="flex items-center"><span className="animate-spin w-4 h-4 border-2 border-white border-t-transparent rounded-full mr-2"></span> Submitting...</span>
+                    ) : "Submit Request"}
+                  </Button>
                 </div>
               </form>
             )}
