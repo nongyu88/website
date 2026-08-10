@@ -15,15 +15,31 @@ export default function GridPlatformPage() {
   const [user, setUser] = useState<any>(null)
   const [isConsultModalOpen, setIsConsultModalOpen] = useState(false)
   const [consultSubmitted, setConsultSubmitted] = useState(false)
+  const [isSubmitting, setIsSubmitting] = useState(false)
 
   // Consult Form State
   const [networkSize, setNetworkSize] = useState("Under 50 Substations")
   const [focusArea, setFocusArea] = useState("Predictive Cascade Failure")
   const [scadaIntegration, setScadaIntegration] = useState("Yes, we have live SCADA")
 
+  const isEvaluationModalOpen = isConsultModalOpen
+  const setIsEvaluationModalOpen = setIsConsultModalOpen
+
   useEffect(() => {
     const storedUser = localStorage.getItem("user")
     if (storedUser) setUser(JSON.parse(storedUser))
+  }, [])
+
+  // Close evaluation modal on ESC key
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') {
+        // Change this state variable to match whatever you named it in those files!
+        setIsEvaluationModalOpen(false) 
+      }
+    }
+    window.addEventListener('keydown', handleKeyDown)
+    return () => window.removeEventListener('keydown', handleKeyDown)
   }, [])
 
   // 1. Check Active Plans
@@ -60,6 +76,9 @@ export default function GridPlatformPage() {
 
   const handleConsultSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
+    if (isSubmitting) return
+    setIsSubmitting(true)
+
     try {
       await fetch('/api/services/request', {
         method: 'POST',
@@ -78,6 +97,8 @@ export default function GridPlatformPage() {
       }, 2500)
     } catch (error) {
       console.error("Consultation Submission Error:", error)
+    } finally {
+      setIsSubmitting(false)
     }
   }
 
@@ -283,27 +304,33 @@ export default function GridPlatformPage() {
               </div>
             ) : (
               <form onSubmit={handleConsultSubmit} className="space-y-4">
-                <div>
-                  <label className="block text-xs font-medium text-slate-600 dark:text-slate-400 mb-1.5">Network Scale</label>
-                  <select value={networkSize} onChange={(e) => setNetworkSize(e.target.value)} className="w-full bg-slate-50 dark:bg-[#0A0A0B] border border-slate-200 dark:border-white/10 rounded-xl px-3 py-2.5 text-sm">
-                    <option>Under 50 Substations</option>
-                    <option>50 - 200 Substations</option>
-                    <option>200+ Enterprise Grid</option>
-                  </select>
-                </div>
+                <fieldset disabled={isSubmitting} className="space-y-4 disabled:opacity-50 transition-opacity">
+                  <div>
+                    <label className="block text-xs font-medium text-slate-600 dark:text-slate-400 mb-1.5">Network Scale</label>
+                    <select value={networkSize} onChange={(e) => setNetworkSize(e.target.value)} className="w-full bg-slate-50 dark:bg-[#0A0A0B] border border-slate-200 dark:border-white/10 rounded-xl px-3 py-2.5 text-sm text-slate-900 dark:text-white focus:outline-none focus:border-emerald-500 disabled:cursor-not-allowed">
+                      <option>Under 50 Substations</option>
+                      <option>50 - 200 Substations</option>
+                      <option>200+ Enterprise Grid</option>
+                    </select>
+                  </div>
 
-                <div>
-                  <label className="block text-xs font-medium text-slate-400 mb-1.5">Primary Focus Area</label>
-                  <select value={focusArea} onChange={(e) => setFocusArea(e.target.value)} className="w-full bg-slate-50 dark:bg-[#0A0A0B] border border-slate-200 dark:border-white/10 rounded-xl px-3 py-2.5 text-sm">
-                    <option>Predictive Cascade Failure</option>
-                    <option>Weather & Load Stress Testing</option>
-                    <option>SCADA Anomaly Detection</option>
-                  </select>
-                </div>
+                  <div>
+                    <label className="block text-xs font-medium text-slate-400 mb-1.5">Primary Focus Area</label>
+                    <select value={focusArea} onChange={(e) => setFocusArea(e.target.value)} className="w-full bg-slate-50 dark:bg-[#0A0A0B] border border-slate-200 dark:border-white/10 rounded-xl px-3 py-2.5 text-sm text-slate-900 dark:text-white focus:outline-none focus:border-emerald-500 disabled:cursor-not-allowed">
+                      <option>Predictive Cascade Failure</option>
+                      <option>Weather & Load Stress Testing</option>
+                      <option>SCADA Anomaly Detection</option>
+                    </select>
+                  </div>
+                </fieldset>
 
                 <div className="flex justify-end space-x-3 pt-4">
-                  <Button type="button" variant="outline" onClick={() => setIsConsultModalOpen(false)} className="border-slate-200 dark:border-white/10 text-xs">Cancel</Button>
-                  <Button type="submit" className="bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-xs px-6">Submit Request</Button>
+                  <Button type="button" variant="outline" disabled={isSubmitting} onClick={() => setIsConsultModalOpen(false)} className="border-slate-200 dark:border-white/10 text-xs disabled:opacity-50">Cancel</Button>
+                  <Button type="submit" disabled={isSubmitting} className="bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-xs px-6 disabled:opacity-50 disabled:cursor-not-allowed transition-all">
+                    {isSubmitting ? (
+                      <span className="flex items-center"><span className="animate-spin w-4 h-4 border-2 border-white border-t-transparent rounded-full mr-2"></span> Submitting...</span>
+                    ) : "Submit Request"}
+                  </Button>
                 </div>
               </form>
             )}

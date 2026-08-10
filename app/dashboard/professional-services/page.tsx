@@ -15,6 +15,7 @@ export default function ProfessionalServicesPage() {
   const [user, setUser] = useState<any>(null)
   const [isSowModalOpen, setIsSowModalOpen] = useState(false)
   const [sowSubmitted, setSowSubmitted] = useState(false)
+  const [isSubmitting, setIsSubmitting] = useState(false)
 
   // SOW Form State
   const [projectType, setProjectType] = useState("SCADA / Legacy System Integration")
@@ -67,6 +68,9 @@ export default function ProfessionalServicesPage() {
 
   const handleSowSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
+    if (isSubmitting) return
+    setIsSubmitting(true)
+
     try {
       await fetch('/api/services/request', {
         method: 'POST',
@@ -89,6 +93,8 @@ export default function ProfessionalServicesPage() {
       }, 2500)
     } catch (error) {
       console.error("SOW submission error:", error)
+    } finally {
+      setIsSubmitting(false)
     }
   }
 
@@ -414,47 +420,53 @@ export default function ProfessionalServicesPage() {
               </div>
             ) : (
               <form onSubmit={handleSowSubmit} className="space-y-4">
-                <div>
-                  <label className="block text-xs font-medium text-slate-600 dark:text-slate-400 mb-1.5">Primary Service Category</label>
-                  <select 
-                    value={projectType}
-                    onChange={(e) => setProjectType(e.target.value)}
-                    className="w-full bg-slate-50 dark:bg-[#0A0A0B] border border-slate-200 dark:border-white/10 rounded-xl px-3 py-2.5 text-sm text-slate-900 dark:text-white focus:outline-none focus:border-purple-500"
-                  >
-                    <option value="SCADA / Legacy System Integration">SCADA / Legacy System Integration</option>
-                    <option value="Custom API / Data Engineering">Custom API & Data Engineering</option>
-                    <option value="Operator Training & Onboarding">Operator Training & Onboarding</option>
-                    <option value="Dedicated Technical Account Management">Dedicated Support / TAM</option>
-                    <option value="Other Enterprise Integration">Other Enterprise Integration</option>
-                  </select>
-                </div>
+                <fieldset disabled={isSubmitting} className="space-y-4 disabled:opacity-50 transition-opacity">
+                  <div>
+                    <label className="block text-xs font-medium text-slate-600 dark:text-slate-400 mb-1.5">Primary Service Category</label>
+                    <select 
+                      value={projectType}
+                      onChange={(e) => setProjectType(e.target.value)}
+                      className="w-full bg-slate-50 dark:bg-[#0A0A0B] border border-slate-200 dark:border-white/10 rounded-xl px-3 py-2.5 text-sm text-slate-900 dark:text-white focus:outline-none focus:border-purple-500 disabled:cursor-not-allowed"
+                    >
+                      <option value="SCADA / Legacy System Integration">SCADA / Legacy System Integration</option>
+                      <option value="Custom API / Data Engineering">Custom API & Data Engineering</option>
+                      <option value="Operator Training & Onboarding">Operator Training & Onboarding</option>
+                      <option value="Dedicated Technical Account Management">Dedicated Support / TAM</option>
+                      <option value="Other Enterprise Integration">Other Enterprise Integration</option>
+                    </select>
+                  </div>
 
-                <div>
-                  <label className="block text-xs font-medium text-slate-600 dark:text-slate-400 mb-1.5">Brief Overview of Requirements</label>
-                  <textarea
-                    required
-                    rows={4}
-                    placeholder="E.g., We need to integrate Kraftgene with our on-premise IBM Maximo server, and require a 2-day on-site training workshop for 15 operators..."
-                    value={scopeDetails}
-                    onChange={(e) => setScopeDetails(e.target.value)}
-                    className="w-full bg-slate-50 dark:bg-[#0A0A0B] border border-slate-200 dark:border-white/10 rounded-xl px-4 py-3 text-sm text-slate-900 dark:text-white focus:outline-none focus:border-purple-500 resize-none"
-                  />
-                </div>
+                  <div>
+                    <label className="block text-xs font-medium text-slate-600 dark:text-slate-400 mb-1.5">Brief Overview of Requirements</label>
+                    <textarea
+                      required
+                      rows={4}
+                      placeholder="E.g., We need to integrate Kraftgene with our on-premise IBM Maximo server, and require a 2-day on-site training workshop for 15 operators..."
+                      value={scopeDetails}
+                      onChange={(e) => setScopeDetails(e.target.value)}
+                      className="w-full bg-slate-50 dark:bg-[#0A0A0B] border border-slate-200 dark:border-white/10 rounded-xl px-4 py-3 text-sm text-slate-900 dark:text-white focus:outline-none focus:border-purple-500 resize-none disabled:cursor-not-allowed"
+                    />
+                  </div>
+                </fieldset>
 
                 <div className="flex justify-end space-x-3 pt-4">
                   <Button 
                     type="button" 
                     variant="outline" 
+                    disabled={isSubmitting}
                     onClick={() => setIsSowModalOpen(false)}
-                    className="border-slate-200 dark:border-white/10 text-slate-700 dark:text-slate-300 text-xs"
+                    className="border-slate-200 dark:border-white/10 text-slate-700 dark:text-slate-300 text-xs disabled:opacity-50"
                   >
                     Cancel
                   </Button>
                   <Button 
                     type="submit" 
-                    className="bg-purple-600 hover:bg-purple-500 text-white font-bold text-xs px-6 shadow-md shadow-purple-900/30"
+                    disabled={isSubmitting}
+                    className="bg-purple-600 hover:bg-purple-500 text-white font-bold text-xs px-6 shadow-md shadow-purple-900/30 disabled:opacity-50 disabled:cursor-not-allowed transition-all"
                   >
-                    Submit SOW Request
+                    {isSubmitting ? (
+                      <span className="flex items-center"><span className="animate-spin w-4 h-4 border-2 border-white border-t-transparent rounded-full mr-2"></span> Submitting...</span>
+                    ) : "Submit SOW Request"}
                   </Button>
                 </div>
               </form>

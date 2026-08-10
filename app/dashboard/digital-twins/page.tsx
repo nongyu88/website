@@ -15,6 +15,7 @@ export default function DigitalTwinsHubPage() {
   const [user, setUser] = useState<any>(null)
   const [isConsultModalOpen, setIsConsultModalOpen] = useState(false)
   const [consultSubmitted, setConsultSubmitted] = useState(false)
+  const [isSubmitting, setIsSubmitting] = useState(false)
 
   // Video Modal State
   const [selectedVideoUrl, setSelectedVideoUrl] = useState<string | null>(null)
@@ -132,6 +133,9 @@ export default function DigitalTwinsHubPage() {
 
   const handleConsultSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
+    if (isSubmitting) return
+    setIsSubmitting(true)
+
     try {
       await fetch('/api/services/request', {
         method: 'POST',
@@ -156,6 +160,8 @@ export default function DigitalTwinsHubPage() {
       }, 2500)
     } catch (error) {
       console.error("Consult submission error:", error)
+    } finally {
+      setIsSubmitting(false)
     }
   }
 
@@ -399,74 +405,80 @@ export default function DigitalTwinsHubPage() {
               </div>
             ) : (
               <form onSubmit={handleConsultSubmit} className="space-y-4">
-                <div>
-                  <label className="block text-xs font-medium text-slate-400 mb-1.5">Facility / Asset Name or Location</label>
-                  <input
-                    type="text"
-                    required
-                    placeholder="e.g. Pacific Coast Compressor Substation"
-                    value={facilityName}
-                    onChange={(e) => setFacilityName(e.target.value)}
-                    className="w-full bg-slate-50 dark:bg-[#0A0A0B] border border-slate-200 dark:border-white/10 rounded-xl px-4 py-2.5 text-sm text-slate-900 dark:text-white focus:outline-none focus:border-blue-500"
-                  />
-                </div>
-
-                <div className="grid grid-cols-2 gap-4">
+                <fieldset disabled={isSubmitting} className="space-y-4 disabled:opacity-50 transition-opacity">
                   <div>
-                    <label className="block text-xs font-medium text-slate-400 mb-1.5">Industry Sector</label>
-                    <select 
-                      value={industrySector}
-                      onChange={(e) => setIndustrySector(e.target.value)}
-                      className="w-full bg-slate-50 dark:bg-[#0A0A0B] border border-slate-200 dark:border-white/10 rounded-xl px-3 py-2.5 text-sm text-slate-900 dark:text-white focus:outline-none focus:border-blue-500"
-                    >
-                      <option value="Power & Utilities">Power & Utilities</option>
-                      <option value="Oil & Gas Pipeline">Oil & Gas Pipeline</option>
-                      <option value="Renewable Infrastructure">Renewable Infrastructure</option>
-                      <option value="Industrial Facility">Industrial Facility</option>
-                    </select>
+                    <label className="block text-xs font-medium text-slate-400 mb-1.5">Facility / Asset Name or Location</label>
+                    <input
+                      type="text"
+                      required
+                      placeholder="e.g. Pacific Coast Compressor Substation"
+                      value={facilityName}
+                      onChange={(e) => setFacilityName(e.target.value)}
+                      className="w-full bg-slate-50 dark:bg-[#0A0A0B] border border-slate-200 dark:border-white/10 rounded-xl px-4 py-2.5 text-sm text-slate-900 dark:text-white focus:outline-none focus:border-blue-500 disabled:cursor-not-allowed"
+                    />
+                  </div>
+
+                  <div className="grid grid-cols-2 gap-4">
+                    <div>
+                      <label className="block text-xs font-medium text-slate-400 mb-1.5">Industry Sector</label>
+                      <select 
+                        value={industrySector}
+                        onChange={(e) => setIndustrySector(e.target.value)}
+                        className="w-full bg-slate-50 dark:bg-[#0A0A0B] border border-slate-200 dark:border-white/10 rounded-xl px-3 py-2.5 text-sm text-slate-900 dark:text-white focus:outline-none focus:border-blue-500 disabled:cursor-not-allowed"
+                      >
+                        <option value="Power & Utilities">Power & Utilities</option>
+                        <option value="Oil & Gas Pipeline">Oil & Gas Pipeline</option>
+                        <option value="Renewable Infrastructure">Renewable Infrastructure</option>
+                        <option value="Industrial Facility">Industrial Facility</option>
+                      </select>
+                    </div>
+
+                    <div>
+                      <label className="block text-xs font-medium text-slate-400 mb-1.5">Current CAD/GIS Status</label>
+                      <select 
+                        value={hasCadData}
+                        onChange={(e) => setHasCadData(e.target.value)}
+                        className="w-full bg-slate-50 dark:bg-[#0A0A0B] border border-slate-200 dark:border-white/10 rounded-xl px-3 py-2.5 text-sm text-slate-900 dark:text-white focus:outline-none focus:border-blue-500 disabled:cursor-not-allowed"
+                      >
+                        <option value="Yes - BIM / Revit / CAD">Yes - Have BIM / CAD files</option>
+                        <option value="LiDAR / Drone Scans Available">Have Drone / LiDAR Scans</option>
+                        <option value="Need Full Site Capture">Need Kraftgene Site Capture</option>
+                      </select>
+                    </div>
                   </div>
 
                   <div>
-                    <label className="block text-xs font-medium text-slate-400 mb-1.5">Current CAD/GIS Status</label>
+                    <label className="block text-xs font-medium text-slate-400 mb-1.5">Target Deployment Timeline</label>
                     <select 
-                      value={hasCadData}
-                      onChange={(e) => setHasCadData(e.target.value)}
-                      className="w-full bg-slate-50 dark:bg-[#0A0A0B] border border-slate-200 dark:border-white/10 rounded-xl px-3 py-2.5 text-sm text-slate-900 dark:text-white focus:outline-none focus:border-blue-500"
+                      value={projectTimeline}
+                      onChange={(e) => setProjectTimeline(e.target.value)}
+                      className="w-full bg-slate-50 dark:bg-[#0A0A0B] border border-slate-200 dark:border-white/10 rounded-xl px-3 py-2.5 text-sm text-slate-900 dark:text-white focus:outline-none focus:border-blue-500 disabled:cursor-not-allowed"
                     >
-                      <option value="Yes - BIM / Revit / CAD">Yes - Have BIM / CAD files</option>
-                      <option value="LiDAR / Drone Scans Available">Have Drone / LiDAR Scans</option>
-                      <option value="Need Full Site Capture">Need Kraftgene Site Capture</option>
+                      <option value="Immediate (1-3 months)">Immediate (1-3 months)</option>
+                      <option value="Q3/Q4 Planning">Q3/Q4 Planning</option>
+                      <option value="Exploratory Evaluation">Exploratory Evaluation</option>
                     </select>
                   </div>
-                </div>
-
-                <div>
-                  <label className="block text-xs font-medium text-slate-400 mb-1.5">Target Deployment Timeline</label>
-                  <select 
-                    value={projectTimeline}
-                    onChange={(e) => setProjectTimeline(e.target.value)}
-                    className="w-full bg-slate-50 dark:bg-[#0A0A0B] border border-slate-200 dark:border-white/10 rounded-xl px-3 py-2.5 text-sm text-slate-900 dark:text-white focus:outline-none focus:border-blue-500"
-                  >
-                    <option value="Immediate (1-3 months)">Immediate (1-3 months)</option>
-                    <option value="Q3/Q4 Planning">Q3/Q4 Planning</option>
-                    <option value="Exploratory Evaluation">Exploratory Evaluation</option>
-                  </select>
-                </div>
+                </fieldset>
 
                 <div className="flex justify-end space-x-3 pt-4">
                   <Button 
                     type="button" 
                     variant="outline" 
+                    disabled={isSubmitting}
                     onClick={() => setIsConsultModalOpen(false)}
-                    className="border-slate-200 dark:border-white/10 text-xs"
+                    className="border-slate-200 dark:border-white/10 text-xs disabled:opacity-50"
                   >
                     Cancel
                   </Button>
                   <Button 
                     type="submit" 
-                    className="bg-blue-600 hover:bg-blue-500 text-white font-bold text-xs px-6 shadow-md shadow-blue-900/30"
+                    disabled={isSubmitting}
+                    className="bg-blue-600 hover:bg-blue-500 text-white font-bold text-xs px-6 shadow-md shadow-blue-900/30 disabled:opacity-50 disabled:cursor-not-allowed transition-all"
                   >
-                    Submit Scoping Request
+                    {isSubmitting ? (
+                      <span className="flex items-center"><span className="animate-spin w-4 h-4 border-2 border-white border-t-transparent rounded-full mr-2"></span> Submitting...</span>
+                    ) : "Submit Scoping Request"}
                   </Button>
                 </div>
               </form>
