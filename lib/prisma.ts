@@ -3,9 +3,11 @@ import { PrismaMssql } from '@prisma/adapter-mssql';
 
 const globalForPrisma = global as unknown as { prisma: PrismaClient };
 
-const connectionString = process.env.DATABASE_URL || '';
+// Provide a valid dummy SQL Server connection string during build time
+const connectionString =
+  process.env.DATABASE_URL ||
+  'sqlserver://localhost:1433;database=dummy;user=sa;password=dummy;trustServerCertificate=true;';
 
-// Initialize the MSSQL driver adapter
 const adapter = new PrismaMssql(connectionString);
 
 export const prisma =
