@@ -19,6 +19,7 @@ interface UserData {
   id: string
   email: string
   company?: string
+  lastLoginAt?: string | Date // <-- Added for security timestamp tracking
   hasCompletedOnboarding?: boolean
   industry?: string // 'grid' | 'pipeline' | 'both'
   planTier?: string
@@ -200,6 +201,17 @@ export default function DashboardPage() {
             <Link href="/dashboard/settings" className="p-2 rounded-full text-slate-400 hover:text-slate-900 dark:hover:text-white hover:bg-slate-200 dark:hover:bg-white/10 transition-colors">
                 <Settings className="w-4 h-4" />
             </Link>
+
+            {/* --- Industry Standard Security Audit: Last Active Timestamp --- */}
+            <div className="hidden xl:flex flex-col text-right mr-1">
+              <span className="text-[10px] text-slate-500 font-mono uppercase tracking-wider">
+                {user?.lastLoginAt ? (
+                  <>Last Active: <span className="text-slate-700 dark:text-slate-300 font-semibold">{new Date(user.lastLoginAt).toLocaleString()}</span></>
+                ) : (
+                  <span className="text-emerald-600 dark:text-emerald-400 font-semibold">Initial Session Active</span>
+                )}
+              </span>
+            </div>
 
             <div className="hidden md:flex items-center space-x-2 text-sm text-slate-600 dark:text-slate-400 bg-slate-100 dark:bg-white/5 border border-slate-200 dark:border-white/10 px-3 py-1.5 rounded-full">
               <User className="w-4 h-4 text-emerald-600 dark:text-emerald-400" />

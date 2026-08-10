@@ -27,6 +27,7 @@ export async function GET() {
         position: true,
         firstName: true,
         lastName: true,
+        serviceProgress: true,
         avatarUrl: true
       }
     });

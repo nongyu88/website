@@ -27,8 +27,39 @@ export default function DataServicesPage() {
   const [trainingRequired, setTrainingRequired] = useState("Yes, include operator training")
 
   useEffect(() => {
-    const storedUser = localStorage.getItem("user")
-    if (storedUser) setUser(JSON.parse(storedUser))
+    const fetchFreshUser = async () => {
+      const storedUser = localStorage.getItem("user")
+      if (!storedUser) return
+
+      const parsedUser = JSON.parse(storedUser)
+      setUser(parsedUser)
+
+      try {
+        const res = await fetch(`/api/user/profile?email=${encodeURIComponent(parsedUser.email)}&t=${Date.now()}`, { cache: 'no-store' })
+        const data = await res.json()
+        if (data.user) {
+          const updatedUser = { ...parsedUser, ...data.user }
+          setUser(updatedUser)
+          localStorage.setItem("user", JSON.stringify(updatedUser))
+        }
+      } catch (err) {
+        console.error("Failed to fetch fresh user progress", err)
+      }
+    }
+
+    fetchFreshUser()
+  }, [])
+
+  // Close all Data Services Modals on ESC key
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') {
+        setIsReportModalOpen(false)
+        setIsHardwareModalOpen(false)
+      }
+    }
+    window.addEventListener('keydown', handleKeyDown)
+    return () => window.removeEventListener('keydown', handleKeyDown)
   }, [])
 
   // Parse subscription state
@@ -320,7 +351,7 @@ export default function DataServicesPage() {
               <h2 className="text-xl font-bold text-slate-900 dark:text-white flex items-center gap-2">
                 <Camera className="w-5 h-5 text-amber-500" /> Robotics in Action
               </h2>
-              <p className="text-xs text-slate-500">Field deployments of our UAVs and autonomous rovers across critical infrastructure</p>
+              <p className="text-xs text-slate-500">Field deployments showing how autonomous UAVs and ground rovers acquire critical telemetry for energy infrastructure</p>
             </div>
           </div>
           
@@ -384,19 +415,37 @@ export default function DataServicesPage() {
               Your subscription is successfully activated. Automated analytics generation is now unlocked, and our field operations team is reviewing your hardware deployment request.
             </p>
             
-            {/* Deployment Progress Bar */}
-            <div className="max-w-2xl bg-slate-900/50 p-5 rounded-xl border border-white/5">
-              <div className="flex justify-between text-xs font-bold text-slate-400 mb-3 uppercase tracking-wider">
-                <span>Provisioning Status</span>
-                <span className="text-emerald-400">20%</span>
-              </div>
-              <div className="w-full bg-slate-800 rounded-full h-2 mb-2 overflow-hidden border border-slate-700">
-                <div className="bg-emerald-500 h-2 rounded-full relative overflow-hidden" style={{ width: '20%' }}>
-                   <div className="absolute inset-0 bg-white/20 w-full animate-[shimmer_2s_infinite] -translate-x-full"></div>
+            {/* Dynamic Deployment Progress Bar from Database */}
+            {(() => {
+              let parsedProgress: Record<string, any> = {}
+              try {
+                parsedProgress = typeof user?.serviceProgress === 'string' 
+                  ? JSON.parse(user.serviceProgress) 
+                  : (user?.serviceProgress || {})
+              } catch (e) {}
+
+              const dataServiceData = parsedProgress["Data Services"] || {}
+              const liveProgress = dataServiceData.progress ?? 20
+              const livePhase = dataServiceData.phaseName ?? "01 - API Provisioning"
+
+              return (
+                <div className="max-w-2xl bg-slate-900/50 p-5 rounded-xl border border-white/5">
+                  <div className="flex justify-between text-xs font-bold text-slate-400 mb-3 uppercase tracking-wider">
+                    <span>Provisioning Status</span>
+                    <span className="text-emerald-400">{liveProgress}%</span>
+                  </div>
+                  <div className="w-full bg-slate-800 rounded-full h-2 mb-2 overflow-hidden border border-slate-700">
+                    <div 
+                      className="bg-emerald-500 h-2 rounded-full relative overflow-hidden transition-all duration-700 ease-out" 
+                      style={{ width: `${liveProgress}%` }}
+                    >
+                       <div className="absolute inset-0 bg-white/20 w-full animate-[shimmer_2s_infinite] -translate-x-full"></div>
+                    </div>
+                  </div>
+                  <p className="text-xs text-slate-500 text-right font-mono mt-2">Current Phase: {livePhase}</p>
                 </div>
-              </div>
-              <p className="text-xs text-slate-500 text-right font-mono mt-2">Current Phase: API Provisioning & Hardware Allocation</p>
-            </div>
+              )
+            })()}
           </section>
         ) : (
           <section className="bg-gradient-to-r from-slate-900 to-slate-800 border border-slate-700 rounded-2xl p-8 text-center mt-12 relative overflow-hidden">

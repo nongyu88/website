@@ -30,15 +30,35 @@ export default function DigitalTwinsHubPage() {
   
 
   useEffect(() => {
-    const storedUser = localStorage.getItem("user")
-    if (storedUser) setUser(JSON.parse(storedUser))
+    const fetchFreshUser = async () => {
+      const storedUser = localStorage.getItem("user")
+      if (!storedUser) return
+
+      const parsedUser = JSON.parse(storedUser)
+      setUser(parsedUser)
+
+      try {
+        const res = await fetch(`/api/user/profile?email=${encodeURIComponent(parsedUser.email)}&t=${Date.now()}`, { cache: 'no-store' })
+        const data = await res.json()
+        if (data.user) {
+          const updatedUser = { ...parsedUser, ...data.user }
+          setUser(updatedUser)
+          localStorage.setItem("user", JSON.stringify(updatedUser))
+        }
+      } catch (err) {
+        console.error("Failed to fetch fresh user progress", err)
+      }
+    }
+
+    fetchFreshUser()
   }, [])
 
-  // Close video modal on ESC key
+  // Close all modals on ESC key
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
       if (e.key === 'Escape') {
         setSelectedVideoUrl(null)
+        setIsConsultModalOpen(false)
       }
     }
     window.addEventListener('keydown', handleKeyDown)
@@ -297,19 +317,37 @@ export default function DigitalTwinsHubPage() {
               Your enterprise subscription is successfully activated. Our spatial engineering team has been notified and is currently initiating the discovery phase for your infrastructure.
             </p>
             
-            {/* Deployment Progress Bar */}
-            <div className="max-w-2xl bg-slate-900/50 p-5 rounded-xl border border-white/5">
-              <div className="flex justify-between text-xs font-bold text-slate-400 mb-3 uppercase tracking-wider">
-                <span>Project Deployment Status</span>
-                <span className="text-emerald-400">15%</span>
-              </div>
-              <div className="w-full bg-slate-800 rounded-full h-2 mb-2 overflow-hidden border border-slate-700">
-                <div className="bg-emerald-500 h-2 rounded-full relative overflow-hidden" style={{ width: '15%' }}>
-                   <div className="absolute inset-0 bg-white/20 w-full animate-[shimmer_2s_infinite] -translate-x-full"></div>
+            {/* Dynamic Deployment Progress Bar from Database */}
+            {(() => {
+              let parsedProgress: Record<string, any> = {}
+              try {
+                parsedProgress = typeof user?.serviceProgress === 'string' 
+                  ? JSON.parse(user.serviceProgress) 
+                  : (user?.serviceProgress || {})
+              } catch (e) {}
+
+              const twinServiceData = parsedProgress["Digital Twins"] || {}
+              const liveProgress = twinServiceData.progress ?? 15
+              const livePhase = twinServiceData.phaseName ?? "01 - Scoping & Discovery"
+
+              return (
+                <div className="max-w-2xl bg-slate-900/50 p-5 rounded-xl border border-white/5">
+                  <div className="flex justify-between text-xs font-bold text-slate-400 mb-3 uppercase tracking-wider">
+                    <span>Project Deployment Status</span>
+                    <span className="text-emerald-400">{liveProgress}%</span>
+                  </div>
+                  <div className="w-full bg-slate-800 rounded-full h-2 mb-2 overflow-hidden border border-slate-700">
+                    <div 
+                      className="bg-emerald-500 h-2 rounded-full relative overflow-hidden transition-all duration-700 ease-out" 
+                      style={{ width: `${liveProgress}%` }}
+                    >
+                       <div className="absolute inset-0 bg-white/20 w-full animate-[shimmer_2s_infinite] -translate-x-full"></div>
+                    </div>
+                  </div>
+                  <p className="text-xs text-slate-500 text-right font-mono mt-2">Current Phase: {livePhase}</p>
                 </div>
-              </div>
-              <p className="text-xs text-slate-500 text-right font-mono mt-2">Current Phase: 01 - Scoping & Discovery</p>
-            </div>
+              )
+            })()}
           </section>
         ) : (
           <section className="bg-gradient-to-r from-slate-900 to-slate-800 border border-slate-700 rounded-2xl p-8 text-center mt-12 relative overflow-hidden">
