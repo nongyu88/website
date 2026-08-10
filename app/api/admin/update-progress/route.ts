@@ -1,12 +1,7 @@
-import { NextResponse } from 'next/server'
-import { PrismaClient } from '@prisma/client'
-
 export const dynamic = 'force-dynamic'
 
-// Next.js Global Singleton Pattern
-const globalForPrisma = globalThis as unknown as { prisma: PrismaClient }
-const prisma = globalForPrisma.prisma || new PrismaClient()
-if (process.env.NODE_ENV !== 'production') globalForPrisma.prisma = prisma
+import { NextResponse } from 'next/server'
+import { prisma } from '@/lib/prisma' // ✅ Imports the fixed singleton with PrismaMssql adapter
 
 export async function POST(req: Request) {
   try {
