@@ -44,6 +44,7 @@ export async function GET(request: Request) {
         subscriptionStatus: true,
         stripeCustomerId: true,
         stripeSubscriptionId: true,
+        serviceProgress: true,
       }
     });
 

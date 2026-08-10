@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from "react"
 import { Shield, Trash2, Edit, CheckCircle, XCircle, X, UserPlus, Info, User as UserIcon } from "lucide-react"
+import AdminProgressController from "@/components/admin/AdminProgressController"
 
 export default function AdminDashboard() {
   const [users, setUsers] = useState<any[]>([])
@@ -484,6 +485,20 @@ export default function AdminDashboard() {
                   )}
                 </div>
               </div>
+
+              {/* Service Fulfillment Progress Controller */}
+              <div className="pt-4 border-t border-white/10">
+                <AdminProgressController 
+                  userEmail={editingUser.email} 
+                  userActivePlans={getParsedPlans(editingUser.activePlans)} 
+                  initialProgress={editingUser.serviceProgress}
+                  onProgressUpdate={(newProgressJson) => {
+                    setEditingUser((prev: any) => prev ? { ...prev, serviceProgress: newProgressJson } : null);
+                    setUsers((prev: any[]) => prev.map(u => u.id === editingUser.id ? { ...u, serviceProgress: newProgressJson } : u));
+                  }}
+                />
+              </div>
+
             </div>
 
           </div>

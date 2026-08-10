@@ -61,7 +61,8 @@ model User {
   role           String        @default("Viewer") // 'Owner', 'Admin', 'Viewer'
 
   activePlans          String   @default("[]") @db.NVarChar(Max)
-
+  serviceProgress        String   @default("{}") @db.NVarChar(Max)
+  
   domainId       String?
   domain         domain?  @relation(fields: [domainId], references: [id])
 

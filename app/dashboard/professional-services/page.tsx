@@ -6,7 +6,7 @@ import {
   ArrowLeft, Briefcase, FileText, Settings, 
   GraduationCap, Headset, ArrowRight, X, 
   CheckCircle2, Workflow, Database, Users,
-  Lock, Unlock
+  Lock, Unlock, ClipboardCheck
 } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
@@ -21,8 +21,39 @@ export default function ProfessionalServicesPage() {
   const [scopeDetails, setScopeDetails] = useState("")
 
   useEffect(() => {
-    const storedUser = localStorage.getItem("user")
-    if (storedUser) setUser(JSON.parse(storedUser))
+    const fetchFreshUser = async () => {
+      const storedUser = localStorage.getItem("user")
+      if (!storedUser) return
+
+      const parsedUser = JSON.parse(storedUser)
+      setUser(parsedUser) // Fast initial render from cache
+
+      try {
+        // Fetch fresh database record to get live serviceProgress
+        const res = await fetch(`/api/user/profile?email=${encodeURIComponent(parsedUser.email)}&t=${Date.now()}`, { cache: 'no-store' })
+        const data = await res.json()
+        if (data.user) {
+          const updatedUser = { ...parsedUser, ...data.user }
+          setUser(updatedUser)
+          localStorage.setItem("user", JSON.stringify(updatedUser))
+        }
+      } catch (err) {
+        console.error("Failed to fetch fresh user progress", err)
+      }
+    }
+
+    fetchFreshUser()
+  }, [])
+
+  // Close SOW Modal on ESC key
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') {
+        setIsSowModalOpen(false)
+      }
+    }
+    window.addEventListener('keydown', handleKeyDown)
+    return () => window.removeEventListener('keydown', handleKeyDown)
   }, [])
 
   // Parse subscription state
@@ -109,103 +140,179 @@ export default function ProfessionalServicesPage() {
           </div>
         </div>
 
-        {/* Service Pillars */}
+        {/* Professional Service Pillars & Delivery Procedures (Unified) */}
         <section className="space-y-6">
-          <div className="flex flex-col md:flex-row md:items-center justify-between gap-2 border-b border-slate-200 dark:border-white/10 pb-4">
-            <div>
-              <h2 className="text-xl font-bold text-slate-900 dark:text-white flex items-center gap-2">
-                <Settings className="w-5 h-5 text-purple-500" /> Professional Service Pillars
-              </h2>
-              <p className="text-xs text-slate-500">Customized engagements to bridge the gap between our platform and your operations</p>
-            </div>
+          <div className="border-b border-slate-200 dark:border-white/10 pb-4">
+            <h2 className="text-xl font-bold text-slate-900 dark:text-white flex items-center gap-2">
+              <Settings className="w-5 h-5 text-purple-500" /> Professional Service Pillars & Pricing
+            </h2>
+            <p className="text-xs text-slate-500 mt-1">
+              Customized enterprise engagements with transparent pricing and structured delivery procedures
+            </p>
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
             
-            {/* Pillar 1: Systems Integration */}
-            <div className="bg-white dark:bg-[#111113] border border-slate-200 dark:border-white/10 rounded-2xl p-6 flex items-start space-x-4 shadow-sm">
-              <div className="w-12 h-12 bg-purple-100 dark:bg-purple-500/10 rounded-xl flex items-center justify-center shrink-0 border border-purple-200 dark:border-purple-500/20">
-                <Workflow className="w-6 h-6 text-purple-600 dark:text-purple-400" />
-              </div>
+            {/* 1. Legacy Systems Integration */}
+            <div className="bg-white dark:bg-[#111113] border border-slate-200 dark:border-white/10 rounded-2xl p-6 shadow-sm flex flex-col justify-between hover:border-purple-500/40 transition-colors">
               <div>
-                <h3 className="font-bold text-slate-900 dark:text-white mb-2">Legacy Systems Integration</h3>
-                <p className="text-xs text-slate-500 dark:text-slate-400 leading-relaxed mb-3">
-                  Connect Kraftgene AI bidirectionally with your existing ERPs, CMMS (IBM Maximo, SAP), and GIS platforms (Esri ArcGIS) to maintain a single source of truth.
-                </p>
+                <div className="flex justify-between items-start mb-3 pb-3 border-b border-slate-100 dark:border-white/5">
+                  <div className="flex items-center space-x-3">
+                    <div className="w-10 h-10 bg-purple-100 dark:bg-purple-500/10 rounded-xl flex items-center justify-center shrink-0 border border-purple-200 dark:border-purple-500/20">
+                      <Workflow className="w-5 h-5 text-purple-600 dark:text-purple-400" />
+                    </div>
+                    <div>
+                      <h3 className="font-bold text-slate-900 dark:text-white text-base">Legacy Systems Integration</h3>
+                      <p className="text-[11px] text-slate-500">Connect ERPs, CMMS (IBM Maximo, SAP), and GIS (ArcGIS)</p>
+                    </div>
+                  </div>
+                  <div className="text-right shrink-0">
+                    <span className="text-purple-600 dark:text-purple-400 font-bold block text-sm">$20k – $50k</span>
+                    <span className="text-[9px] text-slate-400 font-mono uppercase">Per System</span>
+                  </div>
+                </div>
+
+                <div className="space-y-2.5 mt-4">
+                  <div className="flex items-start text-xs text-slate-600 dark:text-slate-300">
+                    <span className="w-5 font-bold text-purple-500 shrink-0">1.</span>
+                    <p><strong className="text-slate-900 dark:text-white font-semibold">Discovery Audit:</strong> Security mapping (NERC CIP/API) and architecture review.</p>
+                  </div>
+                  <div className="flex items-start text-xs text-slate-600 dark:text-slate-300">
+                    <span className="w-5 font-bold text-purple-500 shrink-0">2.</span>
+                    <p><strong className="text-slate-900 dark:text-white font-semibold">Middleware Dev:</strong> Custom bidirectional connectors for SAP, IBM Maximo, or ERPs.</p>
+                  </div>
+                  <div className="flex items-start text-xs text-slate-600 dark:text-slate-300">
+                    <span className="w-5 font-bold text-purple-500 shrink-0">3.</span>
+                    <p><strong className="text-slate-900 dark:text-white font-semibold">UAT & Staging:</strong> Sandbox environment testing to ensure zero operational disruption.</p>
+                  </div>
+                  <div className="flex items-start text-xs text-slate-600 dark:text-slate-300">
+                    <span className="w-5 font-bold text-purple-500 shrink-0">4.</span>
+                    <p><strong className="text-slate-900 dark:text-white font-semibold">Production Launch:</strong> Live deployment with a 30-day hypercare support window.</p>
+                  </div>
+                </div>
               </div>
             </div>
 
-            {/* Pillar 2: Custom Data Engineering */}
-            <div className="bg-white dark:bg-[#111113] border border-slate-200 dark:border-white/10 rounded-2xl p-6 flex items-start space-x-4 shadow-sm">
-              <div className="w-12 h-12 bg-purple-100 dark:bg-purple-500/10 rounded-xl flex items-center justify-center shrink-0 border border-purple-200 dark:border-purple-500/20">
-                <Database className="w-6 h-6 text-purple-600 dark:text-purple-400" />
-              </div>
+            {/* 2. Custom API & Data Engineering */}
+            <div className="bg-white dark:bg-[#111113] border border-slate-200 dark:border-white/10 rounded-2xl p-6 shadow-sm flex flex-col justify-between hover:border-purple-500/40 transition-colors">
               <div>
-                <h3 className="font-bold text-slate-900 dark:text-white mb-2">Custom API & Data Engineering</h3>
-                <p className="text-xs text-slate-500 dark:text-slate-400 leading-relaxed mb-3">
-                  Development of bespoke data connectors for proprietary SCADA historians, custom IoT edge devices, or localized weather monitoring stations.
-                </p>
+                <div className="flex justify-between items-start mb-3 pb-3 border-b border-slate-100 dark:border-white/5">
+                  <div className="flex items-center space-x-3">
+                    <div className="w-10 h-10 bg-purple-100 dark:bg-purple-500/10 rounded-xl flex items-center justify-center shrink-0 border border-purple-200 dark:border-purple-500/20">
+                      <Database className="w-5 h-5 text-purple-600 dark:text-purple-400" />
+                    </div>
+                    <div>
+                      <h3 className="font-bold text-slate-900 dark:text-white text-base">Custom API & Data Engineering</h3>
+                      <p className="text-[11px] text-slate-500">Bespoke connectors for SCADA historians & edge devices</p>
+                    </div>
+                  </div>
+                  <div className="text-right shrink-0">
+                    <span className="text-purple-600 dark:text-purple-400 font-bold block text-sm">$10k – $30k</span>
+                    <span className="text-[9px] text-slate-400 font-mono uppercase">Per Pipeline</span>
+                  </div>
+                </div>
+
+                <div className="space-y-2.5 mt-4">
+                  <div className="flex items-start text-xs text-slate-600 dark:text-slate-300">
+                    <span className="w-5 font-bold text-purple-500 shrink-0">1.</span>
+                    <p><strong className="text-slate-900 dark:text-white font-semibold">Endpoint Profiling:</strong> Assessing rate limits, payload structures, and IoT edge hardware.</p>
+                  </div>
+                  <div className="flex items-start text-xs text-slate-600 dark:text-slate-300">
+                    <span className="w-5 font-bold text-purple-500 shrink-0">2.</span>
+                    <p><strong className="text-slate-900 dark:text-white font-semibold">Schema Mapping:</strong> Aligning external telemetry datasets to the Kraftgene Twin ontology.</p>
+                  </div>
+                  <div className="flex items-start text-xs text-slate-600 dark:text-slate-300">
+                    <span className="w-5 font-bold text-purple-500 shrink-0">3.</span>
+                    <p><strong className="text-slate-900 dark:text-white font-semibold">Pipeline Construction:</strong> Building fault-tolerant, real-time data ingestion pipelines.</p>
+                  </div>
+                  <div className="flex items-start text-xs text-slate-600 dark:text-slate-300">
+                    <span className="w-5 font-bold text-purple-500 shrink-0">4.</span>
+                    <p><strong className="text-slate-900 dark:text-white font-semibold">CI/CD Integration:</strong> Automated testing and deployment into your cloud or on-prem environment.</p>
+                  </div>
+                </div>
               </div>
             </div>
 
-            {/* Pillar 3: Training & Change Management */}
-            <div className="bg-white dark:bg-[#111113] border border-slate-200 dark:border-white/10 rounded-2xl p-6 flex items-start space-x-4 shadow-sm">
-              <div className="w-12 h-12 bg-purple-100 dark:bg-purple-500/10 rounded-xl flex items-center justify-center shrink-0 border border-purple-200 dark:border-purple-500/20">
-                <GraduationCap className="w-6 h-6 text-purple-600 dark:text-purple-400" />
-              </div>
+            {/* 3. Change Management & Training */}
+            <div className="bg-white dark:bg-[#111113] border border-slate-200 dark:border-white/10 rounded-2xl p-6 shadow-sm flex flex-col justify-between hover:border-purple-500/40 transition-colors">
               <div>
-                <h3 className="font-bold text-slate-900 dark:text-white mb-2">Change Management & Training</h3>
-                <p className="text-xs text-slate-500 dark:text-slate-400 leading-relaxed mb-3">
-                  Comprehensive onboarding programs, on-site workshops, and documentation for control room operators, ensuring rapid platform adoption and safety compliance.
-                </p>
+                <div className="flex justify-between items-start mb-3 pb-3 border-b border-slate-100 dark:border-white/5">
+                  <div className="flex items-center space-x-3">
+                    <div className="w-10 h-10 bg-purple-100 dark:bg-purple-500/10 rounded-xl flex items-center justify-center shrink-0 border border-purple-200 dark:border-purple-500/20">
+                      <GraduationCap className="w-5 h-5 text-purple-600 dark:text-purple-400" />
+                    </div>
+                    <div>
+                      <h3 className="font-bold text-slate-900 dark:text-white text-base">Change Management & Training</h3>
+                      <p className="text-[11px] text-slate-500">Operator onboarding, workshops, and compliance docs</p>
+                    </div>
+                  </div>
+                  <div className="text-right shrink-0">
+                    <span className="text-purple-600 dark:text-purple-400 font-bold block text-sm">$5k – $15k</span>
+                    <span className="text-[9px] text-slate-400 font-mono uppercase">Per Cohort</span>
+                  </div>
+                </div>
+
+                <div className="space-y-2.5 mt-4">
+                  <div className="flex items-start text-xs text-slate-600 dark:text-slate-300">
+                    <span className="w-5 font-bold text-purple-500 shrink-0">1.</span>
+                    <p><strong className="text-slate-900 dark:text-white font-semibold">Needs Assessment:</strong> Evaluating operator workflows and control room protocols.</p>
+                  </div>
+                  <div className="flex items-start text-xs text-slate-600 dark:text-slate-300">
+                    <span className="w-5 font-bold text-purple-500 shrink-0">2.</span>
+                    <p><strong className="text-slate-900 dark:text-white font-semibold">Curriculum Design:</strong> Tailoring documentation and scenario playbooks to your unique grid/pipeline.</p>
+                  </div>
+                  <div className="flex items-start text-xs text-slate-600 dark:text-slate-300">
+                    <span className="w-5 font-bold text-purple-500 shrink-0">3.</span>
+                    <p><strong className="text-slate-900 dark:text-white font-semibold">Interactive Workshops:</strong> 2 to 4 day intensive on-site or virtual training sessions.</p>
+                  </div>
+                  <div className="flex items-start text-xs text-slate-600 dark:text-slate-300">
+                    <span className="w-5 font-bold text-purple-500 shrink-0">4.</span>
+                    <p><strong className="text-slate-900 dark:text-white font-semibold">Certification:</strong> Final sandbox testing to ensure operator competence and safety compliance.</p>
+                  </div>
+                </div>
               </div>
             </div>
 
-            {/* Pillar 4: Dedicated Support */}
-            <div className="bg-white dark:bg-[#111113] border border-slate-200 dark:border-white/10 rounded-2xl p-6 flex items-start space-x-4 shadow-sm">
-              <div className="w-12 h-12 bg-purple-100 dark:bg-purple-500/10 rounded-xl flex items-center justify-center shrink-0 border border-purple-200 dark:border-purple-500/20">
-                <Headset className="w-6 h-6 text-purple-600 dark:text-purple-400" />
-              </div>
+            {/* 4. Technical Account Management */}
+            <div className="bg-white dark:bg-[#111113] border border-slate-200 dark:border-white/10 rounded-2xl p-6 shadow-sm flex flex-col justify-between hover:border-purple-500/40 transition-colors">
               <div>
-                <h3 className="font-bold text-slate-900 dark:text-white mb-2">Technical Account Management (TAM)</h3>
-                <p className="text-xs text-slate-500 dark:text-slate-400 leading-relaxed mb-3">
-                  Assigned solutions architects and prioritized SLAs for mission-critical infrastructure, including quarterly business reviews and proactive system audits.
-                </p>
+                <div className="flex justify-between items-start mb-3 pb-3 border-b border-slate-100 dark:border-white/5">
+                  <div className="flex items-center space-x-3">
+                    <div className="w-10 h-10 bg-purple-100 dark:bg-purple-500/10 rounded-xl flex items-center justify-center shrink-0 border border-purple-200 dark:border-purple-500/20">
+                      <Headset className="w-5 h-5 text-purple-600 dark:text-purple-400" />
+                    </div>
+                    <div>
+                      <h3 className="font-bold text-slate-900 dark:text-white text-base">Technical Account Management (TAM)</h3>
+                      <p className="text-[11px] text-slate-500">Dedicated solutions architect & prioritized SLAs</p>
+                    </div>
+                  </div>
+                  <div className="text-right shrink-0">
+                    <span className="text-purple-600 dark:text-purple-400 font-bold block text-sm">$4k – $8k</span>
+                    <span className="text-[9px] text-slate-400 font-mono uppercase">Monthly Retainer</span>
+                  </div>
+                </div>
+
+                <div className="space-y-2.5 mt-4">
+                  <div className="flex items-start text-xs text-slate-600 dark:text-slate-300">
+                    <span className="w-5 font-bold text-purple-500 shrink-0">1.</span>
+                    <p><strong className="text-slate-900 dark:text-white font-semibold">Dedicated Resource:</strong> Senior solutions architect assigned directly to your workspace.</p>
+                  </div>
+                  <div className="flex items-start text-xs text-slate-600 dark:text-slate-300">
+                    <span className="w-5 font-bold text-purple-500 shrink-0">2.</span>
+                    <p><strong className="text-slate-900 dark:text-white font-semibold">SLA Prioritization:</strong> Guaranteed 1-hour response times for critical infrastructure tickets.</p>
+                  </div>
+                  <div className="flex items-start text-xs text-slate-600 dark:text-slate-300">
+                    <span className="w-5 font-bold text-purple-500 shrink-0">3.</span>
+                    <p><strong className="text-slate-900 dark:text-white font-semibold">Proactive Syncs:</strong> Weekly touchpoints to manage ongoing integrations and roadmap requests.</p>
+                  </div>
+                  <div className="flex items-start text-xs text-slate-600 dark:text-slate-300">
+                    <span className="w-5 font-bold text-purple-500 shrink-0">4.</span>
+                    <p><strong className="text-slate-900 dark:text-white font-semibold">Quarterly Reviews:</strong> Comprehensive system audits and ROI reporting (QBRs).</p>
+                  </div>
+                </div>
               </div>
             </div>
 
-          </div>
-        </section>
-
-        {/* Engagement Process */}
-        <section className="bg-white dark:bg-[#111113] border border-slate-200 dark:border-white/10 rounded-2xl p-8">
-          <h2 className="text-xl font-bold text-slate-900 dark:text-white mb-2">The Engagement Process</h2>
-          <p className="text-xs text-slate-500 mb-8">How we scope, execute, and deliver professional services</p>
-
-          <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
-            <div className="p-4 bg-slate-50 dark:bg-[#0A0A0B] rounded-xl border border-slate-200 dark:border-white/5 relative">
-              <span className="text-2xl font-black text-purple-500/30 mb-2 block">01</span>
-              <h4 className="font-bold text-sm text-slate-900 dark:text-white mb-1">Architecture Audit</h4>
-              <p className="text-xs text-slate-500">We analyze your current tech stack, IT security constraints, and operational bottlenecks.</p>
-            </div>
-
-            <div className="p-4 bg-slate-50 dark:bg-[#0A0A0B] rounded-xl border border-slate-200 dark:border-white/5 relative">
-              <span className="text-2xl font-black text-purple-500/30 mb-2 block">02</span>
-              <h4 className="font-bold text-sm text-slate-900 dark:text-white mb-1">SOW Proposal</h4>
-              <p className="text-xs text-slate-500">We deliver a detailed Statement of Work outlining deliverables, timelines, and resourcing.</p>
-            </div>
-
-            <div className="p-4 bg-slate-50 dark:bg-[#0A0A0B] rounded-xl border border-slate-200 dark:border-white/5 relative">
-              <span className="text-2xl font-black text-purple-500/30 mb-2 block">03</span>
-              <h4 className="font-bold text-sm text-slate-900 dark:text-white mb-1">Agile Execution</h4>
-              <p className="text-xs text-slate-500">Our engineers integrate the solutions with regular milestone check-ins and staging reviews.</p>
-            </div>
-
-            <div className="p-4 bg-slate-50 dark:bg-[#0A0A0B] rounded-xl border border-slate-200 dark:border-white/5 relative">
-              <span className="text-2xl font-black text-purple-500/30 mb-2 block">04</span>
-              <h4 className="font-bold text-sm text-slate-900 dark:text-white mb-1">Handover & Support</h4>
-              <p className="text-xs text-slate-500">Rigorous UAT testing, user training sessions, and transition to ongoing TAM support.</p>
-            </div>
           </div>
         </section>
 
@@ -222,19 +329,40 @@ export default function ProfessionalServicesPage() {
               Your service agreement is successfully activated. A Technical Account Manager (TAM) has been assigned to your workspace and is preparing your architecture audit.
             </p>
             
-            {/* Deployment Progress Bar */}
-            <div className="max-w-2xl bg-slate-900/50 p-5 rounded-xl border border-white/5">
-              <div className="flex justify-between text-xs font-bold text-slate-400 mb-3 uppercase tracking-wider">
-                <span>Engagement Status</span>
-                <span className="text-emerald-400">10%</span>
-              </div>
-              <div className="w-full bg-slate-800 rounded-full h-2 mb-2 overflow-hidden border border-slate-700">
-                <div className="bg-emerald-500 h-2 rounded-full relative overflow-hidden" style={{ width: '10%' }}>
-                   <div className="absolute inset-0 bg-white/20 w-full animate-[shimmer_2s_infinite] -translate-x-full"></div>
+            {/* Dynamic Deployment Progress Bar from Database */}
+            {(() => {
+              // Robust Multi-Pass Parser for SQL Server
+              let parsedProgress: any = user?.serviceProgress || {}
+              try {
+                if (typeof parsedProgress === 'string') parsedProgress = JSON.parse(parsedProgress)
+                if (typeof parsedProgress === 'string') parsedProgress = JSON.parse(parsedProgress)
+                if (typeof parsedProgress !== 'object' || parsedProgress === null) parsedProgress = {}
+              } catch (e) {
+                parsedProgress = {}
+              }
+
+              const proServiceData = parsedProgress["Professional Services"] || {}
+              const liveProgress = proServiceData.progress ?? 10
+              const livePhase = proServiceData.phaseName ?? "01 - Architecture Audit & SOW"
+
+              return (
+                <div className="max-w-2xl bg-slate-900/50 p-5 rounded-xl border border-white/5">
+                  <div className="flex justify-between text-xs font-bold text-slate-400 mb-3 uppercase tracking-wider">
+                    <span>Engagement Status</span>
+                    <span className="text-emerald-400">{liveProgress}%</span>
+                  </div>
+                  <div className="w-full bg-slate-800 rounded-full h-2 mb-2 overflow-hidden border border-slate-700">
+                    <div 
+                      className="bg-emerald-500 h-2 rounded-full relative overflow-hidden transition-all duration-700 ease-out" 
+                      style={{ width: `${liveProgress}%` }}
+                    >
+                       <div className="absolute inset-0 bg-white/20 w-full animate-[shimmer_2s_infinite] -translate-x-full"></div>
+                    </div>
+                  </div>
+                  <p className="text-xs text-slate-500 text-right font-mono mt-2">Current Phase: {livePhase}</p>
                 </div>
-              </div>
-              <p className="text-xs text-slate-500 text-right font-mono mt-2">Current Phase: 01 - Architecture Audit & SOW</p>
-            </div>
+              )
+            })()}
           </section>
         ) : (
           <section className="bg-gradient-to-r from-slate-900 to-slate-800 border border-slate-700 rounded-2xl p-8 text-center mt-12 relative overflow-hidden">

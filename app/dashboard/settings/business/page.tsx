@@ -168,9 +168,9 @@ export default function BusinessSettingsPage() {
                 <label className="block text-sm font-medium text-slate-700 dark:text-slate-400 mb-2 flex items-center"><Briefcase className="w-4 h-4 mr-2" /> Primary Industry</label>
                 <select value={industry} onChange={(e) => setIndustry(e.target.value)} className="w-full bg-slate-50 dark:bg-[#0A0A0B] border border-slate-200 dark:border-white/10 rounded-lg px-4 py-2.5 text-slate-900 dark:text-white focus:border-purple-500 focus:outline-none appearance-none transition-colors duration-300 cursor-pointer">
                   <option value="" disabled>Select your focus...</option>
-                  <option value="grid">Utility Power Grids</option>
+                  <option value="grid">Utility Power Grids - Transmission Network</option>
                   <option value="pipeline">Oil & Gas Pipelines</option>
-                  <option value="both">Both (Enterprise Convergence)</option>
+                  <option value="grid">Utility Power Grids - Distribution Network</option>
                 </select>
               </div>
 

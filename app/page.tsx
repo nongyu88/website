@@ -600,13 +600,13 @@ export default function HomePage() {
               Enterprise Infrastructure Intelligence
             </Badge>
             
-            <h1 className="text-4xl md:text-6xl lg:text-7xl font-bold text-slate-900 dark:text-white mb-6 leading-tight tracking-tight">
+            <h1 className="text-xl sm:text-2xl md:text-3xl lg:text-4xl font-bold text-slate-900 dark:text-white mb-6 leading-tight tracking-tight">
               The Operating System for <br className="hidden md:block"/>
               <span className="text-transparent bg-clip-text bg-gradient-to-r from-emerald-500 to-teal-400">
                 Critical Grid Resilience, Oil & Gas Pipelines, & Renewable Energy Management
               </span>
             </h1>
-            
+                        
             <p className="text-base md:text-xl text-slate-700 dark:text-gray-300 mb-10 max-w-3xl mx-auto px-2">
               EnergyEminence™ is a physics-backed digital twin that fuses live drone surveillance and physics-informed ML as a predictive engine with an autonomous AI Copilot to instantly detect, isolate, and mitigate catastrophic failures before they happen.
             </p>
