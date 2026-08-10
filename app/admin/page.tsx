@@ -1,7 +1,7 @@
 "use client"
 
 import { useState, useEffect } from "react"
-import { Shield, Trash2, Edit, CheckCircle, XCircle, X, UserPlus, Info, User as UserIcon } from "lucide-react"
+import { Shield, Trash2, Edit, CheckCircle, XCircle, X, UserPlus, Info, User as UserIcon, Search } from "lucide-react"
 import AdminProgressController from "@/components/admin/AdminProgressController"
 
 export default function AdminDashboard() {
@@ -21,6 +21,8 @@ export default function AdminDashboard() {
   const [editRole, setEditRole] = useState("")
   const [editFirstName, setEditFirstName] = useState("")
   const [editLastName, setEditLastName] = useState("")
+
+  const [searchQuery, setSearchQuery] = useState("")
 
   useEffect(() => {
     fetchUsers()
@@ -193,19 +195,42 @@ export default function AdminDashboard() {
     return users.filter(u => u.id !== userId && u.email.endsWith(`@${domain}`));
   }
 
+  // Real-time filter for Name, Email, and Company
+  const filteredUsers = users.filter((u) => {
+    const query = searchQuery.toLowerCase().trim();
+    if (!query) return true;
+    const fullName = `${u.firstName || ''} ${u.lastName || ''}`.toLowerCase();
+    const email = (u.email || '').toLowerCase();
+    const company = (u.company || '').toLowerCase();
+    return fullName.includes(query) || email.includes(query) || company.includes(query);
+  });
+
   return (
     <div className="min-h-screen bg-[#0A0A0B] text-slate-300 font-sans p-6 md:p-12">
       <div className="max-w-6xl mx-auto">
         
-        {/* Header Section */}
-        <div className="flex flex-col sm:flex-row sm:items-center justify-between mb-8 border-b border-white/10 pb-4 gap-4">
-          <div className="flex items-center space-x-3">
+        {/* Header Section with Search Bar */}
+        <div className="flex flex-col lg:flex-row lg:items-center justify-between mb-8 border-b border-white/10 pb-4 gap-4">
+          <div className="flex items-center space-x-3 shrink-0">
             <Shield className="w-6 h-6 text-purple-500" />
             <h1 className="text-2xl font-bold text-white">Admin / User Management</h1>
           </div>
+
+          {/* Search Bar Input */}
+          <div className="relative flex-1 max-w-md w-full">
+            <Search className="w-4 h-4 absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-500" />
+            <input 
+              type="text"
+              placeholder="Search by name, email, or company..."
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              className="w-full bg-[#111113] border border-white/10 rounded-xl pl-10 pr-4 py-2 text-sm text-white placeholder-slate-500 focus:outline-none focus:border-purple-500 transition-colors shadow-inner"
+            />
+          </div>
+
           <button 
             onClick={() => setShowAddModal(true)}
-            className="flex items-center gap-2 bg-emerald-600 hover:bg-emerald-500 text-white font-bold py-2 px-4 rounded-lg transition-colors shadow-lg shadow-emerald-900/20"
+            className="flex items-center gap-2 bg-emerald-600 hover:bg-emerald-500 text-white font-bold py-2 px-4 rounded-lg transition-colors shadow-lg shadow-emerald-900/20 shrink-0"
           >
             <UserPlus className="w-4 h-4" /> Provision User
           </button>
@@ -225,49 +250,57 @@ export default function AdminDashboard() {
                 </tr>
               </thead>
               <tbody className="text-sm">
-                {users.map((user) => (
-                  <tr key={user.id} className="border-b border-white/5 hover:bg-white/5 transition-colors">
-                    <td className="py-4 px-6">
-                      <p className="text-white font-bold text-base">{user.company}</p>
-                      <p className="text-slate-500 text-xs mt-1">{user.email}</p>
-                    </td>
-                    <td className="py-4 px-6">
-                      <span className="px-2.5 py-1 rounded-full text-xs font-medium bg-white/5 text-slate-300 border border-white/10">
-                        {user.role || 'Unknown'}
-                      </span>
-                    </td>
-                    <td className="py-4 px-6 text-center">
-                      <button 
-                        onClick={() => handleToggleApproval(user)}
-                        className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-md text-xs font-bold transition-all ${user.isApproved ? 'bg-emerald-500/10 text-emerald-400 hover:bg-emerald-500/20' : 'bg-orange-500/10 text-orange-400 border border-orange-500/20 hover:bg-orange-500/20 animate-pulse'}`}
-                      >
-                        {user.isApproved ? <><CheckCircle className="w-3.5 h-3.5"/> Approved</> : <><XCircle className="w-3.5 h-3.5"/> Pending</>}
-                      </button>
-                    </td>
-                    <td className="py-4 px-6 text-right space-x-3">
-                    <button 
-                        onClick={() => { 
-                          setEditingUser(user); 
-                          setEditCompany(user.company || ''); 
-                          setEditRole(user.role || 'Viewer'); 
-                          setEditFirstName(user.firstName || ''); 
-                          setEditLastName(user.lastName || ''); 
-                        }}
-                        className="text-blue-400 hover:text-blue-300 transition-colors p-1"
-                        title="Detailed Profile & Edit"
-                      >
-                        <Info className="w-4 h-4 inline" />
-                      </button>
-                      <button 
-                        onClick={() => handleDelete(user.id, user.company)}
-                        className="text-red-500 hover:text-red-400 transition-colors p-1"
-                        title="Delete User"
-                      >
-                        <Trash2 className="w-4 h-4 inline" />
-                      </button>
+                {filteredUsers.length === 0 ? (
+                  <tr>
+                    <td colSpan={4} className="py-12 text-center text-slate-500">
+                      No users match "{searchQuery}"
                     </td>
                   </tr>
-                ))}
+                ) : (
+                  filteredUsers.map((user) => (
+                    <tr key={user.id} className="border-b border-white/5 hover:bg-white/5 transition-colors">
+                      <td className="py-4 px-6">
+                        <p className="text-white font-bold text-base">{user.company}</p>
+                        <p className="text-slate-500 text-xs mt-1">{user.email}</p>
+                      </td>
+                      <td className="py-4 px-6">
+                        <span className="px-2.5 py-1 rounded-full text-xs font-medium bg-white/5 text-slate-300 border border-white/10">
+                          {user.role || 'Unknown'}
+                        </span>
+                      </td>
+                      <td className="py-4 px-6 text-center">
+                        <button 
+                          onClick={() => handleToggleApproval(user)}
+                          className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-md text-xs font-bold transition-all ${user.isApproved ? 'bg-emerald-500/10 text-emerald-400 hover:bg-emerald-500/20' : 'bg-orange-500/10 text-orange-400 border border-orange-500/20 hover:bg-orange-500/20 animate-pulse'}`}
+                        >
+                          {user.isApproved ? <><CheckCircle className="w-3.5 h-3.5"/> Approved</> : <><XCircle className="w-3.5 h-3.5"/> Pending</>}
+                        </button>
+                      </td>
+                      <td className="py-4 px-6 text-right space-x-3">
+                      <button 
+                          onClick={() => { 
+                            setEditingUser(user); 
+                            setEditCompany(user.company || ''); 
+                            setEditRole(user.role || 'Viewer'); 
+                            setEditFirstName(user.firstName || ''); 
+                            setEditLastName(user.lastName || ''); 
+                          }}
+                          className="text-blue-400 hover:text-blue-300 transition-colors p-1"
+                          title="Detailed Profile & Edit"
+                        >
+                          <Info className="w-4 h-4 inline" />
+                        </button>
+                        <button 
+                          onClick={() => handleDelete(user.id, user.company)}
+                          className="text-red-500 hover:text-red-400 transition-colors p-1"
+                          title="Delete User"
+                        >
+                          <Trash2 className="w-4 h-4 inline" />
+                        </button>
+                      </td>
+                    </tr>
+                  ))
+                )}
               </tbody>
             </table>
           </div>
@@ -315,12 +348,21 @@ export default function AdminDashboard() {
 
       {/* Detailed Edit Modal */}
       {editingUser && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm p-4 overflow-y-auto pt-20 pb-20">
-          <div className="bg-[#111113] border border-white/10 rounded-2xl w-full max-w-lg p-6 shadow-2xl relative">
-            <button onClick={() => setEditingUser(null)} className="absolute top-4 right-4 text-slate-500 hover:text-white transition-colors">
-              <X className="w-5 h-5" />
-            </button>
-            <h3 className="text-xl font-bold text-white mb-6">Enterprise Profile</h3>
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm p-4">
+          
+          {/* 1. The Fixed Window Frame */}
+          <div className="bg-[#111113] border border-white/10 rounded-2xl w-full max-w-lg h-[85vh] shadow-2xl relative flex flex-col overflow-hidden">
+            
+            {/* 2. Stationary Header (Never Scrolls) */}
+            <div className="flex justify-between items-center p-5 border-b border-white/10 bg-[#111113] shrink-0">
+              <h3 className="text-xl font-bold text-white">Enterprise Profile</h3>
+              <button onClick={() => setEditingUser(null)} className="text-slate-500 hover:text-white transition-colors">
+                <X className="w-5 h-5" />
+              </button>
+            </div>
+
+            {/* 3. Scrollable Window Body with Scrolling Widget */}
+            <div className="p-6 overflow-y-scroll flex-1 [&::-webkit-scrollbar]:w-3 [&::-webkit-scrollbar-track]:bg-[#0A0A0B] [&::-webkit-scrollbar-thumb]:bg-slate-600 [&::-webkit-scrollbar-thumb]:border-[3px] [&::-webkit-scrollbar-thumb]:border-[#0A0A0B] [&::-webkit-scrollbar-thumb]:rounded-full hover:[&::-webkit-scrollbar-thumb]:bg-slate-500">
             
             {/* Quick Edit Form */}
             <form onSubmit={handleSaveEdit} className="space-y-4 mb-6">
@@ -380,29 +422,58 @@ export default function AdminDashboard() {
             </form>
 
             <div className="border-t border-white/10 pt-6 space-y-6">
-              {/* Detailed Read-Only Data */}
+              {/* Detailed Read-Only Data Grid */}
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 
-                {/* Audit & Timeline */}
+                {/* 1. Audit & Security Timeline */}
                 <div>
-                  <h4 className="text-xs font-bold text-slate-500 uppercase tracking-widest mb-3">Audit & Timeline</h4>
+                  <h4 className="text-xs font-bold text-slate-500 uppercase tracking-widest mb-3">Audit & Security</h4>
                   <div className="bg-[#0A0A0B] border border-white/5 rounded-lg p-3 space-y-2 text-sm h-full">
+                    <p><span className="text-slate-500 w-28 inline-block">User ID:</span> <span className="text-white font-mono text-xs">{editingUser.id}</span></p>
                     <p><span className="text-slate-500 w-28 inline-block">Email:</span> <span className="text-white font-medium">{editingUser.email}</span></p>
-                    <p><span className="text-slate-500 w-28 inline-block">Stripe ID:</span> <span className="text-white font-medium font-mono">{editingUser.stripeCustomerId || "None"}</span></p>
+                    <p><span className="text-slate-500 w-28 inline-block">2FA Status:</span> <span className={editingUser.isTwoFactorEnabled ? "text-emerald-400 font-medium" : "text-slate-400"}>{editingUser.isTwoFactorEnabled ? "Enabled" : "Disabled"}</span></p>
                     <p><span className="text-slate-500 w-28 inline-block">Created At:</span> <span className="text-white font-medium">{editingUser.createdAt ? new Date(editingUser.createdAt).toLocaleString('en-US', { timeZone: 'Asia/Shanghai' }) + ' (CST)' : "N/A"}</span></p>
                     <p><span className="text-slate-500 w-28 inline-block">Last Active:</span> <span className="text-white font-medium">{editingUser.lastLoginAt ? new Date(editingUser.lastLoginAt).toLocaleString('en-US', { timeZone: 'Asia/Shanghai' }) + ' (CST)' : "Never logged in"}</span></p>
                     <p><span className="text-slate-500 w-28 inline-block">Onboarded:</span> <span className="text-emerald-400 font-medium">{editingUser.hasCompletedOnboarding ? "Yes" : "No"}</span></p>
                   </div>
                 </div>
 
-                {/* Professional Demographics */}
+                {/* 2. Billing & Stripe Details */}
                 <div>
-                  <h4 className="text-xs font-bold text-slate-500 uppercase tracking-widest mb-3">Demographics</h4>
+                  <h4 className="text-xs font-bold text-slate-500 uppercase tracking-widest mb-3">Billing & Plan Status</h4>
                   <div className="bg-[#0A0A0B] border border-white/5 rounded-lg p-3 space-y-2 text-sm h-full">
-                    <p><span className="text-slate-500 w-24 inline-block">Industry:</span> <span className="text-white font-medium capitalize">{editingUser.industry || "Not Provided"}</span></p>
-                    <p><span className="text-slate-500 w-24 inline-block">Region:</span> <span className="text-white font-medium capitalize">{editingUser.region?.replace('_', ' ') || "Not Provided"}</span></p>
-                    <p><span className="text-slate-500 w-24 inline-block">Department:</span> <span className="text-white font-medium">{editingUser.department || "Not Provided"}</span></p>
-                    <p><span className="text-slate-500 w-24 inline-block">Position:</span> <span className="text-white font-medium">{editingUser.position || "Not Provided"}</span></p>
+                    <p><span className="text-slate-500 w-28 inline-block">Plan Tier:</span> <span className="text-purple-400 font-bold uppercase">{editingUser.planTier || "none"}</span></p>
+                    <p><span className="text-slate-500 w-28 inline-block">Sub Status:</span> <span className="text-white capitalize">{editingUser.subscriptionStatus || "inactive"}</span></p>
+                    <p><span className="text-slate-500 w-28 inline-block">Customer ID:</span> <span className="text-white font-mono text-xs">{editingUser.stripeCustomerId || "None"}</span></p>
+                    <p><span className="text-slate-500 w-28 inline-block">Sub ID:</span> <span className="text-white font-mono text-xs">{editingUser.stripeSubscriptionId || "None"}</span></p>
+                    <p><span className="text-slate-500 w-28 inline-block">Period End:</span> <span className="text-white">{editingUser.currentPeriodEnd ? new Date(editingUser.currentPeriodEnd).toLocaleDateString() : "N/A"}</span></p>
+                  </div>
+                </div>
+
+                {/* 3. Professional Profile */}
+                <div>
+                  <h4 className="text-xs font-bold text-slate-500 uppercase tracking-widest mb-3">Professional Profile</h4>
+                  <div className="bg-[#0A0A0B] border border-white/5 rounded-lg p-3 space-y-2 text-sm h-full">
+                    <p><span className="text-slate-500 w-28 inline-block">Industry:</span> <span className="text-white font-medium capitalize">{editingUser.industry || "Not Provided"}</span></p>
+                    <p><span className="text-slate-500 w-28 inline-block">Region:</span> <span className="text-white font-medium capitalize">{editingUser.region?.replace('_', ' ') || "Not Provided"}</span></p>
+                    <p><span className="text-slate-500 w-28 inline-block">Department:</span> <span className="text-white font-medium">{editingUser.department || "Not Provided"}</span></p>
+                    <p><span className="text-slate-500 w-28 inline-block">Position:</span> <span className="text-white font-medium">{editingUser.position || "Not Provided"}</span></p>
+                    <p><span className="text-slate-500 w-28 inline-block">Timezone:</span> <span className="text-white font-medium">{editingUser.timezone || "Not Provided"}</span></p>
+                    <p><span className="text-slate-500 w-28 inline-block">Working Hours:</span> <span className="text-white font-medium">{editingUser.workingHours || "Not Provided"}</span></p>
+                    <p><span className="text-slate-500 w-28 inline-block">Skills:</span> <span className="text-white font-medium">{editingUser.skills || "None listed"}</span></p>
+                  </div>
+                </div>
+
+                {/* 4. Bio, Web & Notification Preferences */}
+                <div>
+                  <h4 className="text-xs font-bold text-slate-500 uppercase tracking-widest mb-3">Online & Preferences</h4>
+                  <div className="bg-[#0A0A0B] border border-white/5 rounded-lg p-3 space-y-2 text-sm h-full">
+                    <p><span className="text-slate-500 w-28 inline-block">Website:</span> {editingUser.website ? <a href={editingUser.website} target="_blank" rel="noreferrer" className="text-blue-400 hover:underline">{editingUser.website}</a> : <span className="text-white">Not Provided</span>}</p>
+                    <p><span className="text-slate-500 w-28 inline-block">LinkedIn:</span> {editingUser.linkedinUrl ? <a href={editingUser.linkedinUrl} target="_blank" rel="noreferrer" className="text-blue-400 hover:underline">{editingUser.linkedinUrl}</a> : <span className="text-white">Not Provided</span>}</p>
+                    <p><span className="text-slate-500 w-28 inline-block">Alert Focus:</span> <span className="text-white font-medium">{editingUser.alertFocus || "Default"}</span></p>
+                    <p><span className="text-slate-500 w-28 inline-block">Sec. Alerts:</span> <span className="text-emerald-400 font-medium">{editingUser.notifySecurityAlerts ? "Enabled" : "Disabled"}</span></p>
+                    <p><span className="text-slate-500 w-28 inline-block">Prod. Updates:</span> <span className="text-emerald-400 font-medium">{editingUser.notifyProductUpdates ? "Enabled" : "Disabled"}</span></p>
+                    <p className="pt-1"><span className="text-slate-500 block mb-1">Bio:</span> <span className="text-slate-300 italic text-xs block bg-black/40 p-2 rounded border border-white/5 max-h-20 overflow-y-auto">{editingUser.bio || "No biography provided."}</span></p>
                   </div>
                 </div>
 
@@ -502,6 +573,7 @@ export default function AdminDashboard() {
             </div>
 
           </div>
+        </div>
         </div>
       )}
     </div>
