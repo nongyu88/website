@@ -65,6 +65,7 @@ model User {
   
   domainId       String?
   domain         domain?  @relation(fields: [domainId], references: [id])
+  reports        Report[]
 
   // OTP Verification Fields
   emailVerified   DateTime?
@@ -85,4 +86,30 @@ model Invite {
   token          String       @unique // A secure random string
   status         String       @default("pending") // 'pending', 'accepted'
   createdAt      DateTime     @default(now())
+}
+
+
+// Add to schema.prisma
+
+model Report {
+  id          String   @id @default(uuid())
+  reportId    String   @unique // e.g., "REP-091"
+  subject     String   
+  source      String   // "Automated API" | "Sensor Telemetry" | "UAV Data Upload"
+  riskLevel   String   
+  metrics     String   @db.NVarChar(Max)
+  fileUrl     String?  // Link to uploaded UAV file in S3/Azure
+  createdAt   DateTime @default(now())
+
+  userId      String?
+  user        User?    @relation(fields: [userId], references: [id])
+}
+
+model TelemetryLog {
+  id        String   @id @default(uuid())
+  sensorId  String
+  pressure  Float
+  temp      Float
+  strain    Float
+  timestamp DateTime @default(now())
 }
