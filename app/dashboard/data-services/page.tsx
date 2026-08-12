@@ -187,6 +187,34 @@ export default function DataServicesPage() {
 
   const dynamicText = getSpectrumLabels();
 
+  // --- DYNAMIC REPORT TARGET OPTIONS BASED ON INDUSTRY FOCUS ---
+  const getReportOptions = () => {
+    if (industryFocus === 'grid') {
+      return [
+        "Substation Phase Balance Audit",
+        "Transformer Thermal Overload Scan",
+        "Grid Cascade & Voltage Sag Assessment",
+        "Regional Wildfire Risk Proximity"
+      ];
+    } else if (industryFocus === 'both') {
+      return [
+        "Unified Enterprise Convergence Audit",
+        "Grid Phase Balance & Voltage Sag Assessment",
+        "Pipeline Hydraulic Strain & Leak Log",
+        "Regional Wildfire Risk Proximity"
+      ];
+    }
+    // Default to Pipeline
+    return [
+      "Hydraulic Transient Strain Audit",
+      "Pipeline Micro-Leak Analysis",
+      "Cathodic Protection & Corrosion Log",
+      "Regional Wildfire Risk Proximity"
+    ];
+  };
+
+  const targetOptions = getReportOptions();
+
   // Close all Data Services Modals on ESC key
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
@@ -220,33 +248,37 @@ export default function DataServicesPage() {
   const [selectedRange, setSelectedRange] = useState("Past 7 Days")
 
   // 2. Real Report Generator
-  const handleGenerateReport = (e: React.FormEvent) => {
-    e.preventDefault()
-    setIsReportGenerating(true)
+  const handleGenerateReport = async (e: React.FormEvent) => {
+  e.preventDefault()
+  setIsReportGenerating(true)
 
-    setTimeout(() => {
-      const now = new Date()
-      const timeStr = `Today, ${now.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}`
-      const newId = `REP-0${Math.floor(100 + Math.random() * 900)}`
+  try {
+    const now = new Date()
+    const timeStr = `Today, ${now.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}`
+    const newId = `REP-0${Math.floor(100 + Math.random() * 900)}`
 
-      const newReport = {
-        id: newId,
-        title: selectedTarget,
-        date: timeStr,
-        type: "Neural Surrogate Engine",
-        status: "Ready",
-        riskLevel: "OPTIMAL / AUDITED",
-        summary: `Compiled operational telemetric evaluation for scope: ${selectedRange}. All physical partial differential equations verified.`
-      }
+    const newReport = {
+      id: newId,
+      title: selectedTarget,
+      date: timeStr,
+      type: "Neural Surrogate Engine",
+      status: "Ready",
+      riskLevel: "OPTIMAL / AUDITED",
+      summary: `Compiled operational telemetric evaluation for scope: ${selectedRange}. All physical partial differential equations verified.`
+    }
 
-      setReports([newReport, ...reports])
-      setIsReportGenerating(false)
-      setIsReportModalOpen(false)
-      
-      // Auto-trigger PDF download for the newly created report
-      handleDownloadPDF(newReport)
-    }, 1500)
+    setReports((prev) => [newReport, ...prev])
+    setIsReportGenerating(false)
+    setIsReportModalOpen(false)
+
+    // Auto-trigger PDF download for the newly created report
+    handleDownloadPDF(newReport)
+  } catch (err) {
+    console.error("Failed to generate report", err)
+  } finally {
+    setIsReportGenerating(false)
   }
+}
 
   {/* UAV UPLOAD SUCCESS DIALOG */}
   {uavSuccessReport && (
@@ -332,19 +364,27 @@ export default function DataServicesPage() {
           <div><strong>Verification Hash:</strong> ${Math.random().toString(36).substring(2, 12).toUpperCase()}</div>
         </div>
 
-        <div class="section-title">Telemetry Summary & Analysis</div>
+        <div class="section-title">Live Database Telemetry & Analysis</div>
         <div class="box">
           <p><strong>Executive Overview:</strong> ${report.summary}</p>
-          <p>Real-time telemetry streams from connected IoT sensors and atmospheric API feeds were processed using Physics-Informed Neural Networks (PINNs). Conservation laws (energy, mass, momentum) were evaluated with zero critical spatial boundary deviations detected.</p>
+          <p>Real-time telemetry streams from connected IoT sensors were evaluated at the exact time of report generation. The Neural Surrogate Engine reported the following live database metrics:</p>
+          <ul style="margin-top: 10px; padding-left: 20px;">
+            <li><strong>Live Ingestion Throughput:</strong> ${stats.throughput.toLocaleString()} payloads/sec</li>
+            <li><strong>Avg Inference Latency:</strong> ${stats.avgLatencyMs} ms</li>
+            <li><strong>Model Fidelity:</strong> ${stats.modelFidelity}%</li>
+            <li><strong>Active Anomalies Flagged:</strong> ${stats.activeAnomalies} critical node(s)</li>
+          </ul>
         </div>
 
-        <div class="section-title">Copilot Autonomous Mitigation Log</div>
+        <div class="section-title">Physical Node Health Spectrum</div>
         <div class="box">
-          <ul>
-            <li>Verified 100% telemetry continuity across primary physical network nodes.</li>
-            <li>Deep State-Space models executed Kalman filtering for unmonitored node spans.</li>
-            <li>Automated emergency isolation routines confirmed ready for sub-10ms response window.</li>
+          <p>Evaluation of ${stats.nodeSpectrum.totalNodes} physical infrastructure nodes:</p>
+          <ul style="margin-top: 10px; padding-left: 20px;">
+            <li><strong>Nominal (Stable):</strong> ${stats.nodeSpectrum.nominalCount} nodes (${stats.nodeSpectrum.nominalPercent}%)</li>
+            <li><strong>Warning (Drift Detected):</strong> ${stats.nodeSpectrum.warningCount} nodes (${stats.nodeSpectrum.warningPercent}%)</li>
+            <li><strong>Critical (Action Required):</strong> ${stats.nodeSpectrum.criticalCount} nodes (${stats.nodeSpectrum.criticalPercent}%)</li>
           </ul>
+          <p style="margin-top: 10px;"><em>Note: Copilot autonomous mitigation routines are armed for sub-10ms response on all critical nodes.</em></p>
         </div>
 
         <div class="footer">
@@ -924,12 +964,13 @@ export default function DataServicesPage() {
                 <select 
                   value={selectedTarget}
                   onChange={(e) => setSelectedTarget(e.target.value)}
-                  className="w-full bg-slate-50 dark:bg-[#0A0A0B] border border-slate-200 dark:border-white/10 rounded-xl px-3 py-2.5 text-sm text-slate-900 dark:text-white focus:outline-none focus:border-amber-500 cursor-pointer"
+                  className="w-full bg-slate-50 dark:bg-[#0A0A0B] border border-slate-200 dark:border-white/10 rounded-xl px-3 py-2 text-xs text-slate-900 dark:text-white focus:outline-none focus:border-amber-500 cursor-pointer"
                 >
-                  <option>Regional Wildfire Risk Proximity</option>
-                  <option>Substation Structural Health Analysis</option>
-                  <option>UAV Thermal Scan Summary</option>
-                  <option>Hydraulic Transient Strain Audit</option>
+                  {targetOptions.map((option) => (
+                    <option key={option} value={option}>
+                      {option}
+                    </option>
+                  ))}
                 </select>
               </div>
 
