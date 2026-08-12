@@ -186,12 +186,12 @@ return (
         
         {/* ── TOP RIGHT CONTROLS ── */}
         <div className="absolute top-4 right-4 flex items-center gap-1">
-          <Link
-            href="https://www.kraftgeneai.ca/"
-            className="p-2 rounded-full text-slate-400 hover:text-slate-600 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-slate-800 transition-all duration-200"
-          >
-            <X className="w-5 h-5" />
-          </Link>
+        <Link
+          href="/"
+          className="p-2 rounded-full text-slate-400 hover:text-slate-600 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-slate-800 transition-all"
+        >
+          <X className="w-5 h-5" />
+        </Link>
         </div>
           
           {/* Header Icon */}
