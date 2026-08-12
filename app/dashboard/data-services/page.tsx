@@ -474,7 +474,7 @@ export default function DataServicesPage() {
           <div className="flex flex-col md:flex-row md:items-center justify-between gap-2 border-b border-slate-200 dark:border-white/10 pb-4">
             <div>
               <h2 className="text-xl font-bold text-slate-900 dark:text-white flex items-center gap-2">
-                <BarChart3 className="w-5 h-5 text-amber-500" /> Telemetry Data Analysis & Neural Benchmarks
+                <BarChart3 className="w-5 h-5 text-amber-500" /> Telemetry Data Analysis & Neural Benchmarks Demo
               </h2>
               <p className="text-xs text-slate-500">Real-time signal processing metrics, PINN surrogate performance, and physical anomaly breakdown</p>
             </div>
