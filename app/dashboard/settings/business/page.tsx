@@ -170,7 +170,7 @@ export default function BusinessSettingsPage() {
                   <option value="" disabled>Select your focus...</option>
                   <option value="grid">Utility Power Grids - Transmission Network</option>
                   <option value="pipeline">Oil & Gas Pipelines</option>
-                  <option value="grid">Utility Power Grids - Distribution Network</option>
+                  <option value="grid">Utility Power Grids - Distribution Network (Comming soon..)</option>
                 </select>
               </div>
 

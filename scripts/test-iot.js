@@ -1,28 +1,45 @@
 // test-iot.js
-async function runSimulator() {
-    console.log("🚀 Starting Pipeline IoT Sensor Simulator (Pinging every 2s)...");
-  
-    setInterval(async () => {
-      const isAnomaly = Math.random() < 0.2; // 20% chance of high pressure spike
-      const pressure = isAnomaly ? 1650 : 1200 + Math.floor(Math.random() * 200);
-  
-      try {
-        const res = await fetch("http://localhost:3000/api/telemetry/ingest", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ 
-            sensorId: "NODE-PIPELINE-01", 
-            pressure, 
-            temp: 45.2, 
-            strain: 0.012 
-          })
-        });
-        const data = await res.json();
-        console.log(`[${new Date().toLocaleTimeString()}] Logged IoT Stream:`, data.status);
-      } catch (err) {
-        console.error("❌ Connection failed. Ensure your Next.js server is running on http://localhost:3000");
-      }
-    }, 2000);
-  }
-  
-  runSimulator();
+async function runDualSimulator() {
+  console.log("🚀 Starting Kraftgene Dual Telemetry Streamer (Grid + Pipeline)...");
+
+  setInterval(async () => {
+    // Randomly switch between Power Grid & Pipeline Telemetry
+    const isGrid = Math.random() < 0.5;
+
+    let payload = {};
+
+    if (isGrid) {
+      const isSag = Math.random() < 0.2; // 20% chance of voltage sag
+      payload = {
+        sensorId: "SUBSTATION-ALPHA-9",
+        domain: "grid",
+        voltage: isSag ? 102.4 : 120.1, // kV
+        frequency: isSag ? 58.8 : 60.0, // Hz
+        temp: 42.1
+      };
+    } else {
+      const isSurge = Math.random() < 0.2; // 20% chance of pressure surge
+      payload = {
+        sensorId: "VALVE-NODE-47",
+        domain: "pipeline",
+        pressure: isSurge ? 1680 : 1240, // PSI
+        temp: 38.5,
+        strain: 0.014
+      };
+    }
+
+    try {
+      const res = await fetch("http://localhost:3000/api/telemetry/ingest", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(payload)
+      });
+      const data = await res.json();
+      console.log(`[${new Date().toLocaleTimeString()}] Logged ${payload.domain.toUpperCase()} Stream (${payload.sensorId}):`, data.status);
+    } catch (err) {
+      console.error("❌ Ingestion ping failed. Ensure Next.js is running.");
+    }
+  }, 2500);
+}
+
+runDualSimulator();

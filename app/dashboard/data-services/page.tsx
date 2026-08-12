@@ -31,6 +31,9 @@ export default function DataServicesPage() {
   const [uavMissionType, setUavMissionType] = useState("Thermal Anomaly Scan (FLIR)")
   const [isUploadingUav, setIsUploadingUav] = useState(false)
 
+  // UAV Success Modal State
+  const [uavSuccessReport, setUavSuccessReport] = useState<any>(null);
+
   // Report Delete Modal State
   const [reportToDelete, setReportToDelete] = useState<string | null>(null);
 
@@ -78,9 +81,10 @@ export default function DataServicesPage() {
         ]);
       }
 
-      alert(`UAV Payload Processed! Report ID ${data.report.reportId} generated.`);
       setIsUavUploadModalOpen(false);
       setUavFile(null);
+      // Open clean UI success dialog instead of browser alert
+      setUavSuccessReport(data.report);
     } catch (err: any) {
       alert(`Upload Error: ${err.message}`);
     } finally {
@@ -153,6 +157,36 @@ export default function DataServicesPage() {
     fetchFreshUser()
   }, [])
 
+  // --- DYNAMIC UI LABELS BASED ON INDUSTRY FOCUS ---
+  const industryFocus = user?.industry?.toLowerCase() || 'pipeline';
+
+  const getSpectrumLabels = () => {
+    if (industryFocus === 'grid') {
+      return {
+        anomalySubtext: "Live DB Voltage & Freq Evaluation",
+        nominal: "Phase Balance Stability (Nominal)",
+        warning: "Transformer Thermal Stress (Warning)",
+        critical: "Voltage Sag / Cascade Risk (Critical)"
+      };
+    } else if (industryFocus === 'both') {
+      return {
+        anomalySubtext: "Live Convergence Telemetry Evaluation",
+        nominal: "System-Wide Baseline (Nominal)",
+        warning: "Cross-Domain Anomaly Drift (Warning)",
+        critical: "Critical Infrastructure Risk (Critical)"
+      };
+    }
+    // Default to Pipeline
+    return {
+      anomalySubtext: "Live DB Pressure & Strain Evaluation",
+      nominal: "Hydraulic Transient Strain (Nominal)",
+      warning: "Thermal Gradient Drift (Warning)",
+      critical: "Micro-Leak Suspicion Index (Critical)"
+    };
+  };
+
+  const dynamicText = getSpectrumLabels();
+
   // Close all Data Services Modals on ESC key
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
@@ -213,6 +247,50 @@ export default function DataServicesPage() {
       handleDownloadPDF(newReport)
     }, 1500)
   }
+
+  {/* UAV UPLOAD SUCCESS DIALOG */}
+  {uavSuccessReport && (
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/60 backdrop-blur-sm p-4 animate-in fade-in duration-200">
+      <div className="bg-white dark:bg-[#111113] border border-slate-200 dark:border-white/10 rounded-2xl w-full max-w-md p-6 shadow-2xl text-center space-y-4 relative">
+        
+        <button 
+          onClick={() => setUavSuccessReport(null)} 
+          className="absolute top-4 right-4 text-slate-400 hover:text-white p-1 rounded-full hover:bg-white/5"
+        >
+          <X className="w-5 h-5" />
+        </button>
+
+        <div className="w-14 h-14 bg-emerald-500/10 border border-emerald-500/20 rounded-full flex items-center justify-center mx-auto">
+          <CheckCircle2 className="w-8 h-8 text-emerald-500" />
+        </div>
+
+        <div>
+          <h3 className="text-xl font-bold text-slate-900 dark:text-white">UAV Payload Processed</h3>
+          <p className="text-xs text-slate-500 dark:text-slate-400 mt-1.5 leading-relaxed">
+            AI Vision Scan successfully analyzed the telemetry archive. Report generated under ID:
+          </p>
+          <p className="text-sm font-mono font-bold text-amber-500 bg-amber-500/10 border border-amber-500/20 py-2 px-4 rounded-xl mt-3 inline-block">
+            {uavSuccessReport.reportId || uavSuccessReport.id}
+          </p>
+        </div>
+
+        <div className="bg-slate-50 dark:bg-black/30 p-3 rounded-xl border border-slate-200 dark:border-white/5 text-left text-xs space-y-1 text-slate-400">
+          <div><strong className="text-slate-200">Subject:</strong> {uavSuccessReport.subject || uavSuccessReport.title}</div>
+          <div><strong className="text-slate-200">Risk Assessment:</strong> <span className="text-orange-400">{uavSuccessReport.riskLevel}</span></div>
+        </div>
+
+        <div className="pt-2">
+          <Button 
+            onClick={() => setUavSuccessReport(null)} 
+            className="w-full bg-gradient-to-r from-amber-600 to-orange-600 hover:from-amber-500 hover:to-orange-500 text-white font-bold text-xs h-10 rounded-xl"
+          >
+            Acknowledge & View in Table
+          </Button>
+        </div>
+
+      </div>
+    </div>
+  )}
 
   // 3. Real Printable PDF Generator
   const handleDownloadPDF = (report: typeof reports[0]) => {
@@ -416,7 +494,7 @@ export default function DataServicesPage() {
                 {stats.activeAnomalies} <span className="text-xs font-normal text-slate-500">Flagged</span>
               </div>
               <div className="text-[10px] text-orange-400 mt-2">
-                Live DB Pressure & Strain Evaluation
+                {dynamicText.anomalySubtext}
               </div>
             </div>
 
@@ -433,7 +511,7 @@ export default function DataServicesPage() {
               <div className="space-y-4">
                 <div>
                   <div className="flex justify-between text-xs mb-1">
-                    <span className="text-slate-400">Hydraulic Transient Strain (Nominal)</span>
+                    <span className="text-slate-400">{dynamicText.nominal}</span>
                     <span className="text-emerald-400 font-mono">{stats.nodeSpectrum.nominalPercent}% ({stats.nodeSpectrum.nominalCount} Nodes)</span>
                   </div>
                   <div className="w-full bg-slate-100 dark:bg-black/40 h-2 rounded-full overflow-hidden">
@@ -443,7 +521,7 @@ export default function DataServicesPage() {
 
                 <div>
                   <div className="flex justify-between text-xs mb-1">
-                    <span className="text-slate-400">Thermal Gradient Drift (Warning)</span>
+                    <span className="text-slate-400">{dynamicText.warning}</span>
                     <span className="text-amber-400 font-mono">{stats.nodeSpectrum.warningPercent}% ({stats.nodeSpectrum.warningCount} Nodes)</span>
                   </div>
                   <div className="w-full bg-slate-100 dark:bg-black/40 h-2 rounded-full overflow-hidden">
@@ -453,7 +531,7 @@ export default function DataServicesPage() {
 
                 <div>
                   <div className="flex justify-between text-xs mb-1">
-                    <span className="text-slate-400">Micro-Leak Suspicion Index (Critical)</span>
+                    <span className="text-slate-400">{dynamicText.critical}</span>
                     <span className="text-red-400 font-mono">{stats.nodeSpectrum.criticalPercent}% ({stats.nodeSpectrum.criticalCount} Nodes)</span>
                   </div>
                   <div className="w-full bg-slate-100 dark:bg-black/40 h-2 rounded-full overflow-hidden">
@@ -1047,17 +1125,15 @@ export default function DataServicesPage() {
               {/* Target & Mission */}
               <div className="grid grid-cols-2 gap-4">
                 <div>
-                  <label className="block text-xs font-medium text-slate-400 mb-1.5">Target Sector / Node</label>
-                  <select 
+                  <label className="block text-xs font-medium text-slate-400 mb-1.5">Target Sector / Asset Tag</label>
+                  <input 
+                    type="text"
+                    required
                     value={uavTargetNode} 
                     onChange={(e) => setUavTargetNode(e.target.value)}
-                    className="w-full bg-slate-50 dark:bg-[#0A0A0B] border border-slate-200 dark:border-white/10 rounded-xl px-3 py-2 text-xs text-slate-900 dark:text-white focus:outline-none focus:border-amber-500"
-                  >
-                    <option>Sector 7 - Pipeline Segment B</option>
-                    <option>Substation Alpha-1 Flare Stack</option>
-                    <option>Node-04 Thermal Array</option>
-                    <option>Solar Array East Wing</option>
-                  </select>
+                    placeholder="e.g. Substation Alpha Feeder-4 or Pipeline Sector 7"
+                    className="w-full bg-slate-50 dark:bg-[#0A0A0B] border border-slate-200 dark:border-white/10 rounded-xl px-3 py-2 text-xs text-slate-900 dark:text-white focus:outline-none focus:border-amber-500 placeholder:text-slate-600"
+                  />
                 </div>
 
                 <div>

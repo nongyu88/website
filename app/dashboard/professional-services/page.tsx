@@ -21,6 +21,17 @@ export default function ProfessionalServicesPage() {
   const [projectType, setProjectType] = useState("SCADA / Legacy System Integration")
   const [scopeDetails, setScopeDetails] = useState("")
 
+  // Close all Professional Services Modals on ESC key
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') {
+        setIsSowModalOpen(false);
+      }
+    }
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, []);
+
   useEffect(() => {
     const fetchFreshUser = async () => {
       const storedUser = localStorage.getItem("user")
@@ -162,6 +173,11 @@ export default function ProfessionalServicesPage() {
             {/* 1. Legacy Systems Integration */}
             <div className="bg-white dark:bg-[#111113] border border-slate-200 dark:border-white/10 rounded-2xl p-6 shadow-sm flex flex-col justify-between hover:border-purple-500/40 transition-colors">
               <div>
+                {/* Embedded Banner Image */}
+                <div className="w-full h-60 rounded-xl overflow-hidden mb-5 flex items-center justify-center p-2">
+                  <img src="/integration2.webp" alt="Legacy Systems Integration" className="w-full h-full object-contain" />
+                </div>
+
                 <div className="flex justify-between items-start mb-3 pb-3 border-b border-slate-100 dark:border-white/5">
                   <div className="flex items-center space-x-3">
                     <div className="w-10 h-10 bg-purple-100 dark:bg-purple-500/10 rounded-xl flex items-center justify-center shrink-0 border border-purple-200 dark:border-purple-500/20">
@@ -202,6 +218,11 @@ export default function ProfessionalServicesPage() {
             {/* 2. Custom API & Data Engineering */}
             <div className="bg-white dark:bg-[#111113] border border-slate-200 dark:border-white/10 rounded-2xl p-6 shadow-sm flex flex-col justify-between hover:border-purple-500/40 transition-colors">
               <div>
+                {/* Embedded Banner Image */}
+                <div className="w-full h-60 rounded-xl overflow-hidden mb-5 flex items-center justify-center p-2">
+                  <img src="/api1.webp" alt="Custom API & Data Engineering" className="w-full h-full object-contain" />
+                </div>
+
                 <div className="flex justify-between items-start mb-3 pb-3 border-b border-slate-100 dark:border-white/5">
                   <div className="flex items-center space-x-3">
                     <div className="w-10 h-10 bg-purple-100 dark:bg-purple-500/10 rounded-xl flex items-center justify-center shrink-0 border border-purple-200 dark:border-purple-500/20">
@@ -242,6 +263,11 @@ export default function ProfessionalServicesPage() {
             {/* 3. Change Management & Training */}
             <div className="bg-white dark:bg-[#111113] border border-slate-200 dark:border-white/10 rounded-2xl p-6 shadow-sm flex flex-col justify-between hover:border-purple-500/40 transition-colors">
               <div>
+                {/* Embedded Banner Image */}
+                <div className="w-full h-60 rounded-xl overflow-hidden mb-5 flex items-center justify-center p-2">
+                  <img src="/tr1.webp" alt="Change Management & Training" className="w-full h-full object-contain" />
+                </div>
+
                 <div className="flex justify-between items-start mb-3 pb-3 border-b border-slate-100 dark:border-white/5">
                   <div className="flex items-center space-x-3">
                     <div className="w-10 h-10 bg-purple-100 dark:bg-purple-500/10 rounded-xl flex items-center justify-center shrink-0 border border-purple-200 dark:border-purple-500/20">
@@ -282,6 +308,11 @@ export default function ProfessionalServicesPage() {
             {/* 4. Technical Account Management */}
             <div className="bg-white dark:bg-[#111113] border border-slate-200 dark:border-white/10 rounded-2xl p-6 shadow-sm flex flex-col justify-between hover:border-purple-500/40 transition-colors">
               <div>
+                {/* Embedded Banner Image */}
+                <div className="w-full h-60 rounded-xl overflow-hidden mb-5 flex items-center justify-center p-2">
+                  <img src="/tam2.webp" alt="Technical Account Management" className="w-full h-full object-contain" />
+                </div>
+
                 <div className="flex justify-between items-start mb-3 pb-3 border-b border-slate-100 dark:border-white/5">
                   <div className="flex items-center space-x-3">
                     <div className="w-10 h-10 bg-purple-100 dark:bg-purple-500/10 rounded-xl flex items-center justify-center shrink-0 border border-purple-200 dark:border-purple-500/20">

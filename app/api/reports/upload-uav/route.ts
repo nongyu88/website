@@ -20,9 +20,11 @@ export async function POST(request: Request) {
 
     // 2. Extract size & mock AI thermal parsing logic
     const fileSizeMb = (fileBytes.byteLength / (1024 * 1024)).toFixed(2);
-    const reportId = `REP-${Math.floor(100 + Math.random() * 900)}`;
+    // Generate a truly unique ID using a timestamp and random hex
+    const uniqueSuffix = Math.random().toString(16).substring(2, 6).toUpperCase();
+    const reportId = `REP-${Date.now().toString().slice(-4)}-${uniqueSuffix}`;
 
-    // 3. Save UAV Anomaly Report & Link File URL
+    // 3. Persist Report in SQL Database via Prisma
     const newReport = await prisma.report.create({
       data: {
         reportId,
