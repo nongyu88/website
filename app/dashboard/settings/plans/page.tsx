@@ -18,7 +18,7 @@ function PlansContent() {
   const [isDarkMode, setIsDarkMode] = useState(true)
   const [billingCycle, setBillingCycle] = useState<"monthly" | "annually">("annually")
   const [addonBillingCycle, setAddonBillingCycle] = useState<"monthly" | "annually">("annually")
-  const [selectedPlan, setSelectedPlan] = useState<string>("Enterprise Convergence")
+  const [selectedPlan, setSelectedPlan] = useState<string>("")
   const [checkoutLoading, setCheckoutLoading] = useState<string>("")
   const [portalLoading, setPortalLoading] = useState(false)
   
@@ -262,6 +262,23 @@ function PlansContent() {
       stripePriceAnnually: "price_1U0dwrCnK1WH2hz2vRXdFtze"
     },
     {
+      id: "grid_distribution",
+      name: "Grid Distribution Twin",
+      priceMonthly: "$1,100",
+      priceAnnually: "$900",
+      description: "Low & medium voltage feeder intelligence, PV/DER tracking, and EV load modeling.",
+      features: [
+        "118-Bus feeder simulation model",
+        "Live PV & Solar DER tracking",
+        "EV load & battery SOC modeling",
+        "Autonomous voltage tap optimization",
+        "Azure IoT Hub MQTT streaming"
+      ],
+      buttonText: "Get Distribution Twin",
+      stripePriceMonthly: "price_1U4FUrCnK1WH2hz2knMkvY8O", 
+      stripePriceAnnually: "price_1U4FVmCnK1WH2hz2hx6mghNL"  
+    },
+    {
       id: "pipeline",
       name: "Pipeline Twin",
       priceMonthly: "$1,500",
@@ -278,23 +295,6 @@ function PlansContent() {
       stripePriceMonthly: "price_1U0dumCnK1WH2hz29ta30zW3",
       stripePriceAnnually: "price_1U0dxfCnK1WH2hz2B6V9AMUl"
     },
-    {
-      id: "enterprise",
-      name: "Enterprise Convergence",
-      priceMonthly: "$2,800",
-      priceAnnually: "$2,400",
-      description: "Unified cross-domain platform for co-located power and pipeline networks.",
-      features: [
-        "Unlimited grid & pipeline nodes",
-        "Cross-domain cascade impact engine",
-        "Custom ML anomaly models",
-        "Unlimited Team seats",
-        "Dedicated account engineer & SLA"
-      ],
-      buttonText: "Get Enterprise Convergence",
-      stripePriceMonthly: "price_1U0dvJCnK1WH2hz2XZ6Zlfnm",
-      stripePriceAnnually: "price_1U0dyKCnK1WH2hz2aIY9w2Om"
-    }
   ]
 
   const filteredPlans = plans.filter(plan => {

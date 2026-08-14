@@ -45,14 +45,16 @@ export async function POST(req: Request) {
         "price_1U0dwrCnK1WH2hz2vRXdFtze": { name: "Utility Grid Twin", cycle: "Annually" },
         "price_1U0dumCnK1WH2hz29ta30zW3": { name: "Pipeline Twin", cycle: "Monthly" },
         "price_1U0dxfCnK1WH2hz2B6V9AMUl": { name: "Pipeline Twin", cycle: "Annually" },
-        "price_1U0dvJCnK1WH2hz2XZ6Zlfnm": { name: "Enterprise Convergence", cycle: "Monthly" },
-        "price_1U0dyKCnK1WH2hz2aIY9w2Om": { name: "Enterprise Convergence", cycle: "Annually" },
         // --- Additional Services (Replace with your actual Price IDs from Step 1) ---
         "price_1U13FiCnK1WH2hz2EwrOlA7u": { name: "Digital Twins Services", cycle: "Monthly" },
         "price_1U13G8CnK1WH2hz2d1Khdn3z": { name: "Digital Twins Services", cycle: "Annually" },
 
         "price_1U13HSCnK1WH2hz2zqnZI8xB": { name: "Professional Services", cycle: "Monthly" },
         "price_1U13HqCnK1WH2hz2QKrXe9En": { name: "Professional Services", cycle: "Annually" },
+
+        // --- Grid Distribution Twin ---
+        "price_1U4FUrCnK1WH2hz2knMkvY8O": { name: "Grid Distribution Twin", cycle: "Monthly" },
+        "price_1U4FVmCnK1WH2hz2hx6mghNL": { name: "Grid Distribution Twin", cycle: "Annually" },
 
         "price_1U13ICCnK1WH2hz2IeK3uYsE": { name: "Data Services", cycle: "Monthly" },
         "price_1U13IOCnK1WH2hz22xIIcIpH": { name: "Data Services", cycle: "Annually" }
@@ -160,8 +162,6 @@ await prisma.user.update({
         "price_1U0dwrCnK1WH2hz2vRXdFtze": { name: "Utility Grid Twin", cycle: "Annually" },
         "price_1U0dumCnK1WH2hz29ta30zW3": { name: "Pipeline Twin", cycle: "Monthly" },
         "price_1U0dxfCnK1WH2hz2B6V9AMUl": { name: "Pipeline Twin", cycle: "Annually" },
-        "price_1U0dvJCnK1WH2hz2XZ6Zlfnm": { name: "Enterprise Convergence", cycle: "Monthly" },
-        "price_1U0dyKCnK1WH2hz2aIY9w2Om": { name: "Enterprise Convergence", cycle: "Annually" },
         "price_1U13FiCnK1WH2hz2EwrOlA7u": { name: "Digital Twins Services", cycle: "Monthly" },
         "price_1U13G8CnK1WH2hz2d1Khdn3z": { name: "Digital Twins Services", cycle: "Annually" },
         "price_1U13HSCnK1WH2hz2zqnZI8xB": { name: "Professional Services", cycle: "Monthly" },

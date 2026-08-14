@@ -50,10 +50,9 @@ export default function GridPlatformPage() {
   } catch (e) {}
 
   const hasGridPlan = activePlansArr.some((p: any) => p.name === "Utility Grid Twin" || p === "Utility Grid Twin");
-  const hasEnterprisePlan = activePlansArr.some((p: any) => p.name === "Enterprise Convergence" || p === "Enterprise Convergence");
   const isGeneralActive = user?.subscriptionStatus === 'active' || user?.organization?.subscriptionStatus === 'active' || (user?.organization?.planName && user?.organization?.planName !== 'Free');
   
-  const isGridSubscribed = hasGridPlan || hasEnterprisePlan || isGeneralActive;
+  const isGridSubscribed = hasGridPlan ||  isGeneralActive;
 
   // 2. JWT Token Logic for Copilot Engine Launch
   const getRobustToken = () => {
@@ -267,7 +266,7 @@ export default function GridPlatformPage() {
               onClick={handleLaunchGrid}
               className="bg-emerald-600 hover:bg-emerald-500 text-white font-bold h-12 px-8 rounded-xl shadow-lg shadow-emerald-900/40 text-sm"
             >
-              Launch Grid Platform <ArrowUpRight className="w-4 h-4 ml-2" />
+              Launch Grid (Transmission) Platform <ArrowUpRight className="w-4 h-4 ml-2" />
             </Button>
           </section>
         ) : (

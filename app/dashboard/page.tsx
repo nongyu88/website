@@ -103,8 +103,8 @@ export default function DashboardPage() {
 
   // Check Core Platform Subscriptions directly inside activePlans array
   const hasGridPlan = activePlansArr.some((p: any) => p.name === "Utility Grid Twin" || p === "Utility Grid Twin");
+  const hasDistributionPlan = activePlansArr.some((p: any) => p.name === "Grid Distribution Twin" || p === "Grid Distribution Twin");
   const hasPipelinePlan = activePlansArr.some((p: any) => p.name === "Pipeline Twin" || p === "Pipeline Twin");
-  const hasEnterprisePlan = activePlansArr.some((p: any) => p.name === "Enterprise Convergence" || p === "Enterprise Convergence");
 
   // General active status check fallback
   const isGeneralActive = 
@@ -112,15 +112,23 @@ export default function DashboardPage() {
     user?.organization?.subscriptionStatus === 'active' || 
     (user?.organization?.planName && user?.organization?.planName !== 'Free');
 
-  // Specific unlock permissions for Grid and Pipeline platforms
-  const isGridSubscribed = hasGridPlan || hasEnterprisePlan || isGeneralActive;
-  const isPipelineSubscribed = hasPipelinePlan || hasEnterprisePlan || isGeneralActive;
+  // Specific unlock permissions for Grid platforms
+  const isGridSubscribed = hasGridPlan ||  isGeneralActive;
+  const isDistributionSubscribed = hasDistributionPlan ||  isGeneralActive;
+  const isPipelineSubscribed = hasPipelinePlan ||  isGeneralActive;
 
   const handleLogout = () => {
       localStorage.removeItem("user")
       localStorage.removeItem("kraftgene_token")
       window.location.href = "/login"
     }
+
+  const getIndustryLabel = (ind?: string) => {
+    if (ind === 'grid_distribution') return 'GRID - DISTRIBUTION'
+    if (ind === 'grid') return 'GRID - TRANSMISSION'
+    if (ind === 'pipeline') return 'PIPELINE'
+    return ind ? ind.toUpperCase() : 'GRID - TRANSMISSION'
+  }
 
   // Helper to guarantee we find the token
   const getRobustToken = () => {
@@ -247,7 +255,7 @@ export default function DashboardPage() {
                 href="/dashboard/settings/business" 
                 className="font-bold text-emerald-600 dark:text-emerald-400 hover:text-emerald-500 underline decoration-emerald-500/30 underline-offset-4 transition-all"
               >
-                {user?.industry === 'both' ? 'ENTERPRISE CONVERGENCE' : (user?.industry?.toUpperCase() || "PIPELINE")}
+                {getIndustryLabel(user?.industry)}
               </Link>.
             </p>
           </div>
@@ -313,9 +321,9 @@ export default function DashboardPage() {
         </div>
 
         {/* Dynamic Platform Launchers based on User Industry Preference */}
-        <div className={`grid grid-cols-1 ${user?.industry === 'both' ? 'md:grid-cols-2' : 'max-w-xl mx-auto'} gap-8 mb-12`}>
+        <div className={`grid grid-cols-1 ${user?.industry === 'both' ? 'md:grid-cols-2 lg:grid-cols-3' : 'max-w-xl mx-auto'} gap-8 mb-12`}>
           
-          {/* Card 1: Power Grid MVP */}
+          {/* Card 1: Power Grid (Transmission) MVP */}
           {(!user?.industry || user.industry === 'grid' || user.industry === 'both') && (
             <div className="bg-white dark:bg-[#111113] border border-slate-200 dark:border-white/10 hover:border-emerald-500/50 rounded-2xl p-6 flex flex-col justify-between transition-all duration-300 shadow-sm group">
               <div>
@@ -343,6 +351,39 @@ export default function DashboardPage() {
               <Link href="/dashboard/grid-platform" className="w-full">
                 <Button className="w-full bg-slate-900 dark:bg-white/10 hover:bg-emerald-600 dark:hover:bg-emerald-600 text-white font-bold h-11 rounded-xl transition-all flex justify-center items-center text-xs">
                   Explore Grid Platform <ArrowRight className="w-4 h-4 ml-2" />
+                </Button>
+              </Link>
+            </div>
+          )}
+
+          {/* Card 2: Power Grid (Distribution) MVP */}
+          {(user?.industry === 'grid_distribution' || user?.industry === 'both') && (
+            <div className="bg-white dark:bg-[#111113] border border-slate-200 dark:border-white/10 hover:border-amber-500/50 rounded-2xl p-6 flex flex-col justify-between transition-all duration-300 shadow-sm group">
+              <div>
+                <div className="flex justify-between items-start mb-4">
+                  <div className="w-12 h-12 bg-amber-500/10 rounded-xl flex items-center justify-center border border-amber-500/20">
+                    <Zap className="w-6 h-6 text-amber-500" />
+                  </div>
+                  <Badge className={`text-[10px] uppercase font-bold border transition-colors ${
+                    isDistributionSubscribed 
+                      ? "bg-amber-500/10 text-amber-500 border-amber-500/20" 
+                      : "bg-slate-100 dark:bg-white/5 text-slate-600 dark:text-slate-400 border-slate-200 dark:border-white/10"
+                  }`}>
+                    {isDistributionSubscribed ? "Active | Enterprise" : "Preview Mode"}
+                  </Badge>
+                </div>
+
+                <h2 className="text-xl font-bold text-slate-900 dark:text-white mb-2 tracking-tight">
+                  EnergyEminence™ - Grid (Distribution)
+                </h2>
+                <p className="text-slate-500 dark:text-slate-400 text-sm leading-relaxed mb-6">
+                  118-Bus feeder simulation, live PV/Solar DER tracking, EV charging load modeling, battery state-of-charge tracking, and autonomous voltage tap optimization.
+                </p>
+              </div>
+
+              <Link href="/dashboard/grid-distribution-platform" className="w-full">
+                <Button className="w-full bg-slate-900 dark:bg-white/10 hover:bg-amber-500 dark:hover:bg-amber-500 hover:text-slate-950 text-white font-bold h-11 rounded-xl transition-all flex justify-center items-center text-xs">
+                  Explore Grid Distribution Platform <ArrowRight className="w-4 h-4 ml-2" />
                 </Button>
               </Link>
             </div>

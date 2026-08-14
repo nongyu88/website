@@ -93,6 +93,7 @@ export async function POST(request: Request) {
 
   } catch (error: any) {
     console.error("Stripe Checkout Error:", error);
-    return NextResponse.json({ error: "Failed to create checkout session" }, { status: 500 });
+    // Return error.message so you can see the exact Stripe error in the alert!
+    return NextResponse.json({ error: error.message || "Failed to create checkout session" }, { status: 500 });
   }
 }

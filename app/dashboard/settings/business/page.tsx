@@ -92,8 +92,15 @@ export default function BusinessSettingsPage() {
 
       if (!res.ok) throw new Error("Failed to save changes")
 
-      setSuccessMsg("Business settings saved successfully.")
-      setTimeout(() => setSuccessMsg(""), 3000)
+        // Update local storage user session immediately
+        const storedUser = localStorage.getItem("user")
+        if (storedUser) {
+          const parsed = JSON.parse(storedUser)
+          localStorage.setItem("user", JSON.stringify({ ...parsed, industry }))
+        }
+        
+        setSuccessMsg("Business settings saved successfully.")
+        setTimeout(() => setSuccessMsg(""), 3000)
     } catch (error) {
       alert("Error saving business details.")
     } finally {
@@ -169,8 +176,8 @@ export default function BusinessSettingsPage() {
                 <select value={industry} onChange={(e) => setIndustry(e.target.value)} className="w-full bg-slate-50 dark:bg-[#0A0A0B] border border-slate-200 dark:border-white/10 rounded-lg px-4 py-2.5 text-slate-900 dark:text-white focus:border-purple-500 focus:outline-none appearance-none transition-colors duration-300 cursor-pointer">
                   <option value="" disabled>Select your focus...</option>
                   <option value="grid">Utility Power Grids - Transmission Network</option>
+                  <option value="grid_distribution">Utility Power Grids - Distribution Network</option>
                   <option value="pipeline">Oil & Gas Pipelines</option>
-                  <option value="grid">Utility Power Grids - Distribution Network (Comming soon..)</option>
                 </select>
               </div>
 

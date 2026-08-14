@@ -50,10 +50,9 @@ export default function PipelinePlatformPage() {
   } catch (e) {}
 
   const hasPipelinePlan = activePlansArr.some((p: any) => p.name === "Pipeline Twin" || p === "Pipeline Twin");
-  const hasEnterprisePlan = activePlansArr.some((p: any) => p.name === "Enterprise Convergence" || p === "Enterprise Convergence");
   const isGeneralActive = user?.subscriptionStatus === 'active' || user?.organization?.subscriptionStatus === 'active' || (user?.organization?.planName && user?.organization?.planName !== 'Free');
   
-  const isPipelineSubscribed = hasPipelinePlan || hasEnterprisePlan || isGeneralActive;
+  const isPipelineSubscribed = hasPipelinePlan || isGeneralActive;
 
   // 2. JWT Token Logic for Copilot Engine Launch
   const getRobustToken = () => {
