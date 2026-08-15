@@ -92,6 +92,16 @@ export default function HomePage() {
 
   const newsItems = [
     {
+      id: 0,
+      date: "August 14, 2026",
+      title: "EnergyEminence™ - GDN (R&D) Is Now Live",
+      content: "Explore our 118-bus feeder distribution twin. The Grid Distribution Network (GDN) Digital Twin MVP is officially online for enterprise R&D testing.",
+      links: [{ url: "", text: "Access GDN R&D MVP", isProtected: true, targetPath: "/dashboard/grid-distribution-platform" }],
+      media: [
+        { type: "image", src: "/images/GDN-face2.PNG" }
+      ]
+    },
+    {
       id: 1,
       date: "May 29, 2026",
       title: "Kraftgene AI at Toronto Tech Week",
@@ -107,7 +117,7 @@ export default function HomePage() {
       date: "July 20, 2026",
       title: "EnergyEminence™ - G is Now Live",
       content: "Experience the future of grid monitoring. Our Power Grid Digital Twin MVP is officially online, interactive, and ready for exploration.",
-      links: [{ url: "", text: "Access Grid MVP", isProtected: true }],
+      links: [{ url: "", text: "Access Grid MVP", isProtected: true, targetPath: "/dashboard" }],
       media: [
         { type: "video", src: "/demo1-maps.webm" } 
       ]
@@ -203,7 +213,7 @@ export default function HomePage() {
   }, []);
   
   // Tab State for Mission-Critical Action Section
-  const [activeTab, setActiveTab] = useState<"utility" | "pipeline">("utility");
+  const [activeTab, setActiveTab] = useState<"utility" | "pipeline" | "gdn">("utility");
 
   // Track active module and create refs for the scroll-spy effect
   const [activeModule, setActiveModule] = useState(0);
@@ -211,6 +221,7 @@ export default function HomePage() {
 
   // Track mute state for the demo videos (false = audio on by default)
   const [isVideoMuted, setIsVideoMuted] = useState(true);
+  const gdnVideoRef = useRef<HTMLVideoElement | null>(null);
 
   // --------------------------------------------------------
   // UTILITY POWER GRID MODULES (Original 8 Caps)
@@ -345,7 +356,7 @@ export default function HomePage() {
   }, [activeTab]); // Re-run effect when tabs change
 
   // Reset active module to 0 when switching tabs
-  const handleTabSwitch = (tab: "utility" | "pipeline") => {
+  const handleTabSwitch = (tab: "utility" | "pipeline" | "gdn") => {
     setActiveTab(tab);
     setActiveModule(0);
     // Optional: Smooth scroll back to the top of the section
@@ -680,11 +691,99 @@ export default function HomePage() {
               >
                 <Droplet className="w-4 h-4 mr-2" /> Oil & Gas Pipeline
               </Button>
+              <Button 
+                variant={activeTab === "gdn" ? "default" : "ghost"}
+                onClick={() => handleTabSwitch("gdn")}
+                className={`h-11 px-6 text-sm font-semibold rounded-full transition-all ${
+                  activeTab === "gdn" 
+                    ? "bg-amber-500 hover:bg-amber-600 text-slate-950 shadow-md shadow-amber-900/20" 
+                    : "text-slate-600 dark:text-gray-400 hover:bg-slate-200 dark:hover:bg-white/10"
+                }`}
+              >
+                <Network className="w-4 h-4 mr-2" /> Grid Distribution (R&D)
+              </Button>
             </div>
           </div>
 
-          {/* Interactive Feature Explorer */}
-          <div className="grid lg:grid-cols-12 gap-12 lg:gap-16 items-start relative">
+          {/* Interactive Feature Explorer / GDN R&D Showcase */}
+          {activeTab === "gdn" ? (
+            <div className="grid lg:grid-cols-12 gap-12 lg:gap-16 items-center pt-6 pb-12">
+              
+              {/* Left Column: Professional R&D Description */}
+              <div className="lg:col-span-5 space-y-6">
+                <Badge className="bg-amber-500/10 text-amber-600 dark:text-amber-400 border-amber-500/30 px-3 py-1 text-xs uppercase tracking-widest font-bold">
+                  Active R&D Prototype
+                </Badge>
+                
+                <h3 className="text-3xl md:text-4xl font-bold tracking-tight text-slate-900 dark:text-white">
+                  118-Bus Distribution Grid Twin (GDN)
+                </h3>
+                
+                <p className="text-base text-slate-600 dark:text-slate-300 leading-relaxed">
+                  Engineered specifically for low and medium voltage feeder intelligence, our GDN Digital Twin processes real-time physics and micro-PMU telemetry streams across 118 distribution buses.
+                </p>
+                
+                <p className="text-sm text-slate-500 dark:text-slate-400 leading-relaxed">
+                  Currently in active research & development, this platform models volatile Distributed Energy Resources (DERs), behind-the-meter solar PV generation, EV charging load surges, and battery storage state-of-charge (SOC) metrics. Integrated with an autonomous AI Protection Copilot, it continuously executes Volt-VAR inverter optimizations and automated step voltage regulator tap switching to maintain low-voltage grid equilibrium.
+                </p>
+
+                <div className="pt-2">
+                  <Button 
+                    onClick={(e) => handleProtectedNavigation(e, "/dashboard/grid-distribution-platform")} 
+                    className="bg-amber-500 hover:bg-amber-600 text-slate-950 font-bold h-12 px-8 rounded-xl shadow-lg transition-all text-xs"
+                  >
+                    Explore R&D Demo <ArrowUpRight className="w-4 h-4 ml-2" />
+                  </Button>
+                </div>
+              </div>
+
+              {/* Right Column: Video Demo */}
+              <div className="lg:col-span-7">
+                <div className="relative rounded-lg border border-slate-200 dark:border-white/10 bg-slate-100 dark:bg-black p-2 shadow-2xl">
+                  <div className="flex items-center justify-between border-b border-slate-300 dark:border-white/5 pb-2 mb-2 px-2">
+                    <div className="flex items-center space-x-2">
+                      <span className="w-2.5 h-2.5 rounded-full bg-slate-300 dark:bg-white/20" />
+                      <span className="w-2.5 h-2.5 rounded-full bg-slate-300 dark:bg-white/20" />
+                      <span className="w-2.5 h-2.5 rounded-full bg-slate-300 dark:bg-white/20" />
+                    </div>
+                    <span className="text-[10px] font-mono text-slate-500 tracking-widest uppercase flex items-center gap-2">
+                      <span className="w-1.5 h-1.5 rounded-full animate-pulse bg-amber-500" />
+                      R&D Live Terminal (Distribution)
+                    </span>
+                  </div>
+
+                  <div className="relative overflow-hidden rounded-md border border-slate-300 dark:border-white/5 bg-white dark:bg-[#050505] aspect-video group">
+                    <video 
+                      ref={gdnVideoRef}
+                      autoPlay 
+                      loop 
+                      muted={isVideoMuted} 
+                      playsInline
+                      className="w-full h-full object-cover opacity-95" 
+                    >
+                      <source src="/GDN-Demo.webm" type="video/mp4" />
+                    </video>
+
+                    {/* Audio Toggle Button (Permanently Visible & Direct Ref Muted Toggle) */}
+                    <button
+                      onClick={() => {
+                        if (gdnVideoRef.current) {
+                          gdnVideoRef.current.muted = !isVideoMuted;
+                        }
+                        setIsVideoMuted(!isVideoMuted);
+                      }}
+                      className="absolute bottom-4 right-4 z-30 p-3 rounded-full bg-slate-900/80 dark:bg-black/80 hover:bg-slate-900 dark:hover:bg-black text-white backdrop-blur-md transition-all duration-300 shadow-xl border border-white/20 flex items-center justify-center cursor-pointer"
+                      aria-label={isVideoMuted ? "Unmute video" : "Mute video"}
+                    >
+                      {isVideoMuted ? <VolumeX className="w-5 h-5 text-red-400" /> : <Volume2 className="w-5 h-5 text-emerald-400" />}
+                    </button>
+                  </div>
+                </div>
+              </div>
+
+            </div>
+          ) : (
+            <div className="grid lg:grid-cols-12 gap-12 lg:gap-16 items-start relative">
             
             {/* Left Column: Scrollable Text Blocks */}
             <div className="lg:col-span-5 pb-[40vh]"> 
@@ -753,8 +852,8 @@ export default function HomePage() {
                     <span className="w-2.5 h-2.5 rounded-full bg-slate-300 dark:bg-white/20" />
                   </div>
                   <span className="text-[10px] font-mono text-slate-500 tracking-widest uppercase flex items-center gap-2">
-                    <span className={`w-1.5 h-1.5 rounded-full animate-pulse ${activeTab === "utility" ? "bg-emerald-500" : "bg-blue-500"}`} /> 
-                    Live Terminal ({activeTab === "utility" ? "Grid" : "Pipeline"})
+                    <span className={`w-1.5 h-1.5 rounded-full animate-pulse ${activeTab === "utility" ? "bg-emerald-500" : activeTab === "pipeline" ? "bg-blue-500" : "bg-amber-500"}`} /> 
+                    Live Terminal ({activeTab === "utility" ? "Grid" : activeTab === "pipeline" ? "Pipeline" : "Distribution R&D"})
                   </span>
                 </div>
 
@@ -770,7 +869,7 @@ export default function HomePage() {
                     poster="/images/snowscreen.jfif"
                     className="w-full h-full object-cover opacity-95" 
                   >
-                    <source src={currentModules[activeModule]?.videoSrc} type="video/webm" />
+                    <source src={(activeTab as string) === "gdn" ? "/GDN-Demo.mp4" : currentModules[activeModule]?.videoSrc} type={(activeTab as string) === "gdn" ? "video/mp4" : "video/webm"} />
                   </video>
 
                   {/* Audio Toggle Button */}
@@ -786,7 +885,7 @@ export default function HomePage() {
               </div>
             </div>
 
-          </div>
+          </div>)}
         </div>
       </section>
 
@@ -1179,8 +1278,8 @@ export default function HomePage() {
       <section id="about" className="py-24 bg-white dark:bg-black border-t border-slate-200 dark:border-white/10 transition-colors duration-300">
         <div className="container mx-auto px-4 sm:px-6 lg:px-8">
           
-          {/* Top Row: About & MVP Cards */}
-          <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 items-center mb-24">
+          {/* Top Row: About & 3 MVP Cards */}
+          <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-6 items-center mb-24">
             
             {/* Column 1: Text Content */}
             <div className="lg:pr-4">
@@ -1250,6 +1349,36 @@ export default function HomePage() {
                 </p>
                 <span className="text-blue-400 text-sm font-semibold flex items-center group-hover:text-blue-300 transition-colors">
                   Access Pipeline Platform 
+                  <ArrowRight className="ml-2 w-4 h-4 group-hover:translate-x-1.5 transition-transform" />
+                </span>
+              </div>
+            </div>
+
+            {/* Column 4: Live MVP Showcase Card (GDN Distribution) */}
+            <div 
+              onClick={(e) => handleProtectedNavigation(e, "/dashboard/grid-distribution-platform")}
+              className="bg-[#120f05] border border-amber-900/30 rounded-3xl overflow-hidden shadow-2xl flex flex-col group transition-all duration-300 hover:border-amber-500/50 hover:shadow-[0_0_30px_rgba(245,158,11,0.15)] w-full max-w-md mx-auto h-[480px] cursor-pointer"
+            >
+              {/* Top: Image (60% Height) */}
+              <div className="relative w-full h-[60%] overflow-hidden bg-black border-b border-amber-900/30">
+                <Image 
+                  src="/images/GDN-face.PNG" 
+                  alt="EnergyEminence™ GDN MVP" 
+                  fill 
+                  className="object-cover object-center group-hover:scale-105 transition-transform duration-700 opacity-80" 
+                />
+                <div className="absolute inset-x-0 bottom-0 h-16 bg-gradient-to-t from-[#120f05] to-transparent"></div>
+              </div>
+
+              {/* Bottom: Content (40% Height) */}
+              <div className="w-full h-[40%] px-6 py-4 flex flex-col items-center justify-center text-center relative z-10">
+                <Network className="w-8 h-8 text-amber-400 mb-3 stroke-[2.5]" />
+                <h3 className="text-xl font-bold text-white mb-2 tracking-tight">Grid Distribution MVP</h3>
+                <p className="text-sm text-slate-300 mb-4 leading-relaxed px-2">
+                  Experience EnergyEminence™ - GDN. Explore our 118-bus feeder distribution twin.
+                </p>
+                <span className="text-amber-400 text-sm font-semibold flex items-center group-hover:text-amber-300 transition-colors">
+                  Access GDN Platform 
                   <ArrowRight className="ml-2 w-4 h-4 group-hover:translate-x-1.5 transition-transform" />
                 </span>
               </div>
@@ -1632,7 +1761,7 @@ export default function HomePage() {
                         link.isProtected ? (
                           <button 
                             key={i}
-                            onClick={handleProtectedNavigation}
+                            onClick={(e) => handleProtectedNavigation(e, (link as any).targetPath || "/dashboard")}
                             className="inline-flex items-center text-sm font-semibold text-emerald-600 dark:text-emerald-400 hover:text-emerald-700 dark:hover:text-emerald-300 transition-colors group bg-emerald-50 dark:bg-emerald-500/10 px-4 py-2 rounded-full border border-emerald-200 dark:border-emerald-500/20"
                           >
                             {link.text}
@@ -1656,10 +1785,10 @@ export default function HomePage() {
                 </div>
 
                 {/* Media Side (Dynamic Grid Support) */}
-                <div className="w-full md:w-1/2 h-1/2 md:h-full relative overflow-hidden bg-slate-50 dark:bg-slate-900/50 border-l border-slate-200 dark:border-white/5 transition-colors">
-                  {/* Fade overlays that adapt to light/dark mode */}
-                  <div className="absolute inset-0 bg-gradient-to-r from-white via-white/80 dark:from-black/90 dark:via-black/20 to-transparent z-10 hidden md:block pointer-events-none transition-colors"></div>
-                  <div className="absolute inset-0 bg-gradient-to-t from-white via-white/80 dark:from-black/90 dark:via-black/20 to-transparent z-10 md:hidden pointer-events-none transition-colors"></div>
+                <div className="w-full md:w-1/2 h-1/2 md:h-full relative overflow-hidden bg-slate-950 border-l border-slate-200 dark:border-white/5 transition-colors">
+                  {/* Subtle dark edge gradient that prevents washing out image details */}
+                  <div className="absolute inset-0 bg-gradient-to-r from-slate-950/40 via-transparent to-transparent z-10 hidden md:block pointer-events-none"></div>
+                  <div className="absolute inset-0 bg-gradient-to-t from-slate-950/40 via-transparent to-transparent z-10 md:hidden pointer-events-none"></div>
                   
                   <div className={`w-full h-full grid gap-1 p-1 ${
                     news.media.length === 1 ? 'grid-cols-1' : 

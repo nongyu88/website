@@ -65,6 +65,18 @@ function AuthForm() {
     }
   }, [router, inviteToken]);
 
+  // Close login page on Escape key press
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === "Escape") {
+        router.push("/");
+      }
+    };
+
+    window.addEventListener("keydown", handleKeyDown);
+    return () => window.removeEventListener("keydown", handleKeyDown);
+  }, [router]);
+
   // Handle Login Submission
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault()
