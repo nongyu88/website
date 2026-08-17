@@ -33,11 +33,11 @@ export async function POST(req: Request) {
     const currentPrompts = user.copilotPromptsLeft ?? 20;
 
     if (currentPrompts <= 0) {
-      return NextResponse.json({
-        allowed: false,
-        remaining: 0,
-        message: "you have exceeded pre-configured msg amount, if you need more please contact customer@kraftgeneai.ca",
-      });
+        return NextResponse.json({
+            allowed: false,
+            remaining: 0,
+            message: "⚠️ You have exceeded pre-configured msg amount, if you need more please contact customer@kraftgeneai.ca",
+        });
     }
 
     const updatedUser = await prisma.user.update({
