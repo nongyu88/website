@@ -28,7 +28,8 @@ export async function GET() {
         firstName: true,
         lastName: true,
         serviceProgress: true,
-        avatarUrl: true
+        avatarUrl: true,
+        copilotPromptsLeft: true
       }
     });
 
