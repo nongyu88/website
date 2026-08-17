@@ -21,6 +21,7 @@ export default function AdminDashboard() {
   const [editRole, setEditRole] = useState("")
   const [editFirstName, setEditFirstName] = useState("")
   const [editLastName, setEditLastName] = useState("")
+  const [editPromptsLeft, setEditPromptsLeft] = useState<number>(20)
 
   const [searchQuery, setSearchQuery] = useState("")
 
@@ -125,12 +126,13 @@ export default function AdminDashboard() {
           role: editRole,
           firstName: editFirstName,
           lastName: editLastName,
+          copilotPromptsLeft: editPromptsLeft,
           isApproved: editingUser.isApproved 
         })
       });
       if (!res.ok) throw new Error("Update failed");
       
-      setUsers(prev => prev.map(u => u.id === editingUser.id ? { ...u, company: editCompany, role: editRole, firstName: editFirstName, lastName: editLastName } : u));
+      setUsers(prev => prev.map(u => u.id === editingUser.id ? { ...u, company: editCompany, role: editRole, firstName: editFirstName, lastName: editLastName, copilotPromptsLeft: editPromptsLeft } : u));
       setEditingUser(null);
     } catch (error) {
       alert("Error updating user details.");
@@ -284,6 +286,7 @@ export default function AdminDashboard() {
                             setEditRole(user.role || 'Viewer'); 
                             setEditFirstName(user.firstName || ''); 
                             setEditLastName(user.lastName || ''); 
+                            setEditPromptsLeft(user.copilotPromptsLeft ?? 20);
                           }}
                           className="text-blue-400 hover:text-blue-300 transition-colors p-1"
                           title="Detailed Profile & Edit"
@@ -400,19 +403,23 @@ export default function AdminDashboard() {
                 </div>
               </div>
 
-              {/* Company & Role Fields */}
+              {/* Company, Role & Prompts Left Fields */}
               <div className="flex gap-4">
                 <div className="flex-1">
                   <label className="block text-xs font-medium text-slate-400 mb-1">Company Name</label>
                   <input type="text" required value={editCompany} onChange={(e) => setEditCompany(e.target.value)} className="w-full bg-[#0A0A0B] border border-white/10 rounded-lg px-4 py-2 text-sm text-white focus:border-blue-500 focus:outline-none transition-colors" />
                 </div>
-                <div className="w-1/3">
+                <div className="w-1/4">
                   <label className="block text-xs font-medium text-slate-400 mb-1">System Role</label>
                   <select value={editRole} onChange={(e) => setEditRole(e.target.value)} className="w-full bg-[#0A0A0B] border border-white/10 rounded-lg px-4 py-2 text-sm text-white focus:border-blue-500 focus:outline-none transition-colors cursor-pointer">
                     <option value="Viewer">Viewer</option>
                     <option value="Admin">Admin</option>
                     <option value="Owner">Owner</option>
                   </select>
+                </div>
+                <div className="w-1/4">
+                  <label className="block text-xs font-medium text-slate-400 mb-1">Prompts Left</label>
+                  <input type="number" min={0} value={editPromptsLeft} onChange={(e) => setEditPromptsLeft(Number(e.target.value))} className="w-full bg-[#0A0A0B] border border-white/10 rounded-lg px-3 py-2 text-sm text-white focus:border-purple-500 focus:outline-none transition-colors" />
                 </div>
               </div>
 

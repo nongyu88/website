@@ -110,7 +110,7 @@ export async function POST(request: Request) {
 // PUT: Update user (Approve, or Edit details)
 export async function PUT(request: Request) {
   try {
-    const { userId, isApproved, company, role, firstName, lastName, sendApprovalEmail } = await request.json();
+    const { userId, isApproved, company, role, firstName, lastName, copilotPromptsLeft, sendApprovalEmail } = await request.json();
 
     const updateData: any = {};
     if (typeof isApproved === "boolean") updateData.isApproved = isApproved;
@@ -118,6 +118,7 @@ export async function PUT(request: Request) {
     if (role !== undefined) updateData.role = role;
     if (firstName !== undefined) updateData.firstName = firstName;
     if (lastName !== undefined) updateData.lastName = lastName;
+    if (copilotPromptsLeft !== undefined) updateData.copilotPromptsLeft = Number(copilotPromptsLeft);
 
     const updatedUser = await prisma.user.update({
       where: { id: userId },
