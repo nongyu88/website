@@ -21,6 +21,7 @@ model User {
   email                  String   @unique
   password               String
   company                String?
+  copilotPromptsLeft     Int      @default(20)
   isApproved             Boolean  @default(false)
   createdAt              DateTime @default(now())
 
