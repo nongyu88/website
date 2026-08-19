@@ -1,6 +1,6 @@
 "use client"
 
-import { useEffect, useState } from "react"
+import { useEffect, useState, useRef } from "react"
 import Link from "next/link"
 import Image from "next/image"
 import { Button } from "@/components/ui/button"
@@ -8,8 +8,9 @@ import { Badge } from "@/components/ui/badge"
 import { 
   ShieldCheck, Zap, Droplet, ArrowUpRight, Settings,
   LogOut, Activity, Lock, Building2, User,
-  Sun, Moon, AlertTriangle, ServerCrash
+  Sun, Moon, AlertTriangle, ServerCrash, Bell, Check
 } from "lucide-react"
+import { getNotifications, markNotificationsAsRead, AppNotification } from "@/lib/notifications"
 import OnboardingWizard from "@/components/OnboardingWizard"
 // import SubscriptionPlans from "@/components/SubscriptionPlans" // <-- ADD THIS
 import { useTheme } from "next-themes";
@@ -37,8 +38,48 @@ interface UserData {
 export default function DashboardPage() {
   const [user, setUser] = useState<UserData | null>(null)
   const [loading, setLoading] = useState(true)
+
+  // --- DYNAMIC NOTIFICATION STATE ---
+  const [showNotifications, setShowNotifications] = useState(false)
+  const [notifications, setNotifications] = useState<AppNotification[]>([])
+  const dropdownRef = useRef<HTMLDivElement>(null)
   
   const { theme, setTheme } = useTheme();
+
+  // Close notifications popover when clicking outside
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (dropdownRef.current && !dropdownRef.current.contains(event.target as Node)) {
+        setShowNotifications(false)
+      }
+    }
+
+    if (showNotifications) {
+      document.addEventListener("mousedown", handleClickOutside)
+    }
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutside)
+    }
+  }, [showNotifications])
+
+  useEffect(() => {
+    if (user?.email) {
+      // Load real notifications from localStorage
+      const userNotifs = getNotifications(user.email)
+      setNotifications(userNotifs)
+    }
+  }, [user?.email])
+
+  const unreadCount = notifications.filter(n => !n.read).length
+
+  const handleOpenNotifications = () => {
+    const nextState = !showNotifications
+    setShowNotifications(nextState)
+    if (user?.email && nextState) {
+      markNotificationsAsRead(user.email)
+      setNotifications(prev => prev.map(n => ({ ...n, read: true })))
+    }
+  }
 
   const toggleTheme = () => {
     setTheme(theme === "dark" ? "light" : "dark");
@@ -130,6 +171,8 @@ export default function DashboardPage() {
     return ind ? ind.toUpperCase() : 'GRID - TRANSMISSION'
   }
 
+    // (Static array removed in favor of dynamic localStorage state)
+
   // Helper to guarantee we find the token
   const getRobustToken = () => {
     let token = localStorage.getItem("kraftgene_token");
@@ -205,10 +248,62 @@ export default function DashboardPage() {
               {theme === "dark" ? <Sun className="w-4 h-4 text-slate-400" /> : <Moon className="w-4 h-4 text-slate-600" />}
             </button>
 
-            {/* --- NEW: Settings Link --- */}
+            {/* --- Settings Link --- */}
             <Link href="/dashboard/settings" className="p-2 rounded-full text-slate-400 hover:text-slate-900 dark:hover:text-white hover:bg-slate-200 dark:hover:bg-white/10 transition-colors">
                 <Settings className="w-4 h-4" />
             </Link>
+
+            {/* ── DYNAMIC NOTIFICATION ICON & DROPDOWN ── */}
+            <div className="relative" ref={dropdownRef}>
+              <button
+                onClick={handleOpenNotifications}
+                className="p-2 rounded-full text-slate-400 hover:text-slate-900 dark:hover:text-white hover:bg-slate-200 dark:hover:bg-white/10 transition-colors relative"
+                aria-label="View notifications"
+              >
+                <Bell className="w-4 h-4" />
+                {unreadCount > 0 && (
+                  <span className="absolute top-1 right-1 w-2 h-2 bg-emerald-500 rounded-full ring-2 ring-white dark:ring-black animate-pulse" />
+                )}
+              </button>
+
+              {/* Notification Popover Menu */}
+              {showNotifications && (
+                <div className="absolute right-0 mt-3 w-80 bg-white dark:bg-slate-900 border border-slate-200 dark:border-white/10 rounded-2xl shadow-2xl p-4 z-50 transition-all text-xs">
+                  <div className="pb-3 border-b border-slate-200 dark:border-white/10 mb-3">
+                    <span className="font-bold text-slate-900 dark:text-white text-sm">Customer Notifications</span>
+                  </div>
+
+                  <div className="space-y-3 max-h-64 overflow-y-auto">
+                    {notifications.length === 0 ? (
+                      <div className="py-6 text-center text-slate-400 italic">
+                        No notifications yet.
+                      </div>
+                    ) : (
+                      notifications.map((n) => (
+                        <div key={n.id} className="p-2.5 rounded-xl bg-slate-50 dark:bg-white/5 border border-slate-200 dark:border-white/5 flex items-start space-x-2.5">
+                          <div className="p-1 rounded-full bg-emerald-500/10 text-emerald-500 shrink-0 mt-0.5">
+                            <Check className="w-3 h-3" />
+                          </div>
+                          <div className="flex-1">
+                            <div className="flex items-center justify-between">
+                              <span className="font-semibold text-slate-900 dark:text-white">{n.title}</span>
+                              <span className="text-[10px] text-slate-400">{n.time}</span>
+                            </div>
+                            <p className="text-slate-500 dark:text-slate-400 mt-0.5 leading-relaxed">{n.message}</p>
+                          </div>
+                        </div>
+                      ))
+                    )}
+                  </div>
+
+                  <div className="pt-3 border-t border-slate-200 dark:border-white/10 mt-3 text-center">
+                    <Link href="/dashboard/settings/communications" onClick={() => setShowNotifications(false)} className="text-emerald-600 dark:text-emerald-400 font-bold hover:underline">
+                      Manage Notification Preferences →
+                    </Link>
+                  </div>
+                </div>
+              )}
+            </div>
 
             {/* --- Industry Standard Security Audit: Last Active Timestamp --- */}
             <div className="hidden xl:flex flex-col text-right mr-1">

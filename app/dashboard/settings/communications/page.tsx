@@ -7,33 +7,69 @@ import { ArrowLeft } from "lucide-react"
 export default function CommunicationsPage() {
   const [isDarkMode, setIsDarkMode] = useState(true)
   const [activeTab, setActiveTab] = useState("account")
+  const [userEmail, setUserEmail] = useState("")
+  
+  // State for all dynamic preferences
+  const [prefs, setPrefs] = useState({
+    upload_data: true,
+    reports: true,
+    billing: true,
+    security: true,
+    profile: true,
+    team: true
+  })
 
   useEffect(() => {
     const savedTheme = localStorage.getItem("theme")
     if (savedTheme === "light") setIsDarkMode(false)
+
+    // Load active user and their specific preferences
+    const storedUser = localStorage.getItem("user")
+    if (storedUser) {
+      const email = JSON.parse(storedUser).email
+      setUserEmail(email)
+      const storedPrefs = localStorage.getItem(`prefs_${email}`)
+      if (storedPrefs) {
+        setPrefs({ ...prefs, ...JSON.parse(storedPrefs) })
+      }
+    }
   }, [])
 
+  // Toggle switch and save instantly to localStorage
+  const togglePref = (key: keyof typeof prefs) => {
+    const newPrefs = { ...prefs, [key]: !prefs[key] }
+    setPrefs(newPrefs)
+    if (userEmail) {
+      localStorage.setItem(`prefs_${userEmail}`, JSON.stringify(newPrefs))
+    }
+  }
+
   const tabs = [
-    { id: "account", label: "Account" },
-    { id: "transactions", label: "Transactions and Balances" },
-    { id: "api", label: "API" },
-    { id: "connected", label: "Connected accounts" },
+    { id: "account", label: "Account Notifications" },
+    { id: "sms", label: "SMS Alerts (Coming Soon)" },
+    { id: "push", label: "Push Alerts (Coming Soon)" },
   ]
 
   const notificationGroups = [
     {
-      title: "Account risk and compliance",
+      title: "Data Services & Reports",
       items: [
+        { key: "upload_data", label: "Flight-data & Telemetry Uploads" },
+        { key: "reports", label: "Automated Report Generation" },
       ]
     },
     {
-      title: "Account updates",
+      title: "Account & Subscriptions",
       items: [
+        { key: "profile", label: "Personal & Business Profile Updates" },
+        { key: "billing", label: "Subscription & Billing Updates" },
       ]
     },
     {
-      title: "Team management",
+      title: "Security & Team",
       items: [
+        { key: "security", label: "Security & Password Alerts" },
+        { key: "team", label: "Team Management & Invitations" },
       ]
     }
   ]
@@ -86,10 +122,15 @@ export default function CommunicationsPage() {
                   <div className="border-t border-slate-200 dark:border-white/10">
                     {group.items.map((item, iIdx) => (
                       <label key={iIdx} className="flex justify-between items-center py-3 border-b border-slate-100 dark:border-white/5 hover:bg-slate-100 dark:hover:bg-white/[0.02] px-2 transition-colors cursor-pointer">
-                        <span className="text-[13px] font-semibold text-slate-700 dark:text-slate-300 select-none">{item}</span>
+                        <span className="text-[13px] font-semibold text-slate-700 dark:text-slate-300 select-none">{item.label}</span>
                         <div className="flex space-x-6">
                           <div className="w-8 flex justify-center">
-                            <input type="checkbox" defaultChecked className="w-4 h-4 rounded border-slate-300 dark:border-white/20 cursor-pointer accent-purple-600 dark:accent-purple-500" />
+                            <input 
+                              type="checkbox" 
+                              checked={prefs[item.key as keyof typeof prefs]}
+                              onChange={() => togglePref(item.key as keyof typeof prefs)}
+                              className="w-4 h-4 rounded border-slate-300 dark:border-white/20 cursor-pointer accent-purple-600 dark:accent-purple-500" 
+                            />
                           </div>
                           <div className="w-8 flex justify-center">
                             <input type="checkbox" disabled className="w-4 h-4 rounded opacity-40 cursor-not-allowed" />

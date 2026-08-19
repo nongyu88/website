@@ -4,6 +4,7 @@ import { useEffect, useState, useRef } from "react"
 import Link from "next/link"
 import { ArrowLeft, Save, Building, MapPin, Briefcase, User, Globe, Mail, Bell, Camera, ShieldAlert } from "lucide-react"
 import { Button } from "@/components/ui/button"
+import { addNotification } from "@/lib/notifications"
 
 export default function ProfileSettingsPage() {
   const [loading, setLoading] = useState(false)
@@ -102,6 +103,7 @@ const handleImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
       if (response.ok) {
         // 4. Swap the local preview URL for the permanent Azure URL!
         setAvatarUrl(data.url);
+        addNotification(email, "Avatar Updated", "Your profile picture was successfully uploaded.");
       } else {
         setErrorMsg(data.error || "Failed to upload image to cloud storage.");
       }
@@ -133,6 +135,8 @@ const handleImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
 
       const storedUser = JSON.parse(localStorage.getItem("user") || "{}")
       localStorage.setItem("user", JSON.stringify({ ...storedUser, ...data.user }))
+
+      addNotification(email, "Profile Updated", "Your personal information and preferences were successfully saved.");
 
       setSuccessMsg("Settings saved successfully.")
       setTimeout(() => setSuccessMsg(""), 3000)

@@ -2,9 +2,11 @@
 
 import { useState, useEffect } from "react"
 import Link from "next/link"
+import { useRouter, useSearchParams } from "next/navigation"
 import { ArrowLeft, Check, Sparkles } from "lucide-react"
 import { Button } from "@/components/ui/button"
-import { Suspense } from "react";
+import { Suspense } from "react"
+import { addNotification } from "@/lib/notifications"
 
 // NEW: Define the strict object structure matching our database
 interface ActivePlanData {
@@ -15,8 +17,35 @@ interface ActivePlanData {
 }
 
 function PlansContent() {
+  const router = useRouter()
+  const searchParams = useSearchParams()
   const [isDarkMode, setIsDarkMode] = useState(true)
   const [billingCycle, setBillingCycle] = useState<"monthly" | "annually">("annually")
+
+  // Listen for return redirects from Stripe Checkout
+  useEffect(() => {
+    const success = searchParams.get("success")
+    const canceled = searchParams.get("canceled")
+    const userObj = JSON.parse(localStorage.getItem("user") || "{}")
+
+    if (success === "true" && userObj?.email) {
+      addNotification(
+        userObj.email,
+        "Subscription Active",
+        "Your payment was successful and your subscription is now active."
+      )
+      router.replace("/dashboard/settings/plans")
+    }
+
+    if (canceled === "true" && userObj?.email) {
+      addNotification(
+        userObj.email,
+        "Checkout Canceled",
+        "Your subscription checkout process was canceled."
+      )
+      router.replace("/dashboard/settings/plans")
+    }
+  }, [searchParams, router])
   const [addonBillingCycle, setAddonBillingCycle] = useState<"monthly" | "annually">("annually")
   const [selectedPlan, setSelectedPlan] = useState<string>("")
   const [checkoutLoading, setCheckoutLoading] = useState<string>("")

@@ -12,6 +12,7 @@ import {
 } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
+import { addNotification } from "@/lib/notifications"
 
 export default function DataServicesPage() {
   const [user, setUser] = useState<any>(null)
@@ -79,6 +80,15 @@ export default function DataServicesPage() {
           },
           ...prev,
         ]);
+
+        const prefs = JSON.parse(localStorage.getItem(`prefs_${user?.email}`) || "{}");
+        if (prefs.upload_data !== false && user?.email) {
+          addNotification(
+            user.email,
+            "Telemetry Uploaded",
+            `Successfully uploaded flight archive to Data Services.`
+          );
+        }
       }
 
       setIsUavUploadModalOpen(false);
@@ -270,6 +280,15 @@ export default function DataServicesPage() {
     setReports((prev) => [newReport, ...prev])
     setIsReportGenerating(false)
     setIsReportModalOpen(false)
+
+    const prefs = JSON.parse(localStorage.getItem(`prefs_${user?.email}`) || "{}");
+    if (prefs.reports !== false && user?.email) {
+      addNotification(
+        user.email,
+        "Report Generated",
+        `Your infrastructure analysis report (${newId}) is ready to view.`
+      );
+    }
 
     // Auto-trigger PDF download for the newly created report
     handleDownloadPDF(newReport)

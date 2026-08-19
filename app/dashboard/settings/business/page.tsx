@@ -4,6 +4,7 @@ import { useState, useEffect, useRef } from "react"
 import Link from "next/link"
 import { ArrowLeft, Save, Building, MapPin, Briefcase, Globe, Users, FileText, Camera, UploadCloud } from "lucide-react"
 import { Button } from "@/components/ui/button"
+import { addNotification } from "@/lib/notifications"
 
 export default function BusinessSettingsPage() {
   const [loading, setLoading] = useState(false)
@@ -96,10 +97,12 @@ export default function BusinessSettingsPage() {
         const storedUser = localStorage.getItem("user")
         if (storedUser) {
           const parsed = JSON.parse(storedUser)
-          localStorage.setItem("user", JSON.stringify({ ...parsed, industry }))
-        }
-        
-        setSuccessMsg("Business settings saved successfully.")
+        localStorage.setItem("user", JSON.stringify({ ...parsed, industry }))
+      }
+      
+      addNotification(userEmail, "Enterprise Information Updated", "Your business details have been successfully saved.");
+
+      setSuccessMsg("Business settings saved successfully.")
         setTimeout(() => setSuccessMsg(""), 3000)
     } catch (error) {
       alert("Error saving business details.")

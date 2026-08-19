@@ -4,6 +4,7 @@ import { useState, useEffect } from "react"
 import Link from "next/link"
 import { ArrowLeft, Shield, Key, Users, UserPlus, Lock, X } from "lucide-react"
 import { Button } from "@/components/ui/button"
+import { addNotification } from "@/lib/notifications"
 
 export default function SecuritySettingsPage() {
   const [userEmail, setUserEmail] = useState("")
@@ -145,6 +146,7 @@ const handleRoleChange = async (targetUserId: string, newRole: string) => {
     setTeamMembers(prev => prev.map(member => 
       member.id === targetUserId ? { ...member, role: newRole } : member
     ));
+    addNotification(userEmail, "Team Role Updated", `Successfully changed team member's role to ${newRole}.`);
   } catch (error) {
     alert("Error updating role. You might not have permission.");
   }
@@ -183,6 +185,7 @@ const confirmRemoveMember = async () => {
     
     setTeamMembers(prev => prev.filter(m => m.email !== memberToRemove));
     setIsRemoveModalOpen(false);
+    addNotification(userEmail, "Team Member Removed", `Successfully removed ${memberToRemove} from the organization.`);
     setMemberToRemove(null);
   } catch (error) {
     alert("Error removing user. You may not have permission.");
@@ -203,6 +206,8 @@ const confirmRemoveMember = async () => {
       const data = await res.json()
 
       if (!res.ok) throw new Error(data.error)
+      
+      addNotification(userEmail, "Security Alert", "Your account password was successfully changed.");
       
       setPasswordMsg({ type: "success", text: "Password updated successfully!" })
       setTimeout(() => {
@@ -239,6 +244,8 @@ const confirmRemoveMember = async () => {
       if (!response.ok) {
         throw new Error(data.error || "Failed to send invitation.")
       }
+
+      addNotification(userEmail, "Team Invitation Sent", `An invitation was sent to ${inviteEmail} as ${inviteRole}.`);
 
       setInviteMsg({ type: "success", text: `Invitation sent to ${inviteEmail}!` })
       
@@ -535,6 +542,7 @@ const confirmRemoveMember = async () => {
                   if (!res.ok) throw new Error(data.error);
 
                   setIs2FAEnabled(true);
+                  addNotification(userEmail, "2FA Enabled", "Two-Factor Authentication has been successfully enabled on your account.");
                   setTwoFactorMsg({ type: "success", text: "2FA successfully enabled!" });
                   setTimeout(() => {
                     setIs2FAModalOpen(false);
@@ -589,10 +597,11 @@ const confirmRemoveMember = async () => {
                         method: 'PUT',
                         headers: { 'Content-Type': 'application/json' },
                         body: JSON.stringify({ email: userEmail, isTwoFactorEnabled: false })
-                      });
-                      setIs2FAEnabled(false);
-                      setIsDisable2FAModalOpen(false);
-                    } catch (error) {
+                    });
+                    setIs2FAEnabled(false);
+                    setIsDisable2FAModalOpen(false);
+                    addNotification(userEmail, "2FA Disabled", "Two-Factor Authentication was disabled. Your account is now less secure.");
+                  } catch (error) {
                       console.error("Failed to disable 2FA", error);
                     } finally {
                       setTwoFactorLoading(false);
