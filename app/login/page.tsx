@@ -27,6 +27,9 @@ function AuthForm() {
   // --- NEW: OTP STATE ---
   const [isVerifyingOtp, setIsVerifyingOtp] = useState(false)
   const [otp, setOtp] = useState("")
+  
+  // --- NEW: FORGOT PASSWORD STATE ---
+  const [isForgotPassword, setIsForgotPassword] = useState(false)
 
   const router = useRouter();
 
@@ -160,6 +163,35 @@ function AuthForm() {
     }
   }
 
+// --- NEW: HANDLE FORGOT PASSWORD ---
+const handleForgotPassword = async (e: React.FormEvent) => {
+  e.preventDefault()
+  setError("")
+  setSuccess("")
+  setLoading(true)
+
+  try {
+    const res = await fetch("/api/auth/forgot-password", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ email }),
+    })
+
+    const isJson = res.headers.get("content-type")?.includes("application/json")
+    const data = isJson ? await res.json() : null
+
+    if (!res.ok) {
+      throw new Error(data?.error || "Failed to send reset link.")
+    }
+
+    setSuccess("If that email exists in our system, we have sent password reset instructions.")
+  } catch (err: any) {
+    setError(err.message)
+  } finally {
+    setLoading(false)
+  }
+}
+
 // --- NEW: HANDLE OTP SUBMISSION ---
 const handleVerifyOtp = async (e: React.FormEvent) => {
   e.preventDefault()
@@ -216,10 +248,12 @@ return (
         </div>
 
         <h2 className="text-2xl font-bold text-center mb-2">
-          {isRegistering ? "Request Enterprise Access" : "Client Portal Login"}
+          {isForgotPassword ? "Reset Password" : isRegistering ? "Request Enterprise Access" : "Client Portal Login"}
         </h2>
         <p className="text-slate-400 text-xs text-center mb-8">
-          {isRegistering 
+          {isForgotPassword 
+            ? "Enter your enterprise email to receive reset instructions."
+            : isRegistering 
             ? "Register your enterprise credentials to access digital twins." 
             : "Sign in with your registered enterprise email."}
         </p>
@@ -237,7 +271,7 @@ return (
         )}
 
 {/* Form */}
-<form onSubmit={isVerifyingOtp ? handleVerifyOtp : (isRegistering ? handleRegister : handleLogin)} className="space-y-4">
+<form onSubmit={isForgotPassword ? handleForgotPassword : isVerifyingOtp ? handleVerifyOtp : (isRegistering ? handleRegister : handleLogin)} className="space-y-4">
           
           {requiresTwoFactor ? (
             <div>
@@ -298,33 +332,49 @@ return (
                 />
               </div>
 
-              <div>
-                <label className="block text-xs font-medium text-slate-400 mb-1.5">Password</label>
-                <div className="relative">
-                  <input
-                    type={showPassword ? "text" : "password"}
-                    value={password}
-                    onChange={(e) => setPassword(e.target.value)}
-                    disabled={loading}
-                    placeholder="••••••••••••"
-                    // Added pr-10 to ensure the text doesn't hide behind the icon
-                    className="w-full bg-slate-50 dark:bg-slate-950 border border-slate-300 dark:border-slate-800 rounded-xl px-4 py-3 pr-10 text-sm text-slate-900 dark:text-white focus:outline-none focus:border-emerald-500 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
-                    required
-                  />
-                  <button
-                    type="button"
-                    onClick={() => setShowPassword(!showPassword)}
-                    className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-emerald-500 transition-colors"
-                    aria-label={showPassword ? "Hide password" : "Show password"}
-                  >
-                    {showPassword ? (
-                      <EyeOff className="w-5 h-5" />
-                    ) : (
-                      <Eye className="w-5 h-5" />
+              {!isForgotPassword && (
+                <div>
+                  <div className="flex justify-between items-center mb-1.5">
+                    <label className="block text-xs font-medium text-slate-400">Password</label>
+                    {!isRegistering && (
+                      <button 
+                        type="button" 
+                        onClick={() => {
+                          setIsForgotPassword(true)
+                          setError("")
+                          setSuccess("")
+                        }}
+                        className="text-xs text-emerald-500 hover:text-emerald-400 transition-colors"
+                      >
+                        Forgot password?
+                      </button>
                     )}
-                  </button>
+                  </div>
+                  <div className="relative">
+                    <input
+                      type={showPassword ? "text" : "password"}
+                      value={password}
+                      onChange={(e) => setPassword(e.target.value)}
+                      disabled={loading}
+                      placeholder="••••••••••••"
+                      className="w-full bg-slate-50 dark:bg-slate-950 border border-slate-300 dark:border-slate-800 rounded-xl px-4 py-3 pr-10 text-sm text-slate-900 dark:text-white focus:outline-none focus:border-emerald-500 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                      required
+                    />
+                    <button
+                      type="button"
+                      onClick={() => setShowPassword(!showPassword)}
+                      className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-emerald-500 transition-colors"
+                      aria-label={showPassword ? "Hide password" : "Show password"}
+                    >
+                      {showPassword ? (
+                        <EyeOff className="w-5 h-5" />
+                      ) : (
+                        <Eye className="w-5 h-5" />
+                      )}
+                    </button>
+                  </div>
                 </div>
-              </div>
+              )}
             </>
           )}
 
@@ -333,25 +383,41 @@ return (
             disabled={loading}
             className="w-full bg-emerald-600 hover:bg-emerald-500 text-white h-12 rounded-xl font-bold transition-all shadow-lg shadow-emerald-900/30 mt-2"
           >
-            {loading ? "Processing..." : requiresTwoFactor ? "Verify 2FA" : isVerifyingOtp ? "Verify Email" : isRegistering ? "Register Account" : "Secure Login"}
+            {loading ? "Processing..." : isForgotPassword ? "Send Reset Link" : requiresTwoFactor ? "Verify 2FA" : isVerifyingOtp ? "Verify Email" : isRegistering ? "Register Account" : "Secure Login"}
           </Button>
         </form>
 
         {/* Toggle between Login and Register */}
         <div className="mt-8 pt-6 border-t border-slate-800 text-center">
           <p className="text-xs text-slate-400">
-            {isRegistering ? "Already have an account?" : "Don't have an account yet?"}{" "}
-            <button
-              type="button"
-              onClick={() => {
-                setIsRegistering(!isRegistering)
-                setError("")
-                setSuccess("")
-              }}
-              className="text-emerald-400 hover:underline font-semibold ml-1"
-            >
-              {isRegistering ? "Sign In" : "Register Here"}
-            </button>
+            {isForgotPassword ? (
+              <button
+                type="button"
+                onClick={() => {
+                  setIsForgotPassword(false)
+                  setError("")
+                  setSuccess("")
+                }}
+                className="text-emerald-400 hover:underline font-semibold"
+              >
+                ← Back to Login
+              </button>
+            ) : (
+              <>
+                {isRegistering ? "Already have an account?" : "Don't have an account yet?"}{" "}
+                <button
+                  type="button"
+                  onClick={() => {
+                    setIsRegistering(!isRegistering)
+                    setError("")
+                    setSuccess("")
+                  }}
+                  className="text-emerald-400 hover:underline font-semibold ml-1"
+                >
+                  {isRegistering ? "Sign In" : "Register Here"}
+                </button>
+              </>
+            )}
           </p>
         </div>
 

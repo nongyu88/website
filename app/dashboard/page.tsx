@@ -10,7 +10,7 @@ import {
   LogOut, Activity, Lock, Building2, User,
   Sun, Moon, AlertTriangle, ServerCrash, Bell, Check
 } from "lucide-react"
-import { getNotifications, markNotificationsAsRead, AppNotification } from "@/lib/notifications"
+import { getNotifications, markNotificationsAsRead, AppNotification, clearNotifications } from "@/lib/notifications"
 import OnboardingWizard from "@/components/OnboardingWizard"
 // import SubscriptionPlans from "@/components/SubscriptionPlans" // <-- ADD THIS
 import { useTheme } from "next-themes";
@@ -269,8 +269,21 @@ export default function DashboardPage() {
               {/* Notification Popover Menu */}
               {showNotifications && (
                 <div className="absolute right-0 mt-3 w-80 bg-white dark:bg-slate-900 border border-slate-200 dark:border-white/10 rounded-2xl shadow-2xl p-4 z-50 transition-all text-xs">
-                  <div className="pb-3 border-b border-slate-200 dark:border-white/10 mb-3">
+                  <div className="flex items-center justify-between pb-3 border-b border-slate-200 dark:border-white/10 mb-3">
                     <span className="font-bold text-slate-900 dark:text-white text-sm">Customer Notifications</span>
+                    {notifications.length > 0 && (
+                      <button
+                        onClick={() => {
+                          if (user?.email) {
+                            clearNotifications(user.email)
+                            setNotifications([])
+                          }
+                        }}
+                        className="text-[11px] font-semibold text-red-500 hover:text-red-400 transition-colors"
+                      >
+                        Clear All
+                      </button>
+                    )}
                   </div>
 
                   <div className="space-y-3 max-h-64 overflow-y-auto">

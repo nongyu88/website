@@ -16,6 +16,11 @@ export interface AppNotification {
       return []
     }
   }
+
+  export const clearNotifications = (email: string) => {
+    if (typeof window === "undefined" || !email) return
+    localStorage.removeItem(`notifications_${email}`)
+  }
   
   // Add a new notification
   export const addNotification = (email: string, title: string, message: string) => {
