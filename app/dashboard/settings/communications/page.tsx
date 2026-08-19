@@ -18,7 +18,6 @@ export default function CommunicationsPage() {
     { id: "transactions", label: "Transactions and Balances" },
     { id: "api", label: "API" },
     { id: "connected", label: "Connected accounts" },
-    { id: "stripe", label: "Stripe updates" },
   ]
 
   const notificationGroups = [

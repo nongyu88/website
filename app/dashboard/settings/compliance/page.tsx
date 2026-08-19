@@ -28,12 +28,7 @@ export default function CompliancePage() {
           >
             My documents
           </button>
-          <button 
-            onClick={() => setActiveTab("stripe")}
-            className={`pb-3 transition-colors ${activeTab === "stripe" ? "text-purple-600 dark:text-purple-400 border-b-2 border-purple-600 dark:border-purple-500" : "text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white"}`}
-          >
-            Stripe documents
-          </button>
+          
           <button 
             onClick={() => setActiveTab("legacy")}
             className={`pb-3 transition-colors ${activeTab === "legacy" ? "text-purple-600 dark:text-purple-400 border-b-2 border-purple-600 dark:border-purple-500" : "text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white"}`}
