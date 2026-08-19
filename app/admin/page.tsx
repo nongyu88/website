@@ -1,7 +1,7 @@
 "use client"
 
 import { useState, useEffect } from "react"
-import { Shield, Trash2, Edit, CheckCircle, XCircle, X, UserPlus, Info, User as UserIcon, Search } from "lucide-react"
+import { Shield, Trash2, Edit, CheckCircle, XCircle, X, UserPlus, Info, User as UserIcon, Search, Eye, EyeOff } from "lucide-react"
 import AdminProgressController from "@/components/admin/AdminProgressController"
 
 export default function AdminDashboard() {
@@ -14,6 +14,8 @@ export default function AdminDashboard() {
   const [addPassword, setAddPassword] = useState("")
   const [addCompany, setAddCompany] = useState("")
   const [addRole, setAddRole] = useState("Owner")
+
+  const [showAddPassword, setShowAddPassword] = useState(false)
 
   // Edit / Detailed View Modal State
   const [editingUser, setEditingUser] = useState<any | null>(null)
@@ -331,7 +333,27 @@ export default function AdminDashboard() {
               </div>
               <div>
                 <label className="block text-xs font-medium text-slate-400 mb-1">Temporary Password</label>
-                <input type="password" required value={addPassword} onChange={(e) => setAddPassword(e.target.value)} className="w-full bg-[#0A0A0B] border border-white/10 rounded-lg px-4 py-2 text-sm text-white focus:border-emerald-500 focus:outline-none transition-colors" />
+                <div className="relative">
+                  <input 
+                    type={showAddPassword ? "text" : "password"} 
+                    required 
+                    value={addPassword} 
+                    onChange={(e) => setAddPassword(e.target.value)} 
+                    // Added pr-10 so text doesn't overlap the icon
+                    className="w-full bg-[#0A0A0B] border border-white/10 rounded-lg px-4 py-2 pr-10 text-sm text-white focus:border-emerald-500 focus:outline-none transition-colors" 
+                  />
+                  <button
+                    type="button"
+                    onClick={() => setShowAddPassword(!showAddPassword)}
+                    className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-500 hover:text-white transition-colors focus:outline-none"
+                  >
+                    {showAddPassword ? (
+                      <EyeOff className="w-4 h-4" />
+                    ) : (
+                      <Eye className="w-4 h-4" />
+                    )}
+                  </button>
+                </div>
               </div>
               <div>
                 <label className="block text-xs font-medium text-slate-400 mb-1">System Role</label>

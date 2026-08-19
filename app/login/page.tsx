@@ -2,7 +2,7 @@
 
 import { useState } from "react"
 import { Button } from "@/components/ui/button"
-import { ShieldCheck, Sun, Moon, X } from "lucide-react"
+import { ShieldCheck, Sun, Moon, X, Eye, EyeOff } from "lucide-react"
 import { useRouter } from "next/navigation";
 import { useEffect } from "react";
 import Link from 'next/link';
@@ -16,6 +16,8 @@ function AuthForm() {
   const [email, setEmail] = useState("")
   const [password, setPassword] = useState("")
   const [company, setCompany] = useState("")
+
+  const [showPassword, setShowPassword] = useState(false)
 
   // State Management
   const [error, setError] = useState("")
@@ -298,15 +300,30 @@ return (
 
               <div>
                 <label className="block text-xs font-medium text-slate-400 mb-1.5">Password</label>
-                <input
-                  type="password"
-                  value={password}
-                  onChange={(e) => setPassword(e.target.value)}
-                  disabled={loading}
-                  placeholder="••••••••••••"
-                  className="w-full bg-slate-50 dark:bg-slate-950 border border-slate-300 dark:border-slate-800 rounded-xl px-4 py-3 text-sm text-slate-900 dark:text-white focus:outline-none focus:border-emerald-500 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
-                  required
-                />
+                <div className="relative">
+                  <input
+                    type={showPassword ? "text" : "password"}
+                    value={password}
+                    onChange={(e) => setPassword(e.target.value)}
+                    disabled={loading}
+                    placeholder="••••••••••••"
+                    // Added pr-10 to ensure the text doesn't hide behind the icon
+                    className="w-full bg-slate-50 dark:bg-slate-950 border border-slate-300 dark:border-slate-800 rounded-xl px-4 py-3 pr-10 text-sm text-slate-900 dark:text-white focus:outline-none focus:border-emerald-500 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                    required
+                  />
+                  <button
+                    type="button"
+                    onClick={() => setShowPassword(!showPassword)}
+                    className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-emerald-500 transition-colors"
+                    aria-label={showPassword ? "Hide password" : "Show password"}
+                  >
+                    {showPassword ? (
+                      <EyeOff className="w-5 h-5" />
+                    ) : (
+                      <Eye className="w-5 h-5" />
+                    )}
+                  </button>
+                </div>
               </div>
             </>
           )}
