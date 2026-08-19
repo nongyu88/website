@@ -37,7 +37,8 @@ export async function POST(req: Request) {
     });
 
     // 4. Determine the base URL for the reset link
-    const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || 'http://localhost:3000';
+    const rawBaseUrl = process.env.NEXT_PUBLIC_BASE_URL || 'http://localhost:3000';
+    const baseUrl = rawBaseUrl.replace(/\/$/, ''); // Strips trailing slash to avoid //reset-password
     const resetLink = `${baseUrl}/reset-password?token=${resetToken}&email=${encodeURIComponent(email)}`;
 
     // 5. Send the email via Resend

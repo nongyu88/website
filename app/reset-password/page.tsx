@@ -1,6 +1,6 @@
 "use client"
 
-import { useState, Suspense } from "react"
+import { useState, useEffect, Suspense } from "react"
 import { useRouter, useSearchParams } from "next/navigation"
 import { ShieldCheck, Eye, EyeOff, X } from "lucide-react"
 import { Button } from "@/components/ui/button"
@@ -9,8 +9,10 @@ import Link from "next/link"
 function ResetPasswordForm() {
   const router = useRouter()
   const searchParams = useSearchParams()
-  const token = searchParams?.get('token')
-  const email = searchParams?.get('email')
+  
+  const [mounted, setMounted] = useState(false)
+  const [token, setToken] = useState<string | null>(null)
+  const [email, setEmail] = useState<string | null>(null)
 
   const [newPassword, setNewPassword] = useState("")
   const [confirmPassword, setConfirmPassword] = useState("")
@@ -19,6 +21,22 @@ function ResetPasswordForm() {
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState("")
   const [success, setSuccess] = useState("")
+
+  useEffect(() => {
+    setMounted(true)
+    if (searchParams) {
+      setToken(searchParams.get('token'))
+      setEmail(searchParams.get('email'))
+    }
+  }, [searchParams])
+
+  if (!mounted) {
+    return (
+      <div className="min-h-screen bg-slate-950 flex items-center justify-center text-slate-400 font-mono text-xs">
+        Initializing secure session...
+      </div>
+    )
+  }
 
   if (!token || !email) {
     return (
@@ -68,7 +86,7 @@ function ResetPasswordForm() {
       
       setTimeout(() => {
         router.push("/login")
-      }, 3000)
+      }, 2500)
 
     } catch (err: any) {
       setError(err.message)
