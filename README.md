@@ -1,143 +1,166 @@
-================================================================================
-ENERGYEMINENCE™ INDUSTRIAL DIGITAL TWIN PLATFORM - KRAFTGENE AI
-================================================================================
-README.txt
-Version: 2.0.0
-Release Date: 2026
+# Kraftgene AI Web Platform & Enterprise Customer Portal — kraftgeneai.ca
 
---------------------------------------------------------------------------------
-1. OVERVIEW
---------------------------------------------------------------------------------
-EnergyEminence™ by Kraftgene AI Inc. is an enterprise-grade AI Digital Twin 
-platform designed for real-time monitoring, state estimation, cascade 
-prediction, and automated closed-loop control across critical infrastructure:
+> **System:** Enterprise Web Platform & Customer Portal
+> **Production URL:** https://www.kraftgeneai.ca/
+> **Version:** 2.4.0 (2026 Edition)
+> **Publisher:** Kraftgene AI Inc. - Yu Nong
 
-- Grid Distribution Network (GDN): IEEE 118-bus distribution feeder twin with 
-  real-time active/reactive power balancing, micro-PMU telemetry, smart inverter 
-  Volt-VAR dispatches, and BESS storage control.
-- Grid Transmission Network (GTN): Multi-hop cascade failure detection and GNN-
-  driven transmission line overload prediction.
-- Oil & Gas Pipeline Twin: SCADA pressure/flow monitoring, leak detection, and 
-  Emergency Shutdown (ESD) valve isolation.
-- UAV Aerial Surveillance: Automated FLIR/Thermal & RGB optical drone feed analysis 
-  for wildfire, thermal anomaly, and structural hazard detection.
+---
 
---------------------------------------------------------------------------------
-2. ARCHITECTURE & TECH STACK
---------------------------------------------------------------------------------
-Frontend:
-  - Next.js / React (Tailwind CSS, Mapbox GL / 3D Topo visualizers)
-  - Web Speech API for native voice command input
-  - Dynamic auto-expanding chat UI, floating/draggable windows, text selection
+## 1. Executive Summary
 
-Backend & AI Engine:
-  - Python 3.11+ / FastAPI (Async REST API & WebSockets)
-  - PyTorch (Unified GDN Graph Neural Network Model)
-  - Redis Sliding Window Buffer (Rolling T=10 telemetry stream)
-  - Azure OpenAI Service (Fine-tuned GPT-4-1 Mini & GPT-4 Heavy models)
-  - Autonomous Tool Execution Engine (SCADA, micro-PMU, ESD dispatches)
+The Kraftgene AI Web Platform (https://www.kraftgeneai.ca/) serves as the central SaaS hub, authentication provider, customer portal, and API billing gateway for Kraftgene AI's Industrial Digital Twin platforms.
 
---------------------------------------------------------------------------------
-3. PROJECT REPOSITORY STRUCTURE
---------------------------------------------------------------------------------
-/
-├── frontend/                      # Web Client
-│   ├── src/
-│   │   ├── components/
-│   │   │   ├── AiCopilotWidget.jsx # AI Copilot Chat Interface
-│   │   │   ├── GridMap.jsx         # 3D / Mapbox Visualizer
-│   │   │   ├── GeographicView.jsx  # Topological/Geographic Views
-│   │   │   ├── NodePanel.jsx       # Real-time Telemetry Panel
-│   │   │   └── ...
-│   │   └── api.js                  # Frontend API Bridge
-│   └── package.json
-│
-├── backend/                       # Neural Engine & API Server
-│   ├── main.py / server.py        # FastAPI Server & WebSocket Engine
-│   ├── routes/
-│   │   └── ai.py                  # Copilot Chat & UAV Surveillance Endpoint
-│   ├── services/
-│   │   ├── gt_tools.py            # Transmission Grid Tools
-│   │   ├── pipeline_tools.py      # SCADA Pipeline Tools
-│   │   └── gdn_tools.py           # Distribution Micro-PMU Tools
-│   ├── models/                    # PyTorch GNN Architecture
-│   ├── control/                   # Closed-Loop GDN Controller
-│   └── requirements.txt
-│
-└── README.txt                     # Platform Documentation
+It bridges industrial operators with real-time neural simulation platforms (Grid Distribution, Grid Transmission, Oil & Gas Pipelines) and provides automated subscription management, API quota enforcement, team role management, and secure telemetry ingestion.
 
---------------------------------------------------------------------------------
-4. ENVIRONMENT CONFIGURATION (.env)
---------------------------------------------------------------------------------
-Set the following environment variables in your backend environment:
+---
 
-  AZURE_OPENAI_ENDPOINT=https://azure-open-ai-model-for-energyeminence.openai.azure.com/
-  AZURE_OPENAI_API_KEY=<YOUR_AZURE_OPENAI_KEY>
-  AZURE_OPENAI_API_VERSION=2025-04-01-preview
-  MINI_DEPLOYMENT=gpt-4-1-mini-2025-04-14-kraftgeneai
-  HEAVY_DEPLOYMENT=gpt-4-04-14-kraftgeneai
-  WEBSITE_API_URL=https://www.kraftgeneai.ca
-  JWT_SECRET=kraftgene_super_secret_key_2026_x89z!
-  GDN_ENV=prod  # Options: dev / prod
+## 2. Core Capabilities & Customer Portal Architecture
 
---------------------------------------------------------------------------------
-5. SETUP & LOCAL INSTALLATION
---------------------------------------------------------------------------------
-Backend Setup:
-  1. cd backend
-  2. python -m venv venv
-  3. source venv/bin/activate  (or venv\Scripts\activate on Windows)
-  4. pip install -r requirements.txt
-  5. uvicorn main:app --reload --host 0.0.0.0 --port 8000
+### 🔐 Authentication & Identity Management
+- **Multi-Factor Security:** Built-in 2FA (TOTP/SMS) verification, OTP validation, and email password reset workflows.
+- **Enterprise Session Guard:** SessionGuard React wrappers enforce JWT validation and role-based access control (RBAC).
+- **JWT Authorization:** Issues signed HS256 JWT tokens for microservice authentication across Copilot engines and Digital Twin backends.
 
-Frontend Setup:
-  1. cd frontend
-  2. npm install
-  3. npm run dev
+### 📊 Customer Portal (`/dashboard`)
+- **Digital Twin Command Center:** Unified launcher for Digital Twin platforms:
+  - `grid-distribution-platform`: IEEE 118-bus distribution feeder twin
+  - `grid-platform`: High-voltage transmission cascade simulation
+  - `pipeline-platform`: SCADA oil & gas hydraulic network twin
+- **Data & Professional Services:** On-demand data stream analytics and professional consulting request management.
+- **Organization & Team Hub:** Sub-account invitation system (`/api/team/invite`) and multi-user seat management.
 
-Authentication Note:
-  On localhost (127.0.0.1 / localhost), the frontend automatically uses a 
-  development bypass token (`dev_localhost_token`), enabling full tool 
-  testing without signing in. Production deployments enforce JWT token 
-  validation via kraftgeneai.ca.
+### 💳 Stripe Billing & Quota Engine
+- **Stripe Integration:** Native checkout session creation, webhook listeners, and customer self-serve billing portal (`/api/stripe/portal`).
+- **Copilot Prompt Quota Tracker:** Automated rate-limiting endpoint (`/api/copilot/quota`) tracking monthly prompt usage per customer tier before routing requests to Azure OpenAI deployments.
 
---------------------------------------------------------------------------------
-6. API ENDPOINTS & FUNCTION TOOLS
---------------------------------------------------------------------------------
-HTTP Endpoints:
-  - GET  /api/gdn/topology       : Returns static 118-bus layout & topology
-  - GET  /api/gdn/state          : Instant neural state estimation snapshot
-  - GET  /api/gdn/control        : Closed-loop active balancing control dispatches
-  - POST /api/telemetry/ingest   : Batch smart meter ping ingestion
-  - POST /api/copilot/chat       : Autonomous Copilot Assistant API
-  - POST /api/vision/surveillance: Silent UAV drone FLIR/optical frame analyzer
+### 🚁 Telemetry Ingestion & UAV Surveillance
+- **Batch Meter Ingestion:** High-throughput telemetry ingestion route (`/api/telemetry/ingest`).
+- **Automated Wildfire & UAV Uploads:** FLIR/Optical drone image report uploads (`/api/reports/automated-wildfire` & `/api/upload-uav`).
 
-WebSocket Endpoint:
-  - WS   /ws/grid                : Low-latency real-time state stream tick
+---
 
-Autonomous AI Tools Executed:
-  - get_bus_telemetry(bus_id)
-  - execute_gdn_control_dispatch(bus_id, q_mvar, bess_p_mw, tap_step)
-  - get_cascade_predictions()
-  - execute_transmission_dispatch(node_id, action, amount_mw)
-  - get_scada_telemetry(segment_id)
-  - execute_esd_valve_isolation(segment_id, valves_to_close)
+## 3. Project Directory Structure
 
---------------------------------------------------------------------------------
-7. COPYRIGHT & PROPRIETARY NOTICE
---------------------------------------------------------------------------------
-Copyright (c) 2026 Kraftgene AI Inc. All rights reserved.
+```
+WEBSITE/
+├── .azure-static-web-apps-*.yml   # Azure Static Web Apps CI/CD Deployment
+├── app/                           # Next.js App Router
+│   ├── admin/                     # System Administration Panel
+│   ├── api/                       # Enterprise REST API Routes
+│   │   ├── admin/                 # User Management, 2FA, Reset Controls
+│   │   ├── auth/                  # Login, Register, Session Authentication
+│   │   ├── checkout/              # Purchase Workflows
+│   │   ├── copilot/               # Prompt Quota Verification Engine
+│   │   ├── data-services/         # Data Analytics Endpoints
+│   │   ├── preferences/           # User UI Preferences
+│   │   ├── register/              # Customer Onboarding
+│   │   ├── reports/               # Wildfire & UAV Surveillance Processing
+│   │   ├── services/              # Custom Professional Service Requests
+│   │   ├── stripe/                # Checkout, Webhooks, Customer Billing Portal
+│   │   ├── team/                  # Organization & Seat Invitations
+│   │   ├── telemetry/             # Smart Meter & SCADA Ingest Route
+│   │   ├── upload-uav/            # Drone Imagery Ingestion
+│   │   └── user/                  # Business Profiles, Password, OTP, Documents
+│   ├── dashboard/                 # Secure Customer Portal
+│   │   ├── data-services/         # Data Service Modules
+│   │   ├── digital-twins/         # Digital Twin Launchpad
+│   │   ├── grid-distribution-platform/ # Distribution Feeder Portal
+│   │   ├── grid-platform/         # Transmission Grid Portal
+│   │   ├── pipeline-platform/     # Oil & Gas SCADA Portal
+│   │   ├── professional-services/ # Enterprise Support & Consulting
+│   │   └── settings/              # Account & Organization Settings
+│   ├── login/                     # Authentication View
+│   ├── globals.css                # Global Tailwind CSS Styles
+│   ├── layout.tsx                 # Root Web Layout
+│   └── page.tsx                   # Main Landing Page (kraftgeneai.ca)
+├── components/                    # Reusable React UI Components
+│   ├── admin/                     # Admin View Controls
+│   ├── ui/                        # UI Primitives
+│   ├── OnboardingWizard.jsx       # Customer Setup Wizard
+│   ├── SessionGuard.tsx           # Route Protection Guard
+│   ├── SubscriptionPlans.tsx      # Tier Pricing Table
+│   └── theme-provider.tsx         # Dark/Light Theme Manager
+├── hooks/                         # Custom React Hooks
+├── lib/                           # Core Library Wrappers
+│   ├── notifications.ts           # Email & SMS Gateway Integration
+│   ├── prisma.ts                  # Database ORM Client
+│   └── utils.ts                   # Helper Functions
+├── prisma/                        # Database Schema Definitions
+│   └── schema.prisma              # PostgreSQL / MySQL Entity Model
+└── package.json                   # Web Dependencies
+```
 
-This software, source code, neural network model weights, digital twin 
-architectures, and associated documentation are the exclusive proprietary 
-property of Kraftgene AI Inc. (https://www.kraftgeneai.ca).
+---
 
-UNAUTHORIZED COPYING, DECOMPILATION, REVERSE ENGINEERING, MODIFICATION, 
-DISTRIBUTION, OR REPRODUCTION OF THIS SOFTWARE, IN WHOLE OR IN PART, VIA ANY 
-MEDIUM, IS STRICTLY PROHIBITED WITHOUT EXPRESS WRITTEN CONSENT FROM 
-KRAFTGENE AI INC.
+## 4. Environment Configuration Template
 
-For licensing inquiries, enterprise deployment, or technical support:
-Website : https://www.kraftgeneai.ca
-Contact : customer@kraftgeneai.ca
-================================================================================
+Below is the required `.env` environment layout for deployment setup (all sensitive secret keys have been omitted for security):
+
+```env
+# Website & Application Configuration
+NEXT_PUBLIC_APP_URL=https://www.kraftgeneai.ca
+NODE_ENV=production
+
+# Database (Prisma ORM)
+DATABASE_URL=your_database_connection_string_here
+
+# JWT Authentication Secret
+JWT_SECRET=your_jwt_secret_key_here
+
+# Stripe Payment Gateway
+STRIPE_SECRET_KEY=your_stripe_secret_key_here
+STRIPE_WEBHOOK_SECRET=your_stripe_webhook_secret_here
+NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY=your_stripe_publishable_key_here
+
+# AI & Copilot Service Integrations
+COPILOT_BACKEND_URL=your_copilot_backend_url_here
+
+# Notification Services (Email / SMS)
+SMTP_HOST=your_smtp_host_here
+SMTP_PORT=587
+SMTP_USER=your_smtp_user_here
+SMTP_PASSWORD=your_smtp_password_here
+```
+
+---
+
+## 5. Build & Deployment Instructions
+
+### Local Development Setup
+```bash
+# 1. Install dependencies
+npm install
+
+# 2. Push database schema via Prisma
+npx prisma db push
+
+# 3. Start Next.js development server
+npm run dev
+```
+
+### Production Build
+```bash
+# Generate optimized production build
+npm run build
+
+# Start production server
+npm start
+```
+
+### Azure Static Web Apps CI/CD
+Deployments are automatically executed via GitHub Actions workflow targeting Azure Static Web Apps (`.github/workflows/azure-static-web-apps-*.yml`).
+
+---
+
+## 6. Copyright & Proprietary Notice
+
+**Copyright © 2026 Kraftgene AI Inc. All rights reserved.**
+
+This web platform, source code, dashboard components, API endpoints, and associated software architectures are the exclusive proprietary property of **Kraftgene AI Inc.** (https://www.kraftgeneai.ca/).
+
+*UNAUTHORIZED COPYING, DECOMPILATION, REVERSE ENGINEERING, MODIFICATION, DISTRIBUTION, OR REPRODUCTION OF THIS SOFTWARE, IN WHOLE OR IN PART, VIA ANY MEDIUM, IS STRICTLY PROHIBITED WITHOUT EXPRESS WRITTEN CONSENT FROM KRAFTGENE AI INC.*
+
+### Corporate Contacts
+- **Official Website:** https://www.kraftgeneai.ca/
+- **Customer Support & Enterprise Inquiries:** customer@kraftgeneai.ca
