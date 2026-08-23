@@ -203,7 +203,7 @@ export default function DashboardPage() {
       return;
     }
     
-    window.open(`https://www.energyeminence.xyz/?auth_token=${encodeURIComponent(token)}`, '_blank')
+    window.open(`https://www.pipeline.energyeminence.online/?auth_token=${encodeURIComponent(token)}`, '_blank')
   }
 
   if (loading) {
