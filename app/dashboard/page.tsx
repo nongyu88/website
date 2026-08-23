@@ -193,7 +193,7 @@ export default function DashboardPage() {
       alert("Authentication token missing. Please sign out and log back in to generate a secure session.");
       return;
     }
-    window.open(`https://www.energyeminence.online/?auth_token=${encodeURIComponent(token)}`, '_blank')
+    window.open(`https://www.gtn.energyeminence.online/?auth_token=${encodeURIComponent(token)}`, '_blank')
   }
 
   const handleLaunchPipeline = () => {
