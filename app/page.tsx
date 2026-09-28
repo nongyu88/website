@@ -1657,60 +1657,67 @@ export default function HomePage() {
       </section>
 
           {/* Bottom Row: Founders */}
-          <div id="team" className="pt-16 border-t border-slate-200 dark:border-white/10">
-            <div className="text-center mb-16">
-              <h2 className="text-3xl md:text-5xl font-bold text-slate-900 dark:text-white mb-6">
-                Meet Our Founders
-              </h2>
-              <p className="text-slate-600 dark:text-gray-400 max-w-2xl mx-auto text-lg">
-                A diverse group of experts in AI, robotics, and engineering dedicated to building resilient critical infrastructure.
-              </p>
-            </div>
+<div id="team" className="pt-16 border-t border-slate-200 dark:border-white/10">
+  <div className="text-center mb-16">
+    <h2 className="text-3xl md:text-5xl font-bold text-slate-900 dark:text-white mb-6">
+      Meet Our Founders
+    </h2>
+    <p className="text-slate-600 dark:text-gray-400 max-w-2xl mx-auto text-lg">
+      A diverse group of experts in AI, robotics, and engineering dedicated to building resilient critical infrastructure.
+    </p>
+  </div>
 
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-12 max-w-6xl mx-auto">
-              {[
-                {
-                  name: "Huy (Michel) Trinh",
-                  role: "Co-Founder, Digital Twins Engineer & Head of Technical Partnerships",
-                  image: "images/Huy.jfif",
-                  linkedin: "https://www.linkedin.com/in/huy-michel-trinh-masc-085905187/",
-                  bio: "Michel bridges physics-informed modeling with machine learning, leading the development of our high-performance Digital Twin architecture and spearheading strategic industry partnerships.",
-                },
-                {
-                  name: "Yu Nong (John)",
-                  role: "Co-Founder & CEO",
-                  image: "images/yu-nong-ceo.jpg",
-                  linkedin: "https://www.linkedin.com/in/nongyu/",
-                  bio: "John blends visionary leadership with expertise in ML, software engineering, and robotics to drive global infrastructure resilience.",
-                },
-                {
-                  name: "Yonghao Mai (Michael)",
-                  role: "Co-Founder & Chief AI Officer",
-                  image: "images/michael_mai.PNG",
-                  linkedin: "https://www.linkedin.com/in/michael-yong-hao-mai-78702234/",
-                  bio: "Michael has expertise in ML, full-stack architecture, and automation to build high-impact, market-ready platforms.",
-                },
-              ].map((member, index) => (
-                <a 
-                  key={index} 
-                  href={member.linkedin}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="group p-8 rounded-2xl bg-white dark:bg-white/5 border border-slate-200 dark:border-white/10 hover:border-emerald-400 dark:hover:border-emerald-500/50 shadow-sm dark:shadow-none transition-all duration-300 text-center block cursor-pointer"
-                >
-                  <div className="relative w-32 h-32 mx-auto mb-6">
-                    <div className="absolute inset-0 rounded-full bg-emerald-100 dark:bg-emerald-500/20 blur-lg group-hover:bg-emerald-200 dark:group-hover:bg-emerald-500/40 transition-all"></div>
-                    <div className="relative w-full h-full rounded-full border-2 border-emerald-200 dark:border-emerald-500/30 overflow-hidden">
-                      <img src={member.image} alt={member.name} className="object-cover w-full h-full" />
-                    </div>
-                  </div>
-                  <h3 className="text-xl font-bold text-slate-900 dark:text-white mb-1">{member.name}</h3>
-                  <p className="text-emerald-600 dark:text-emerald-500 text-sm font-medium mb-4">{member.role}</p>
-                  <p className="text-slate-600 dark:text-gray-400 text-sm leading-relaxed">{member.bio}</p>
-                </a>
-              ))}
-            </div>
+  <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8 max-w-7xl mx-auto">
+    {[
+      {
+        name: "Yu Nong (John)",
+        role: "Co-Founder & CEO",
+        image: "images/yu-nong-ceo.jpg",
+        linkedin: "https://www.linkedin.com/in/nongyu/",
+        bio: "John blends visionary leadership with expertise in ML, software engineering, and robotics to drive global infrastructure resilience.",
+      },
+      {
+        name: "Yonghao Mai (Michael)",
+        role: "Co-Founder & Chief AI Officer",
+        image: "images/michael_mai.PNG",
+        linkedin: "https://www.linkedin.com/in/michael-yong-hao-mai-78702234/",
+        bio: "Michael has expertise in ML, full-stack architecture, and automation to build high-impact, market-ready platforms.",
+      },
+      {
+        name: "Huy (Michel) Trinh",
+        role: "Co-Founder, Digital Twins Engineer & Head of Technical Partnerships",
+        image: "images/Huy.jfif",
+        linkedin: "https://www.linkedin.com/in/huy-michel-trinh-masc-085905187/",
+        bio: "Michel bridges physics-informed modeling with machine learning, leading the development of our high-performance Digital Twin architecture.",
+      },
+      {
+        name: "Jigar Patel",
+        role: "Co-Founder & Hardware-Embedded Engineer",
+        image: "images/Jigar.jfif",
+        linkedin: "https://www.linkedin.com/in/", // Insert Jigar's actual LinkedIn URL here
+        bio: "Jigar leads physical engineering and hardware integration, focusing on developing the Kraftgene Edge Pod and advancing on-device edge computing.",
+      },
+    ].map((member, index) => (
+      <a 
+        key={index} 
+        href={member.linkedin}
+        target="_blank"
+        rel="noopener noreferrer"
+        className="group p-6 rounded-2xl bg-white dark:bg-white/5 border border-slate-200 dark:border-white/10 hover:border-emerald-400 dark:hover:border-emerald-500/50 shadow-sm dark:shadow-none transition-all duration-300 text-center block cursor-pointer"
+      >
+        <div className="relative w-28 h-28 mx-auto mb-6">
+          <div className="absolute inset-0 rounded-full bg-emerald-100 dark:bg-emerald-500/20 blur-lg group-hover:bg-emerald-200 dark:group-hover:bg-emerald-500/40 transition-all"></div>
+          <div className="relative w-full h-full rounded-full border-2 border-emerald-200 dark:border-emerald-500/30 overflow-hidden">
+            <img src={member.image} alt={member.name} className="object-cover w-full h-full" />
           </div>
+        </div>
+        <h3 className="text-lg font-bold text-slate-900 dark:text-white mb-1">{member.name}</h3>
+        <p className="text-emerald-600 dark:text-emerald-500 text-xs font-medium mb-3 min-h-[32px] flex items-center justify-center">{member.role}</p>
+        <p className="text-slate-600 dark:text-gray-400 text-xs leading-relaxed">{member.bio}</p>
+      </a>
+    ))}
+  </div>
+</div>
 
         </div>
       </section>
