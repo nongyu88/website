@@ -1,7 +1,7 @@
 export const dynamic = 'force-dynamic';
 
 import { NextResponse } from 'next/server';
-import { BlobServiceClient } from '@azure/storage-blob';
+import { S3Client, PutObjectCommand } from '@aws-sdk/client-s3';
 
 export async function POST(request: Request) {
   try {
@@ -12,38 +12,44 @@ export async function POST(request: Request) {
       return NextResponse.json({ error: "No file received." }, { status: 400 });
     }
 
-    const connectionString = process.env.AZURE_STORAGE_CONNECTION_STRING;
-    const containerName = process.env.AZURE_STORAGE_CONTAINER_NAME || 'avatars';
+    const bucketName = process.env.S3_BUCKET_NAME;
+    const region = process.env.S3_REGION || 'us-east-1';
 
-    if (!connectionString) {
-      return NextResponse.json({ error: "Azure Storage Connection String is missing in .env" }, { status: 500 });
+    if (!bucketName) {
+      return NextResponse.json({ error: "S3_BUCKET_NAME is missing in .env" }, { status: 500 });
     }
+
+    const s3Client = new S3Client({
+      region,
+      credentials: {
+        accessKeyId: process.env.APP_AWS_ACCESS_KEY_ID || '',
+        secretAccessKey: process.env.APP_AWS_SECRET_ACCESS_KEY || '',
+      },
+    });
 
     // Convert file to Buffer
     const buffer = Buffer.from(await file.arrayBuffer());
 
-    // Connect to Azure Blob Service
-    const blobServiceClient = BlobServiceClient.fromConnectionString(connectionString);
-    const containerClient = blobServiceClient.getContainerClient(containerName);
-
-    // AUTO-CREATE CONTAINER WITH PUBLIC BLOB READ ACCESS IF MISSING
-    await containerClient.createIfNotExists({
-      access: 'blob' // Allows public URL reading for avatar images
-    });
-
     // Create unique filename
     const uniqueName = `${Date.now()}-${file.name.replace(/[^a-zA-Z0-9.-]/g, '_')}`;
-    const blockBlobClient = containerClient.getBlockBlobClient(uniqueName);
 
-    // Upload to Azure
-    await blockBlobClient.uploadData(buffer, {
-      blobHTTPHeaders: { blobContentType: file.type }
-    });
+    // Upload to Amazon S3
+    await s3Client.send(
+      new PutObjectCommand({
+        Bucket: bucketName,
+        Key: uniqueName,
+        Body: buffer,
+        ContentType: file.type,
+      })
+    );
 
-    return NextResponse.json({ url: blockBlobClient.url }, { status: 200 });
+    // Construct public S3 URL
+    const fileUrl = `https://${bucketName}.s3.${region}.amazonaws.com/${uniqueName}`;
+
+    return NextResponse.json({ url: fileUrl }, { status: 200 });
 
   } catch (error: any) {
-    console.error("Azure Upload Error:", error);
+    console.error("S3 Upload Error:", error);
     return NextResponse.json({ error: error.message || "Failed to upload image." }, { status: 500 });
   }
 }
