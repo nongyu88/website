@@ -3,10 +3,9 @@ import { PrismaMssql } from '@prisma/adapter-mssql';
 
 const globalForPrisma = global as unknown as { prisma: PrismaClient };
 
-// Provide a valid dummy SQL Server connection string during build time
 const connectionString =
   process.env.DATABASE_URL ||
-  'sqlserver://localhost:1433;database=dummy;user=sa;password=dummy;trustServerCertificate=true;';
+  'sqlserver://database-1.cafgq2amw3z4.us-east-1.rds.amazonaws.com:1433;database=kraftgene_db;user=admin;password=Sh19571854675;encrypt=true;trustServerCertificate=true';
 
 const adapter = new PrismaMssql(connectionString);
 
